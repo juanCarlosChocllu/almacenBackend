@@ -5,17 +5,18 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Area } from './schemas/area.schema';
 import { Model, Types } from 'mongoose';
 import { flag } from 'src/enums/flag.enum';
+import { ApiResponseI } from 'src/interface/httpRespuesta';
 
 @Injectable()
 export class AreasService {
   constructor(@InjectModel(Area.name) private readonly area:Model<Area>){}
- async  create(createAreaDto: CreateAreaDto) {
+ async  create(createAreaDto: CreateAreaDto):Promise<ApiResponseI> {
     const area = await this.area.exists({nombre:createAreaDto.nombre, flag:flag.nuevo})
     if(area){
        throw new ConflictException('El area ya existe')
     }
     await this.area.create(createAreaDto)
-    return  {status:HttpStatus.CREATED};
+    return  {status:HttpStatus.CREATED,message:'Area registrada'};
   }
 
   findAll() {

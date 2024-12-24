@@ -5,17 +5,18 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Categoria } from './schema/categoria.schema';
 import { Model, Types } from 'mongoose';
 import { flag } from 'src/enums/flag.enum';
-import { log } from 'console';
 
 @Injectable()
 export class CategoriasService {
   constructor(@InjectModel(Categoria.name) private readonly categoria:Model<Categoria>){}
 
   async create(createCategoriaDto: CreateCategoriaDto) {
+    createCategoriaDto.nombre = createCategoriaDto.nombre.toUpperCase()
     const categoria = await this.categoria.exists({nombre:createCategoriaDto.nombre})    
     if(categoria){
       throw new ConflictException('La categoria ya existe')
     }
+
     await this.categoria.create(createCategoriaDto)
     return {status:HttpStatus.CREATED};
   }
@@ -37,7 +38,7 @@ export class CategoriasService {
   }
 
   public async verificarCategoria(id:Types.ObjectId){
-    const categoria = await  this.categoria.exists({_id:new Types.ObjectId(id)})
+    const categoria = await  this.categoria.findOne({_id:new Types.ObjectId(id)})    
     if(!categoria){
       throw new NotFoundException('La categoria no existe')
     }

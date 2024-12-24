@@ -3,7 +3,7 @@ import { ProveedorEmpresaService } from './proveedor-empresa.service';
 import { CreateProveedorEmpresaDto } from './dto/create-proveedor-empresa.dto';
 import { UpdateProveedorEmpresaDto } from './dto/update-proveedor-empresa.dto';
 
-@Controller('proveedor-empresa')
+@Controller('proveedor/empresa')
 export class ProveedorEmpresaController {
   constructor(private readonly proveedorEmpresaService: ProveedorEmpresaService) {}
 

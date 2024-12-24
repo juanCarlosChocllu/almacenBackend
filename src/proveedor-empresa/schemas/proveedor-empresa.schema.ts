@@ -1,6 +1,7 @@
-import { Prop } from "@nestjs/mongoose"
+import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose"
 import { flag } from "src/enums/flag.enum"
 
+@Schema({collection:'ProveedorEmpresa'})
 export class ProveedorEmpresa {
    @Prop()
    nombre:string
@@ -32,3 +33,4 @@ export class ProveedorEmpresa {
 
 
 }
+export const proveedorEmpresaSchema:SchemaFactory= SchemaFactory.createForClass(ProveedorEmpresa)

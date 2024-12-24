@@ -1,11 +1,12 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose"
 import { Types } from "mongoose"
+import { flag } from "src/enums/flag.enum"
+import { tipoE } from "../enums/tipo.enum"
 
 @Schema({collection:'Stock'})
 export class Stock {
-
     @Prop()
-    imagen:string
+    codigo:string
 
     @Prop()
     cantidad:number
@@ -17,11 +18,18 @@ export class Stock {
     @Prop()
     total:number
 
+    
     @Prop()
-    fechaCompra:string
+    factura:string
+
+    @Prop({type:String , enum:tipoE} )
+    tipo:string
 
     @Prop()
-    fechaVencimiento:string
+    fechaCompra:Date
+
+    @Prop()
+    fechaVencimiento:Date
 
     @Prop({type:Types.ObjectId, ref:'AlmacenArea'})
     almacenArea:Types.ObjectId
@@ -33,6 +41,13 @@ export class Stock {
     @Prop({type:Date, default:Date.now()})
     fecha:Date
 
+
+ 
+    @Prop({type:String, enum:flag, default:flag.nuevo })
+    flag:flag
+
+
+    
 
 }
 

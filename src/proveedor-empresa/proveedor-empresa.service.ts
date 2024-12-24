@@ -1,15 +1,32 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateProveedorEmpresaDto } from './dto/create-proveedor-empresa.dto';
 import { UpdateProveedorEmpresaDto } from './dto/update-proveedor-empresa.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { ProveedorEmpresa } from './schemas/proveedor-empresa.schema';
+import { Model } from 'mongoose';
+import { ApiResponseI } from 'src/interface/httpRespuesta';
+import { flag } from 'src/enums/flag.enum';
 
 @Injectable()
 export class ProveedorEmpresaService {
-  create(createProveedorEmpresaDto: CreateProveedorEmpresaDto) {
-    return 'This action adds a new proveedorEmpresa';
+  constructor(
+    @InjectModel(ProveedorEmpresa.name) private readonly proveedorEmpresa:Model<ProveedorEmpresa>,
+  ){}
+
+
+  async create(createProveedorEmpresaDto: CreateProveedorEmpresaDto):Promise<ApiResponseI> {
+    console.log(createProveedorEmpresaDto);
+     
+    const nit:ProveedorEmpresa = await this.proveedorEmpresa.findOne({nit:createProveedorEmpresaDto.nit})
+    if(nit){
+      throw new ConflictException('El nit ya existe')
+    }
+    await this.proveedorEmpresa.create(createProveedorEmpresaDto)
+     return {status:HttpStatus.CREATED, message:'Proveedor registrado'};
   }
 
-  findAll() {
-    return `This action returns all proveedorEmpresa`;
+  findAll():Promise<ProveedorEmpresa[]> {
+    return this.proveedorEmpresa.find({flag:flag.nuevo});
   }
 
   findOne(id: number) {

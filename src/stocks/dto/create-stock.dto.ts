@@ -1,43 +1,26 @@
-import { IsDateString, IsMongoId, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator"
+import { IsArray, IsDateString, IsMongoId, IsNotEmpty, IsNumber, IsOptional, IsString, ValidateIf, ValidateNested } from "class-validator"
 import { Types } from "mongoose"
+import { DataStockDto } from "./data.stock.dto"
+import { Type } from "class-transformer"
+import { isvalidarDataTranferencia } from "../utils/validar.data.util"
 
 export class CreateStockDto {
 
-    @IsString()
-    @IsOptional()
-    imagen:string
-
-    @IsNumber()
+    @IsArray()
     @IsNotEmpty()
-    cantidad:number
-
-
-    @IsNumber()
-    @IsNotEmpty()
-    precio:number
-
-    @IsNumber()
-    total:number
-
-    @IsDateString()
-    fechaCompra:string
-
-    @IsDateString()
-    @IsOptional()
-    fechaVencimiento:string
-
-    @IsMongoId()
-    @IsNotEmpty()
-    almacenArea:Types.ObjectId
-
+    @isvalidarDataTranferencia()
+    data:DataStockDto[]
     
-    @IsMongoId()
-    @IsNotEmpty()
-    producto:Types.ObjectId
+    @ValidateIf((o) => !o.proveedorEmpresa)
+    @IsMongoId({ message: 'Debe seleccionar un proveedor persona válido' })
+    @IsNotEmpty({ message: 'Debe seleccionar un proveedor persona' })
+    proveedorPersona: Types.ObjectId;
+  
+    @ValidateIf((o) => !o.proveedorPersona)
+    @IsMongoId({ message: 'Debe seleccionar un proveedor empresa válido' })
+    @IsNotEmpty({ message: 'Debe seleccionar un proveedor empresa' })
+    proveedorEmpresa: Types.ObjectId;
 
-    @IsMongoId()
-    @IsNotEmpty()
-    proveedor:Types.ObjectId
 
    
 

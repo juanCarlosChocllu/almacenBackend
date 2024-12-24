@@ -1,29 +1,36 @@
-import { IsString } from "class-validator"
+import { IsEmail, IsNotEmpty, IsOptional, IsString } from "class-validator"
 
 export class CreateProveedorPersonaDto {
-    @IsString()
-    ci:string
+    @IsString({ message: 'La cédula de identidad (ci) debe ser una cadena de texto.' })
+    @IsNotEmpty({ message: 'La cédula de identidad (ci) es obligatoria.' })
+    ci: string;
 
-    @IsString()
-    nombres:string
+    @IsString({ message: 'El campo de nombres debe ser una cadena de texto.' })
+    @IsNotEmpty({ message: 'El nombre es obligatorio.' })
+    nombres: string;
 
-    @IsString()
-    apellidos:string
-    
-    @IsString()
-    nit:string
+    @IsString({ message: 'El campo de apellidos debe ser una cadena de texto.' })
+    @IsNotEmpty({ message: 'El apellido es obligatorio.' })
+    apellidos: string;
 
-        
-    @IsString()
-    correo:string
+    @IsString({ message: 'El campo NIT debe ser una cadena de texto.' })
+    @IsNotEmpty({ message: 'El NIT es obligatorio.' })
+    nit: string;
 
-        
-    @IsString()
-    ciudad:string
+    @IsString({ message: 'El correo debe ser una cadena de texto.' })
+    @IsEmail({}, { message: 'El correo electrónico proporcionado no es válido.' })
+    correo: string;
 
-    @IsString()
-    direccion:string
+    @IsString({ message: 'La ciudad debe ser una cadena de texto.' })
+    @IsOptional()
+    ciudad: string;
 
-    @IsString()
-    celular:string
+    @IsString({ message: 'La dirección debe ser una cadena de texto.' })
+    @IsOptional()
+    direccion: string;
+
+    @IsString({ message: 'El celular debe ser una cadena de texto.' })
+    @IsNotEmpty({ message: 'El número de celular es obligatorio.' })
+    celular: string;
 }
+    

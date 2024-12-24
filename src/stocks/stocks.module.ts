@@ -14,6 +14,6 @@ import { MovimientoAreaModule } from 'src/movimiento-area/movimiento-area.module
 ],
   controllers: [StocksController],
   providers: [StocksService],
-  
+  exports:[StocksService]
 })
 export class StocksModule {}

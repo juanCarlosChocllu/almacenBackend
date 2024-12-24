@@ -3,7 +3,7 @@ import { MovimientoAreaService } from './movimiento-area.service';
 import { CreateMovimientoAreaDto } from './dto/create-movimiento-area.dto';
 import { UpdateMovimientoAreaDto } from './dto/update-movimiento-area.dto';
 
-@Controller('movimiento-area')
+@Controller('movimiento/area')
 export class MovimientoAreaController {
   constructor(private readonly movimientoAreaService: MovimientoAreaService) {}
 
@@ -12,9 +12,9 @@ export class MovimientoAreaController {
     return this.movimientoAreaService.create(createMovimientoAreaDto);
   }
 
-  @Get()
-  findAll() {
-    return this.movimientoAreaService.findAll();
+  @Get('ingresos')
+  ingresos() {
+    return this.movimientoAreaService.ingresos();
   }
 
   @Get(':id')
@@ -31,4 +31,6 @@ export class MovimientoAreaController {
   remove(@Param('id') id: string) {
     return this.movimientoAreaService.remove(+id);
   }
+
+
 }

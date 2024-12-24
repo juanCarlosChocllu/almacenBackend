@@ -11,7 +11,6 @@ export class AlmacenArea {
     
     @Prop({type:Types.ObjectId, ref:'Categoria'})
     area:Types.ObjectId
-
     
     @Prop({type:String, enum:flag, default:flag.nuevo })
     flag:flag

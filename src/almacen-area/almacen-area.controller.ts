@@ -21,6 +21,11 @@ export class AlmacenAreaController {
     return this.almacenAreaService.findAll();
   }
 
+  @Get('listar')
+  listarAlmacenPorArea() {
+    return this.almacenAreaService.listarAlmacenPorArea();
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.almacenAreaService.findOne(+id);
