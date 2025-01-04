@@ -5,6 +5,10 @@ import { tipoE } from "src/stocks/enums/tipo.enum"
 
 @Schema({collection:'MovimientoSucursal'})
 export class MovimientoSucursal {
+         
+        @Prop()
+        codigo:string
+
      @Prop({type:Types.ObjectId,ref:'AlmacenArea'})
         almacenSucursal:Types.ObjectId
         @Prop({type:Types.ObjectId,ref:'Producto'})

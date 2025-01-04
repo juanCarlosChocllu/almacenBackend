@@ -8,13 +8,14 @@ import {
   Delete,
   Query,
 } from '@nestjs/common';
-import { StocksService } from './stocks.service';
+
 import { CreateStockDto } from './dto/create-stock.dto';
 import { UpdateStockDto } from './dto/update-stock.dto';
 import { ValidateIdPipe } from 'src/utils/validate-id/validate-id.pipe';
 import { PaginadorDto } from 'src/utils/dtos/paginadorDto';
-import { BuscadorStockDto } from './dto/buscador-stock-dto';
+import { ParametrosStockDto } from './dto/parametros-stock-dto';
 import { Types } from 'mongoose';
+import { StocksService } from './services/stocks.service';
 
 @Controller('stocks')
 export class StocksController {
@@ -33,12 +34,11 @@ export class StocksController {
     return this.verficarStock(stock, tipo);
   }
 
-  @Get('/:almacen')
+  @Get()
   findAll(
-    @Param ('almacen', ValidateIdPipe) almacen:string,
-    @Query() paginadorDto:PaginadorDto,
-) {  
-    return this.stocksService.findAll(almacen, paginadorDto);
+    @Query() parametrosStockDto:ParametrosStockDto, 
+) {      
+    return this.stocksService.findAll(parametrosStockDto);
   }
 
   @Get(':id')

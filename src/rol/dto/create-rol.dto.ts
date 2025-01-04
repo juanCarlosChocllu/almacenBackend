@@ -1,6 +1,4 @@
 import { ArrayNotEmpty, IsArray, IsEnum, IsString } from "class-validator"
-import { modulosE } from "../enums/administracion/modulos.enum"
-import { permisosE } from "../enums/administracion/permisos.enum"
 import { Transform } from "class-transformer";
 import { permiso } from "src/permisos/interface/permisos";
 

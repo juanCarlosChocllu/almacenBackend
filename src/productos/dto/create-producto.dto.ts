@@ -28,7 +28,7 @@ export class CreateProductoDto {
     talla: tallaE;
   
     @IsString({ message: 'La descripción debe ser una cadena de texto válida.' })
-    @IsNotEmpty({ message: 'La descripción es obligatoria.' })
+    @IsOptional()
     descripcion: string;
   
 

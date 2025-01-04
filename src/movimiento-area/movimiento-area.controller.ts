@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { MovimientoAreaService } from './movimiento-area.service';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import { MovimientoAreaService } from './services/movimiento-area.service';
 import { CreateMovimientoAreaDto } from './dto/create-movimiento-area.dto';
 import { UpdateMovimientoAreaDto } from './dto/update-movimiento-area.dto';
+import { BuscadorMovimientoArea } from './dto/buscador-movimiento-area.dto';
 
 @Controller('movimiento/area')
 export class MovimientoAreaController {
@@ -13,8 +14,8 @@ export class MovimientoAreaController {
   }
 
   @Get('ingresos')
-  ingresos() {
-    return this.movimientoAreaService.ingresos();
+  ingresos(@Query() buscadorMovimientoArea:BuscadorMovimientoArea) {
+    return this.movimientoAreaService.ingresos( buscadorMovimientoArea);
   }
 
   @Get(':id')

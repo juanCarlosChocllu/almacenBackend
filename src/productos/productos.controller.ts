@@ -7,9 +7,10 @@ import {
   Param,
   UseInterceptors,
   UploadedFile,
+  Query,
 
 } from '@nestjs/common';
-import { ProductosService } from './productos.service';
+import { ProductosService } from './services/productos.service';
 import { CreateProductoDto } from './dto/create-producto.dto';
 import { UpdateProductoDto } from './dto/update-producto.dto';
 
@@ -17,6 +18,8 @@ import { FileInterceptor } from '@nestjs/platform-express';
 
 
 import { configuracionMulter } from './utils/multer.utils';
+import { BuscadorProductoDto } from './dto/buscadorProducto.dto';
+
 
 
 @Controller('productos')
@@ -27,7 +30,9 @@ export class ProductosController {
    async create(
     @Body() createProductoDto: CreateProductoDto,
     @UploadedFile() file: Express.Multer.File,
-  ) {  
+  ) {    
+    console.log(createProductoDto);
+      
     if (file) {
       createProductoDto.imagen = file.filename;
     }
@@ -35,8 +40,9 @@ export class ProductosController {
   }
 
   @Get()
-  findAll() {
-    return this.productosService.findAll();
+  findAll(@Query() buscadorProductoDto:BuscadorProductoDto ) {
+
+    return this.productosService.findAll(buscadorProductoDto);
   }
 
   @Get(':id')

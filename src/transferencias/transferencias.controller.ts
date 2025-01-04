@@ -1,9 +1,9 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
-import { TransferenciasService } from './transferencias.service';
+import { TransferenciasService } from './services/transferencias.service';
 import { CreateTransferenciaDto } from './dto/create-transferencia.dto';
 import { UpdateTransferenciaDto } from './dto/update-transferencia.dto';
-import { BuscadorStockDto } from 'src/stocks/dto/buscador-stock-dto';
-import { PaginadorDto } from 'src/utils/dtos/paginadorDto';
+
+import { BuscadorTransferenciaDto } from './dto/buscador-transferencia.dto';
 
 @Controller('transferencias')
 export class TransferenciasController {
@@ -16,8 +16,8 @@ export class TransferenciasController {
   }
 
   @Get()
-  findAll(@Query() paginadorDto:PaginadorDto) {
-    return this.transferenciasService.findAll(paginadorDto);
+  findAll(@Query()buscadorTransferenciaDto :BuscadorTransferenciaDto) {
+    return this.transferenciasService.findAll(buscadorTransferenciaDto);
   }
 
   @Get(':id')

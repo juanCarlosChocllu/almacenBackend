@@ -3,10 +3,11 @@ import { CreateRolDto } from './dto/create-rol.dto';
 import { UpdateRolDto } from './dto/update-rol.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Rol } from './schema/rol.schema';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { flag } from 'src/enums/flag.enum';
 import { ApiResponseI } from 'src/interface/httpRespuesta';
 import { PermisosService } from 'src/permisos/permisos.service';
+import { RolI } from './interface/rol.interface';
 
 @Injectable()
 export class RolService {
@@ -27,12 +28,12 @@ export class RolService {
   }
 
   findAll() {
-    return `This action returns all rol`;
+    return this.rol.find({flag:flag.nuevo});
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} rol`;
-  }
+
+
+
 
   update(id: number, updateRolDto: UpdateRolDto) {
     return `This action updates a #${id} rol`;
@@ -40,5 +41,11 @@ export class RolService {
 
   remove(id: number) {
     return `This action removes a #${id} rol`;
+  }
+
+  public async verificarRol(id:Types.ObjectId):Promise<RolI>{
+    const rol = this.rol.findOne({_id:new Types.ObjectId(id)})
+    return rol
+
   }
 }

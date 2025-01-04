@@ -13,6 +13,7 @@ export interface StockResponse {
     codigo: string;           
     marca: string;           
     almacen: string;         
-    almacenArea: string;     
+    almacenArea: string;   
+    imagen: string;     
   }
   

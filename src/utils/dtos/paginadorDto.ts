@@ -1,10 +1,10 @@
-import { IsInt, IsNumber, IsOptional, IsString, Min } from "class-validator";
+import {IsOptional, IsString, Min } from "class-validator";
 export class PaginadorDto {
     @IsOptional()
     @IsString()
-    pagina: string;
+    pagina: string ='1';
   
     @IsOptional()
     @IsString()
-    limite: string;
+    limite: string = '10';
   }

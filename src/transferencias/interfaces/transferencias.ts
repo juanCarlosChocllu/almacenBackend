@@ -26,5 +26,6 @@ export interface transferenciaSalidaI {
     total: number;
     usuario: string;
     stock:Types.ObjectId
-    transferencia:Types.ObjectId
+    transferencia:Types.ObjectId,
+    codigo?:string
   }

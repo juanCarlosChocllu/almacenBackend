@@ -9,5 +9,6 @@ import { PermisosModule } from 'src/permisos/permisos.module';
     imports:[MongooseModule.forFeature([{name:Rol.name, schema:rolSchema}]), PermisosModule],
   controllers: [RolController],
   providers: [RolService],
+  exports:[RolService]
 })
 export class RolModule {}

@@ -2,6 +2,8 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { RolService } from './rol.service';
 import { CreateRolDto } from './dto/create-rol.dto';
 import { UpdateRolDto } from './dto/update-rol.dto';
+import { Type } from 'class-transformer';
+import { Types } from 'mongoose';
 
 @Controller('rol')
 export class RolController {
@@ -17,10 +19,8 @@ export class RolController {
     return this.rolService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.rolService.findOne(+id);
-  }
+ 
+
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateRolDto: UpdateRolDto) {

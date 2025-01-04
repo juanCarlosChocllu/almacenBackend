@@ -1,9 +1,11 @@
 import { Module } from '@nestjs/common';
-import { StocksService } from './stocks.service';
+
 import { StocksController } from './stocks.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Stock, stockSchema } from './schemas/stock.schema';
 import { MovimientoAreaModule } from 'src/movimiento-area/movimiento-area.module';
+import { FiltardorStockService } from './services/filtardor.stock.service';
+import { StocksService } from './services/stocks.service';
 
 @Module({
   imports:[MongooseModule.forFeature([{
@@ -13,7 +15,7 @@ import { MovimientoAreaModule } from 'src/movimiento-area/movimiento-area.module
 
 ],
   controllers: [StocksController],
-  providers: [StocksService],
+  providers: [StocksService,FiltardorStockService],
   exports:[StocksService]
 })
 export class StocksModule {}

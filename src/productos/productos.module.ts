@@ -1,11 +1,12 @@
 import { Module } from '@nestjs/common';
-import { ProductosService } from './productos.service';
+import { ProductosService } from './services/productos.service';
 import { ProductosController } from './productos.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Producto, productoSchema } from './schemas/producto.schema';
 import { CategoriasModule } from 'src/categorias/categorias.module';
 import { StocksModule } from 'src/stocks/stocks.module';
 import { MulterModule } from '@nestjs/platform-express';
+import { ProductoFiltradorService } from './services/producto.filtardor.service';
 
 @Module({
   imports:[MongooseModule.forFeature([{
@@ -21,6 +22,6 @@ MulterModule.register({
 
 ],
   controllers: [ProductosController],
-  providers: [ProductosService],
+  providers: [ProductosService,ProductoFiltradorService ],
 })
 export class ProductosModule {}

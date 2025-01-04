@@ -6,6 +6,7 @@ import { Permiso } from './schema/permiso.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { log } from 'node:console';
+import { flag } from 'src/enums/flag.enum';
 
 @Injectable()
 export class PermisosService {
@@ -21,9 +22,12 @@ export class PermisosService {
     return `This action returns all permisos`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} permiso`;
+  obtenerPermisos(rol:Types.ObjectId){
+    return rol
   }
+
+
+  
 
   update(id: number, updatePermisoDto: UpdatePermisoDto) {
     return `This action updates a #${id} permiso`;
@@ -34,9 +38,16 @@ export class PermisosService {
   }
 
 public async  registarPermisosRol(data:permiso, rol:Types.ObjectId){
-    console.log(data);
+
     
   await this.permiso.create({acciones:data.acciones, modulo:data.modulo, rol:new Types.ObjectId(rol)})
   return HttpStatus.CREATED
 }
+
+public verificarPemisos(rol:Types.ObjectId):Promise<Permiso[]>{
+  const permisos = this.permiso.find({rol:new Types.ObjectId(rol), flag:flag.nuevo})
+  return permisos
+}
+
+
 }

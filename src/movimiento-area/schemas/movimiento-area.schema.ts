@@ -6,6 +6,9 @@ import { tipoE } from "src/stocks/enums/tipo.enum";
 
 @Schema({collection:'MovimientoArea'})
 export class MovimientoArea {
+    @Prop()
+    codigo:string
+
     @Prop({type:Types.ObjectId,ref:'AlmacenArea'})
     almacenArea:Types.ObjectId
     @Prop({type:Types.ObjectId,ref:'Producto'})

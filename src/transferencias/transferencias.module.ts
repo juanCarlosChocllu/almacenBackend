@@ -1,12 +1,14 @@
 import { Module } from '@nestjs/common';
-import { TransferenciasService } from './transferencias.service';
+import { TransferenciasService } from './services/transferencias.service';
 import { TransferenciasController } from './transferencias.controller';
 import { Transferencia, transferenciaSchema } from './schemas/transferencia.schema';
 import { MongooseModule } from '@nestjs/mongoose';
 import { StocksModule } from 'src/stocks/stocks.module';
 import { MovimientoAreaModule } from 'src/movimiento-area/movimiento-area.module';
 import { MovimientoSucursalModule } from 'src/movimiento-sucursal/movimiento-sucursal.module';
-import { StockTransferenciaModule } from 'src/stock-transferencia/stock-transferencia.module';
+
+import { FiltardoresService } from './services/filtradores.service';
+import { StockSucursalModule } from 'src/stock-sucursal/stock-sucursal.module';
 
 @Module({
     imports:[MongooseModule.forFeature([{
@@ -15,9 +17,9 @@ import { StockTransferenciaModule } from 'src/stock-transferencia/stock-transfer
     StocksModule,
     MovimientoAreaModule,
     MovimientoSucursalModule,
-    StockTransferenciaModule
+    StockSucursalModule
   ],
   controllers: [TransferenciasController],
-  providers: [TransferenciasService],
+  providers: [TransferenciasService, FiltardoresService],
 })
 export class TransferenciasModule {}

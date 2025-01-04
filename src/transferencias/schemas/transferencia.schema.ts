@@ -37,4 +37,9 @@ export class Transferencia {
     
 }
 
-export const transferenciaSchema:SchemaFactory=SchemaFactory.createForClass(Transferencia)
+export const transferenciaSchema=SchemaFactory.createForClass(Transferencia)
+
+transferenciaSchema.index({codigo:1})
+transferenciaSchema.index({area:1})
+transferenciaSchema.index({almacenSucursal:1})
+transferenciaSchema.index({flag:1})

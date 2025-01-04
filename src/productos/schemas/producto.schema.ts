@@ -54,3 +54,6 @@ export class Producto {
 }
 
 export const productoSchema=  SchemaFactory.createForClass(Producto)
+productoSchema.index({flag:1})
+productoSchema.index({marca:1})
+productoSchema.index({codigoBarra:1})

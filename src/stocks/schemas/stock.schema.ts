@@ -11,38 +11,18 @@ export class Stock {
     @Prop()
     cantidad:number
 
-
-    @Prop()
-    precio:number
-
-    @Prop()
-    total:number
-
-    
-    @Prop()
-    factura:string
-
     @Prop({type:String , enum:tipoE} )
     tipo:string
-
-    @Prop()
-    fechaCompra:Date
-
-    @Prop()
-    fechaVencimiento:Date
 
     @Prop({type:Types.ObjectId, ref:'AlmacenArea'})
     almacenArea:Types.ObjectId
 
-    
     @Prop({type:Types.ObjectId, ref:'Producto'})
     producto:Types.ObjectId
 
     @Prop({type:Date, default:Date.now()})
     fecha:Date
 
-
- 
     @Prop({type:String, enum:flag, default:flag.nuevo })
     flag:flag
 
@@ -51,4 +31,7 @@ export class Stock {
 
 }
 
-export const stockSchema:SchemaFactory = SchemaFactory.createForClass(Stock)
+export const stockSchema = SchemaFactory.createForClass(Stock)
+stockSchema.index({codigo:1})
+stockSchema.index({tipo:1})
+stockSchema.index({almacenArea:1})

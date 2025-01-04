@@ -1,20 +1,20 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Req } from '@nestjs/common';
 import { CategoriasService } from './categorias.service';
 import { CreateCategoriaDto } from './dto/create-categoria.dto';
 import { UpdateCategoriaDto } from './dto/update-categoria.dto';
-
+import {Request} from 'express'
 @Controller('categorias')
 export class CategoriasController {
   constructor(private readonly categoriasService: CategoriasService) {}
 
   @Post()
-  create(@Body() createCategoriaDto: CreateCategoriaDto) {
-    return this.categoriasService.create(createCategoriaDto);
+  create(@Body() createCategoriaDto: CreateCategoriaDto, @Req() request:Request) {
+    return this.categoriasService.create(createCategoriaDto, request);
   }
 
   @Get()
-  findAll() {
-    return this.categoriasService.findAll();
+  findAll(@Req() request:Request) {
+    return this.categoriasService.findAll(request);
   }
 
   @Get(':id')

@@ -5,24 +5,25 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Categoria } from './schema/categoria.schema';
 import { Model, Types } from 'mongoose';
 import { flag } from 'src/enums/flag.enum';
-
+import {Request} from 'express'
 @Injectable()
 export class CategoriasService {
   constructor(@InjectModel(Categoria.name) private readonly categoria:Model<Categoria>){}
 
-  async create(createCategoriaDto: CreateCategoriaDto) {
+  async create(createCategoriaDto: CreateCategoriaDto,request:Request) {
     createCategoriaDto.nombre = createCategoriaDto.nombre.toUpperCase()
-    const categoria = await this.categoria.exists({nombre:createCategoriaDto.nombre})    
+    createCategoriaDto.area = request.area
+
+    const categoria = await this.categoria.exists({nombre:createCategoriaDto.nombre,area:request.area})    
     if(categoria){
       throw new ConflictException('La categoria ya existe')
     }
-
     await this.categoria.create(createCategoriaDto)
     return {status:HttpStatus.CREATED};
   }
 
-  findAll() {
-    return this.categoria.find({flag:flag.nuevo});
+  findAll(request:Request) {
+    return this.categoria.find({flag:flag.nuevo, ...request.area ? {area:request.area} :{}});
   }
 
   findOne(id: number) {

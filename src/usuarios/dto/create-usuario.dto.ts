@@ -1,4 +1,4 @@
-import { IsMongoId, IsNotEmpty, IsString } from "class-validator";
+import { IsBoolean, IsMongoId, IsNotEmpty, IsOptional, IsString, ValidateIf } from "class-validator";
 import { Types } from "mongoose";
 
 export class CreateUsuarioDto {
@@ -29,5 +29,21 @@ export class CreateUsuarioDto {
   
     @IsMongoId({ message: 'El campo Rol debe ser un ID válido de Mongo.' })
     @IsNotEmpty({ message: 'El campo Rol es obligatorio.' })
+    
     rol: Types.ObjectId;
+
+    @IsMongoId({ message: 'El campo Rol debe ser un ID válido de Mongo.' })
+    @ValidateIf((a:CreateUsuarioDto)=> !a.sucursal)
+    @IsOptional()
+    area: Types.ObjectId;
+
+    @IsBoolean({ message: 'El campo sin relacion debe ser un boolean valido.' })
+    @IsOptional()
+    @ValidateIf((a:CreateUsuarioDto)=> !a.sucursal && !a.area)
+    sinRelacion:boolean
+
+    @IsMongoId({ message: 'El campo Rol debe ser un ID válido de Mongo.' })
+    @ValidateIf((a:CreateUsuarioDto) => !a.area)
+    @IsOptional()
+    sucursal: Types.ObjectId;
 }

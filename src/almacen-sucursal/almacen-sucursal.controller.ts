@@ -1,8 +1,10 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { AlmacenSucursalService } from './almacen-sucursal.service';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Req } from '@nestjs/common';
+
 import { CreateAlmacenSucursalDto } from './dto/create-almacen-sucursal.dto';
 import { UpdateAlmacenSucursalDto } from './dto/update-almacen-sucursal.dto';
 import { ValidateIdPipe } from 'src/utils/validate-id/validate-id.pipe';
+import { AlmacenSucursalService } from './services/almacen-sucursal.service';
+import { Request } from 'express';
 
 @Controller('almacen/sucursal')
 export class AlmacenSucursalController {
@@ -14,8 +16,8 @@ export class AlmacenSucursalController {
   }
 
   @Get()
-  findAll() {
-    return this.almacenSucursalService.findAll();
+  findAll(@Req() request :Request ) {
+    return this.almacenSucursalService.findAll(request);
   }
 
   @Get('listar/:sucursal')

@@ -6,6 +6,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
 import { transferenciaEntradaSucursalI } from 'src/transferencias/interfaces/transferencias';
+import { flag } from 'src/enums/flag.enum';
 
 @Injectable()
 export class MovimientoSucursalService {
@@ -33,10 +34,14 @@ export class MovimientoSucursalService {
   }
 
     public async registarMovimientoSucursal(data:transferenciaEntradaSucursalI ){
-          console.log(data);
-          
+        data.codigo = await this.generarCodigo()
         await this.movimientoSucursal.create(data)
-  
         return {status:HttpStatus.CREATED}
     } 
+
+     private async generarCodigo(){
+        const countDocuments = this.movimientoSucursal.countDocuments({flag:flag.nuevo})
+        const codigo = (await countDocuments).toString().padStart(8,'0')
+        return codigo
+     }
 }

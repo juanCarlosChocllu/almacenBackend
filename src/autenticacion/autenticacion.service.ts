@@ -1,26 +1,55 @@
-import { Injectable } from '@nestjs/common';
-import { CreateAutenticacionDto } from './dto/create-autenticacion.dto';
-import { UpdateAutenticacionDto } from './dto/update-autenticacion.dto';
+import { HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common';
+import { AutenticacionDto } from './dto/autenticacion.dto';
+import { UsuariosService } from 'src/usuarios/usuarios.service';
+import * as argon2 from 'argon2';
+import { JwtService } from '@nestjs/jwt';
+import { RolService } from 'src/rol/rol.service';
+import { PermisosService } from 'src/permisos/permisos.service';
+import { payloadI } from './interface/payload.interface';
+import { permiso } from 'src/permisos/interface/permisos';
+import { PermisoPayloadI } from './interface/permisos.interface';
+import { log } from 'node:console';
+import { jwtConstants } from './constants/jwtSecret';
 
 @Injectable()
 export class AutenticacionService {
-  create(createAutenticacionDto: CreateAutenticacionDto) {
-    return 'This action adds a new autenticacion';
-  }
-
-  findAll() {
-    return `This action returns all autenticacion`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} autenticacion`;
-  }
-
-  update(id: number, updateAutenticacionDto: UpdateAutenticacionDto) {
-    return `This action updates a #${id} autenticacion`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} autenticacion`;
+  constructor(
+    private readonly usuariosService: UsuariosService,
+    private readonly jwtService: JwtService,
+    private readonly rolService: RolService,
+    private readonly permisosService: PermisosService,
+  ) {}
+  async login(autenticacionDto: AutenticacionDto) {
+    try {
+      const usuario = await this.usuariosService.verificarUsername(
+        autenticacionDto.username,
+      );
+      if (!usuario) {
+        throw new UnauthorizedException();
+      }
+ 
+      
+      if (await argon2.verify(usuario.password, autenticacionDto.password)) {
+        const rol = await this.rolService.verificarRol(usuario.rol);
+        const payload: payloadI = {
+          rol: rol._id,
+          id: usuario._id,
+        };
+        const token = await this.jwtService.signAsync(payload, {
+          expiresIn: '4h',
+          secret:jwtConstants.secret
+        });
+        return {
+          status:HttpStatus.OK,
+          token:token
+        }
+      } else {
+        throw new UnauthorizedException();
+      }
+    } catch (error) {   
+      console.log(error);
+    
+      throw new UnauthorizedException();
+    }
   }
 }

@@ -18,14 +18,23 @@ import { MovimientoSucursalModule } from './movimiento-sucursal/movimiento-sucur
 import { UsuariosModule } from './usuarios/usuarios.module';
 import { AutenticacionModule } from './autenticacion/autenticacion.module';
 import { SucursalModule } from './sucursal/sucursal.module';
-import { StockTransferenciaModule } from './stock-transferencia/stock-transferencia.module';
 import { RolModule } from './rol/rol.module';
 import { PermisosModule } from './permisos/permisos.module';
+import { APP_GUARD } from '@nestjs/core';
+import { TokenGuard } from './autenticacion/guards/token/token.guard';
+import { PermisosGuard } from './autenticacion/guards/permisos/permisos.guard';
+import { ModulosGuard } from './autenticacion/guards/modulos/modulos.guard';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
+import { StockSucursalModule } from './stock-sucursal/stock-sucursal.module';
 
 
 
 @Module({
   imports: [
+    ServeStaticModule.forRoot({
+      rootPath:join(__dirname,'..','upload')
+    }),
     MongooseModule.forRoot('mongodb://kanna:kanna@localhost:27017/almacen?authSource=admin'),
     ProductosModule,
      CategoriasModule,
@@ -45,13 +54,28 @@ import { PermisosModule } from './permisos/permisos.module';
        UsuariosModule,
        AutenticacionModule,
        SucursalModule,
-       StockTransferenciaModule,
+
        RolModule,
        PermisosModule,
+       StockSucursalModule,
 
 
       ],
   controllers: [],
-  providers: [],
+  providers: [
+    {
+      provide:APP_GUARD,
+      useClass:TokenGuard
+    },
+    /*{
+      provide:APP_GUARD,
+      useClass:ModulosGuard
+    },
+    {
+      provide:APP_GUARD,
+      useClass:PermisosGuard
+    }*/
+  ],
+  
 })
 export class AppModule {}

@@ -26,6 +26,15 @@ export class Usuario {
   @Prop({ type: Types.ObjectId, ref: 'Rol' })
   rol: Types.ObjectId;
 
+  @Prop({ type: Types.ObjectId, ref: 'Area' })
+  area: Types.ObjectId;
+
+  @Prop({ type: Types.ObjectId, ref: 'Sucursal' })
+  sucursal: Types.ObjectId;
+
+  @Prop()
+  sinRelacion: boolean;
+
   @Prop({ type: String, enum: flag, default: flag.nuevo })
   flag: flag;
 

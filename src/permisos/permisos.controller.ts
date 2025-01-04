@@ -2,6 +2,8 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { PermisosService } from './permisos.service';
 import { CreatePermisoDto } from './dto/create-permiso.dto';
 import { UpdatePermisoDto } from './dto/update-permiso.dto';
+import { ValidateIdPipe } from 'src/utils/validate-id/validate-id.pipe';
+import { Types } from 'mongoose';
 
 @Controller('permisos')
 export class PermisosController {
@@ -16,11 +18,12 @@ export class PermisosController {
   findAll() {
     return this.permisosService.findAll();
   }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.permisosService.findOne(+id);
+  @Get()
+  optenerPermiso() {
+    return this.permisosService.obtenerPermisos(new Types.ObjectId('hol'));
   }
+
+
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updatePermisoDto: UpdatePermisoDto) {
@@ -30,5 +33,10 @@ export class PermisosController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.permisosService.remove(+id);
+  }
+
+  @Get(':rol')
+  verificarPemisos(@Param('rol', ValidateIdPipe) rol:Types.ObjectId){
+    return this.permisosService.verificarPemisos(rol)
   }
 }
