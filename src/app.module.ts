@@ -66,8 +66,8 @@ import { StockSucursalModule } from './stock-sucursal/stock-sucursal.module';
     {
       provide:APP_GUARD,
       useClass:TokenGuard
-    },
-    /*{
+    }
+   /* {
       provide:APP_GUARD,
       useClass:ModulosGuard
     },

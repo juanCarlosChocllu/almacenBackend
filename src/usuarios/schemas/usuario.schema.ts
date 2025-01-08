@@ -44,3 +44,59 @@ export class Usuario {
 
 export const usuarioSchema: SchemaFactory =
   SchemaFactory.createForClass(Usuario);
+
+
+
+  @Schema({ collection: 'DetalleSucursal' })
+export class DetalleSucursal{
+
+  @Prop({ type: Types.ObjectId, ref: 'Usuario' })
+  usuario: Types.ObjectId;
+
+  @Prop({ type: Types.ObjectId, ref: 'Sucursal' })
+  sucursal: Types.ObjectId;
+
+  @Prop()
+  sinRelacion: boolean;
+
+  @Prop({ type: String, enum: flag, default: flag.nuevo })
+  flag: flag;
+
+  @Prop({ type: Date, default: Date.now() })
+  fecha: Date;
+}
+
+export const DetalleSucursalSchema: SchemaFactory =
+  SchemaFactory.createForClass(DetalleSucursal);
+
+
+
+
+  
+
+
+
+  @Schema({ collection: 'DetalleSucursal' })
+export class DetalleArea{
+
+  @Prop({ type: Types.ObjectId, ref: 'Usuario' })
+  usuario: Types.ObjectId;
+
+  @Prop({ type: Types.ObjectId, ref: 'Sucursal' })
+  sucursal: Types.ObjectId;
+
+  @Prop()
+  sinRelacion: boolean;
+
+  @Prop({ type: String, enum: flag, default: flag.nuevo })
+  flag: flag;
+
+  @Prop({ type: Date, default: Date.now() })
+  fecha: Date;
+}
+
+export const DetalleAreaSchema: SchemaFactory =
+  SchemaFactory.createForClass(DetalleArea);
+
+
+

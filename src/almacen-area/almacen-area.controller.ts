@@ -17,9 +17,7 @@ export class AlmacenAreaController {
   }
 
   @Get()
-  findAll() {
-    console.log('hola');
-    
+  findAll() {    
     return this.almacenAreaService.findAll();
   }
 

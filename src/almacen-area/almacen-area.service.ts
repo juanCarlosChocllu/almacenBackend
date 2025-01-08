@@ -45,7 +45,7 @@ export class AlmacenAreaService {
         $project:{
            nombre:1,
            nombreArea:'$area.nombre',
-                      area:'$area._id'
+            area:'$area._id'
         }
       }
      ])

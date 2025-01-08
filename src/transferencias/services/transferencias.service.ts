@@ -27,6 +27,7 @@ import { BuscadorTransferenciaDto } from '../dto/buscador-transferencia.dto';
 import { FiltardoresService } from './filtradores.service';
 import { StockSucursalService } from 'src/stock-sucursal/services/stock-sucursal.service';
 import { StockSucursalI } from 'src/stock-sucursal/interfaces/stock.sucursal';
+import { ProductosService } from 'src/productos/services/productos.service';
 
 @Injectable()
 export class TransferenciasService {
@@ -38,57 +39,70 @@ export class TransferenciasService {
     private readonly movimientoSucursalService: MovimientoSucursalService,
     private readonly stockSucursalService: StockSucursalService,
     private readonly filtardoresService: FiltardoresService,
+    private readonly productoService: ProductosService,
   ) {}
   async create(
     createTransferenciaDto: CreateTransferenciaDto,
   ): Promise<ApiResponseI> {
-    
-      try {
-        const error: httErrorI[] = [];
+    try {
+  
+        const errorStock: httErrorI[] = await this.verificarStock(createTransferenciaDto)//verifica el stock si no devuelve los error con los stock 
+        
+        if (errorStock.length > 0) {
+          throw errorStock;
+        }else {
+          for (const data of createTransferenciaDto.data) {
+        
+            const stock = await this.stockService.verificarStock(
+              data.stock,
+              data.tipo,
+              data.almacenArea
+            );
+          
+              const transferencia = await this.realizarTransferencia(data);
+              if (transferencia) {
+                    await this.actualizarStock(stock, data);
+                   // await this.registraMovimientoSalida(stock, data);
+                    await this.registrarStockTransferencia(data, stock,transferencia._id )
+                    await this.registraMovimientoEntradaSucursal(stock, data, transferencia._id)
+                  }
+              }
+        }
+        return { message: 'Transferencia realizada', status: HttpStatus.OK };
+      } catch (error) { 
+         throw new BadRequestException(error)
+      }
+  }
+
+
+  private async verificarStock (createTransferenciaDto: CreateTransferenciaDto):Promise<httErrorI[]>{
+    const errorStock: httErrorI[] = [];
         for (const data of createTransferenciaDto.data) {
+        
           const stock = await this.stockService.verificarStock(
             data.stock,
             data.tipo,
             data.almacenArea
-          );
-    
+          );            
           if (!stock) {         
             throw new NotFoundException('Verifica los productos');
           }
     
           if (data.cantidad > stock.cantidad) {
-            error.push({
+              const producto = await this.productoService.verificarProducto(stock.producto)
+              
+              errorStock.push({
+              codigoProducto:producto.codigo,
               propiedad: 'cantidad',
               message: 'Cantidad mayor a la de stock',
               status: HttpStatus.BAD_REQUEST,
             });
-          } else {
-            const transferencia = await this.realizarTransferencia(data);
-            if (transferencia) {
-              await this.actulizarStock(stock, data);
-             // await this.registraMovimientoSalida(stock, data);
-              await this.registrarStockTransferencia(data, stock,transferencia._id )
-              await this.registraMovimientoEntradaSucursal(stock, data, transferencia._id)
-            
-            }
           }
-
         }
-  
-        
-        if (error.length > 0) {
-          throw error;
-        }
-        
-        return { message: 'Transferencia realizada', status: HttpStatus.OK };
-      } catch (error) { 
-        console.log(error);
-          
-         throw new BadRequestException(error)
-      }
+        return errorStock
   }
 
-  private async actulizarStock(stock: any, data: dataTransferenciaDto) {
+  private async actualizarStock(stock: any, data: dataTransferenciaDto) {
     const nuevaCantiad: number = Number(stock.cantidad) - Number(data.cantidad);
     const stockActulizado = await this.stockService.descontarCantidad(
       data.stock,

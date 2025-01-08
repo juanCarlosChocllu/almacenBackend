@@ -9,6 +9,9 @@ import { tipoE } from 'src/stocks/enums/tipo.enum';
 import { flag } from 'src/enums/flag.enum';
 import {Request}from 'express'
 import { FiltradorSucursalService } from './filtrador-sucursal.service';
+import { BuscadorStockSucursal } from '../dto/buscador-stock-sucursal.dto';
+import { limits } from 'argon2';
+import { PaginatedResponseI } from 'src/interface/httpRespuesta';
 @Injectable()
 export class StockSucursalService {
    constructor( 
@@ -20,9 +23,24 @@ export class StockSucursalService {
     return 'This action adds a new stockSucursal';
   }
 
-  async findAll(request:Request) {
-   const filtroTipoSucursal=  this.filtradorSucursalService.filtroTipoSucursal(request)   
+  async findAll(request:Request, buscadorStockSucursal:BuscadorStockSucursal):Promise<PaginatedResponseI<StockSucursal>> {
+
+    
+   const filtroTipoSucursal=  this.filtradorSucursalService.filtroTipoSucursal(request) 
+    
+   const {codigo, marca , ...filtrador} =this.filtradorSucursalService.buscadorStockSucursal(buscadorStockSucursal)
+
+   console.log(filtrador);
+   
+   const countDocuments = await this.stockSucursal.countDocuments({flag:flag.nuevo, ...filtrador})
+   const paginas = Math.ceil(countDocuments / Number(buscadorStockSucursal.limite))
     const stock = await this.stockSucursal.aggregate([
+      {
+        $match:{
+          flag:flag.nuevo,
+          ...filtrador
+        }
+      },
       {
         $lookup:{
           from:'Producto',
@@ -36,6 +54,8 @@ export class StockSucursalService {
     {
       $unwind:{path:'$producto', preserveNullAndEmptyArrays:false}
     },
+    ...(codigo) ? [ {$match:{'producto.codigo':codigo}}]: [],
+    ...(marca) ? [ {$match:{'producto.marca':marca}}]: [],
     {
       $lookup:{
         from:'Marca',
@@ -69,17 +89,23 @@ export class StockSucursalService {
    {
       $project:{
         codigo:1,
+        codigoProducto:'$producto.codigo',
         nombre:'$producto.nombre',
         marca:'$marca.nombre',
         descripcion:'$producto.descripcion',
         cantidad:1,
         tipo:1,
         color:'$producto.color',
-        imagen:'$producto.imagen'
+        imagen:'$producto.imagen',
+         almacen:'$almacenSucursal.nombre'
       }
     }
-  ])
-    return stock;
+  ])  .sort({fecha:-1})
+  .skip((Number(buscadorStockSucursal.pagina) - 1) * Number( buscadorStockSucursal.limite))
+  .limit(Number(buscadorStockSucursal.limite))
+
+
+    return {paginas:paginas, data:stock};
   }
 
   findOne(id: number) {

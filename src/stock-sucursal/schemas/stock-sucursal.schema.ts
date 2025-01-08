@@ -34,5 +34,8 @@ export class StockSucursal {
   flag: flag;
 }
 
-export const stockSucursalSchema: SchemaFactory =
+export const stockSucursalSchema =
   SchemaFactory.createForClass(StockSucursal);
+
+  stockSucursalSchema.index({almacenSucursal:1})
+  stockSucursalSchema.index({tipo:1})

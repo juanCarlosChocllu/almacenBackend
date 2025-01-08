@@ -9,6 +9,7 @@ import { MovimientoSucursalModule } from 'src/movimiento-sucursal/movimiento-suc
 
 import { FiltardoresService } from './services/filtradores.service';
 import { StockSucursalModule } from 'src/stock-sucursal/stock-sucursal.module';
+import { ProductosModule } from 'src/productos/productos.module';
 
 @Module({
     imports:[MongooseModule.forFeature([{
@@ -17,7 +18,8 @@ import { StockSucursalModule } from 'src/stock-sucursal/stock-sucursal.module';
     StocksModule,
     MovimientoAreaModule,
     MovimientoSucursalModule,
-    StockSucursalModule
+    StockSucursalModule,
+    ProductosModule
   ],
   controllers: [TransferenciasController],
   providers: [TransferenciasService, FiltardoresService],

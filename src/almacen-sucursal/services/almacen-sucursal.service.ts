@@ -25,7 +25,6 @@ export class AlmacenSucursalService {
   }
 
   findAll( request :Request):Promise<sucursalEmpresaI[]> {
-    console.log(request.sucursal);
     
     return  this.almacenSucursal.aggregate([{
       $match:{

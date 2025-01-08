@@ -33,8 +33,7 @@ export class StocksService {
         });
 
         if (stockExistente) {
-            const nuevaCantidad: number =
-            stockExistente.cantidad + data.cantidad;
+            const nuevaCantidad: number =   stockExistente.cantidad + data.cantidad;
             data.almacenArea = new Types.ObjectId(data.almacenArea);
             data.producto = new Types.ObjectId(data.producto);
             await this.stock.updateOne(
@@ -103,8 +102,8 @@ export class StocksService {
   async findAll(parametrosStockDto:ParametrosStockDto):Promise<PaginatedResponseI<StockResponse>> { 
 
   const filtrador=    this.filtardorStockService.filtroBusquedaStock(parametrosStockDto)
-    const {marca, ...filtradorSinMarca}= filtrador
-    let countDocuments =await this.stock.countDocuments({flag:flag.nuevo, ...filtrador})
+    const {marca, codigo, ...filtradorSinMarca}= filtrador
+    let countDocuments =await this.stock.countDocuments({flag:flag.nuevo, ...filtradorSinMarca})
     if (marca) {
       countDocuments = await this.cantidadStockConMarca(marca);
     }
@@ -128,6 +127,7 @@ export class StocksService {
         $unwind: { path: '$producto', preserveNullAndEmptyArrays: false },
       },
       
+      ...(codigo ? [ {$match : {'producto.codigo':codigo }}]:[]),
 
       {
         $lookup: {
@@ -183,7 +183,9 @@ export class StocksService {
           marca: '$marca.nombre',
           almacen: '$almacen.nombre',
           almacenArea:'$almacen._id',
-          imagen:'$producto.imagen'
+          imagen:'$producto.imagen',
+          codigoProducto:'$producto.codigo',
+          iamgen:'$producto.imagen',
         },
       },
     ]).skip((Number(parametrosStockDto.pagina) - 1) * Number( parametrosStockDto.limite)).limit(Number(parametrosStockDto.limite));       

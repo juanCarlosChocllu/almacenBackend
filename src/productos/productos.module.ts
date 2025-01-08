@@ -23,5 +23,6 @@ MulterModule.register({
 ],
   controllers: [ProductosController],
   providers: [ProductosService,ProductoFiltradorService ],
+  exports:[ProductosService]
 })
 export class ProductosModule {}

@@ -81,7 +81,7 @@ export class ProductosService {
     
     const filtrador =  this.productoFiltradorService.filtradorProducto(buscadorProductoDto)
     
-    const countDocuments = await this.producto.countDocuments({flag:flag.nuevo})
+    const countDocuments = await this.producto.countDocuments({flag:flag.nuevo, ...filtrador})
   
     const paginas = Math.ceil(countDocuments / Number(buscadorProductoDto.limite))
     
@@ -126,7 +126,11 @@ export class ProductosService {
           color: 1,
         },
       },
-    ]).skip((Number(buscadorProductoDto.pagina) - 1) * Number( buscadorProductoDto.limite)).limit(Number(buscadorProductoDto.limite));    
+    ])
+    .sort({fecha:-1})
+    .skip((Number(buscadorProductoDto.pagina) - 1) * Number( buscadorProductoDto.limite))
+    .limit(Number(buscadorProductoDto.limite))
+      
     return{data:productos,paginas:paginas};
   }
 
@@ -145,6 +149,9 @@ export class ProductosService {
     return producto;
   }
 
+   verificarProducto (producto:Types.ObjectId){
+    return this.producto.findOne({_id:new Types.ObjectId(producto), flag:flag.nuevo})
+   }
 
   async elimarImagen(imagen:string):Promise<void>{
     const ruta:string = path.join(__dirname, '../../..', 'upload');
