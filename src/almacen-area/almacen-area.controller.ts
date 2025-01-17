@@ -1,8 +1,15 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Req } from '@nestjs/common';
 import { AlmacenAreaService } from './almacen-area.service';
 import { CreateAlmacenAreaDto } from './dto/create-almacen-area.dto';
 import { UpdateAlmacenAreaDto } from './dto/update-almacen-area.dto';
+import { Request } from 'express';
+import { Modulo } from 'src/autenticacion/decorators/modulos/modulo.decorator';
+import { modulosE } from 'src/rol/enums/administracion/modulos.enum';
+import { TipoUsuario } from 'src/autenticacion/decorators/tipoUsuario/tipoUsuario';
+import { TipoUsuarioE } from 'src/usuarios/enums/tipoUsuario';
 
+@Modulo(modulosE.ALMACEN_AREA)
+@TipoUsuario(TipoUsuarioE.AREA, TipoUsuarioE.NINGUNO)
 @Controller('almacen/area')
 export class AlmacenAreaController {
   constructor(
@@ -11,19 +18,19 @@ export class AlmacenAreaController {
   ) {}
 
   @Post()
-  create(@Body() createAlmacenAreaDto: CreateAlmacenAreaDto) {
+  create(@Body() createAlmacenAreaDto: CreateAlmacenAreaDto, @Req() request :Request ) {
 
-    return this.almacenAreaService.create(createAlmacenAreaDto);
+    return this.almacenAreaService.create(createAlmacenAreaDto, request);
   }
 
   @Get()
-  findAll() {    
-    return this.almacenAreaService.findAll();
+  findAll(@Req() request:Request) {    
+    return this.almacenAreaService.findAll(request);
   }
 
   @Get('listar')
-  listarAlmacenPorArea() {
-    return this.almacenAreaService.listarAlmacenPorArea();
+  listarAlmacenPorArea(@Req() request:Request) {
+    return this.almacenAreaService.listarAlmacenPorArea(request);
   }
 
   @Get(':id')

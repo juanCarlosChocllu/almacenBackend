@@ -1,7 +1,7 @@
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 import { Request} from 'express'
 import { Reflector } from '@nestjs/core';
-import {BUSCADOR_KEY, PERMISOS_KEY, Public_KEY } from 'src/autenticacion/constants/contantes';
+import {PERMISOS_KEY, PUBLIC_INTERNO_KEY, Public_KEY } from 'src/autenticacion/constants/contantes';
 @Injectable()
 export class PermisosGuard implements CanActivate {
   constructor(
@@ -10,14 +10,13 @@ export class PermisosGuard implements CanActivate {
   async canActivate(context: ExecutionContext):  Promise<boolean>{
   try {
     const publico = this.reflector.get<boolean>(Public_KEY, context.getHandler())
-     const buscador = this.reflector.get<boolean>(
-                BUSCADOR_KEY,
-                context.getHandler(),
-              );    
-    
-              if (buscador) {
-                return true;
-              }
+      const publicInterno = this.reflector.get<boolean>(
+          PUBLIC_INTERNO_KEY,
+          context.getHandler(),
+        );
+        if (publicInterno) {
+          return true;
+        }
     if(publico){
      return true
     }

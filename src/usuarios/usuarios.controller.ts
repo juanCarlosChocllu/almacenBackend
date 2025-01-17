@@ -8,20 +8,23 @@ import { modulosE } from 'src/rol/enums/administracion/modulos.enum';
 import { PermisosGuard } from 'src/autenticacion/guards/permisos/permisos.guard';
 import { Permiso } from 'src/autenticacion/decorators/permisos/permisos.decorator';
 import { permisosE } from 'src/rol/enums/administracion/permisos.enum';
+import { TipoUsuario } from 'src/autenticacion/decorators/tipoUsuario/tipoUsuario';
+import { TipoUsuarioE } from './enums/tipoUsuario';
 
 @Controller('usuarios')
 @Modulo(modulosE.USUARIOS)
+@TipoUsuario(TipoUsuarioE.AREA,TipoUsuarioE.NINGUNO )
 export class UsuariosController {
   constructor(private readonly usuariosService: UsuariosService) {}
 
   @Post()
-  @Permiso(permisosE.CREAR)
-  create(@Body() createUsuarioDto: CreateUsuarioDto) {
+  //@Permiso(permisosE.CREAR)
+  create(@Body() createUsuarioDto: CreateUsuarioDto) {    
     return this.usuariosService.create(createUsuarioDto);
   }
 
   @Get()
-  @Permiso(permisosE.LISTAR)
+  //@Permiso(permisosE.LISTAR)
   findAll() {
     return this.usuariosService.findAll();
   }

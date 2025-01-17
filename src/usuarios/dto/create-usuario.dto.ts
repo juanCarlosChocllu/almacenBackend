@@ -1,5 +1,6 @@
-import { IsBoolean, IsMongoId, IsNotEmpty, IsOptional, IsString, ValidateIf } from "class-validator";
+import { IsArray, IsBoolean, IsEnum, IsMongoId, IsNotEmpty, IsOptional, IsString, ValidateIf } from "class-validator";
 import { Types } from "mongoose";
+import { TipoUsuarioE } from "../enums/tipoUsuario";
 
 export class CreateUsuarioDto {
   
@@ -32,10 +33,11 @@ export class CreateUsuarioDto {
     
     rol: Types.ObjectId;
 
-    @IsMongoId({ message: 'El campo Rol debe ser un ID válido de Mongo.' })
-    @ValidateIf((a:CreateUsuarioDto)=> !a.sucursal)
+    @ValidateIf((a: CreateUsuarioDto) => !a.sucursal)
     @IsOptional()
-    area: Types.ObjectId;
+    @IsMongoId({ each: true, message: 'El campo Area debe ser un ID válido de Mongo.' })
+    @IsArray()
+    area: Types.ObjectId[];
 
     @IsBoolean({ message: 'El campo sin relacion debe ser un boolean valido.' })
     @IsOptional()
@@ -46,4 +48,9 @@ export class CreateUsuarioDto {
     @ValidateIf((a:CreateUsuarioDto) => !a.area)
     @IsOptional()
     sucursal: Types.ObjectId;
+
+
+    @IsEnum(TipoUsuarioE)
+    @IsNotEmpty()
+    tipo:string
 }

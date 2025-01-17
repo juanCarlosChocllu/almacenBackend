@@ -25,10 +25,7 @@ export class Stock {
 
     @Prop({type:String, enum:flag, default:flag.nuevo })
     flag:flag
-
-
     
-
 }
 
 export const stockSchema = SchemaFactory.createForClass(Stock)

@@ -3,6 +3,13 @@ import { CategoriasService } from './categorias.service';
 import { CreateCategoriaDto } from './dto/create-categoria.dto';
 import { UpdateCategoriaDto } from './dto/update-categoria.dto';
 import {Request} from 'express'
+import { Modulo } from 'src/autenticacion/decorators/modulos/modulo.decorator';
+import { modulosE } from 'src/rol/enums/administracion/modulos.enum';
+import { TipoUsuarioE } from 'src/usuarios/enums/tipoUsuario';
+import { TipoUsuario } from 'src/autenticacion/decorators/tipoUsuario/tipoUsuario';
+
+@Modulo(modulosE.CATEGORIAS)
+@TipoUsuario(TipoUsuarioE.AREA, TipoUsuarioE.NINGUNO)
 @Controller('categorias')
 export class CategoriasController {
   constructor(private readonly categoriasService: CategoriasService) {}

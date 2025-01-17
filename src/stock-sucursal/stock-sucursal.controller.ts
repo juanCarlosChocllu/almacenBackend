@@ -7,6 +7,15 @@ import { Types } from 'mongoose';
 import { tipoE } from 'src/stocks/enums/tipo.enum';
 import {Request}from 'express'
 import { BuscadorStockSucursal } from './dto/buscador-stock-sucursal.dto';
+import { Modulo } from 'src/autenticacion/decorators/modulos/modulo.decorator';
+import { modulosE } from 'src/rol/enums/administracion/modulos.enum';
+import { TipoUsuario } from 'src/autenticacion/decorators/tipoUsuario/tipoUsuario';
+import { TipoUsuarioE } from 'src/usuarios/enums/tipoUsuario';
+import { PublicInterno } from 'src/autenticacion/decorators/publicInterno/publicInterno';
+
+
+@Modulo(modulosE.STOCK_SUCURSAL)
+@TipoUsuario(TipoUsuarioE.SUCURSAL, TipoUsuarioE.AREA,TipoUsuarioE.NINGUNO )
 @Controller('stock/sucursal')
 export class StockSucursalController {
   constructor(private readonly stockSucursalService: StockSucursalService) {}
@@ -21,20 +30,7 @@ export class StockSucursalController {
     return this.stockSucursalService.findAll(request,buscadorStockSucursal);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.stockSucursalService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateStockSucursalDto: UpdateStockSucursalDto) {
-    return this.stockSucursalService.update(+id, updateStockSucursalDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.stockSucursalService.remove(+id);
-  }
+ @PublicInterno()   
   @Get('verificar/cantidad/:stock/:almacen/:tipo') 
     verificarStockTransferencia(@Param('stock',ValidateIdPipe) stock:Types.ObjectId ,
      @Param('almacen', ValidateIdPipe) almacen:Types.ObjectId , @Param('tipo') tipo:tipoE ){

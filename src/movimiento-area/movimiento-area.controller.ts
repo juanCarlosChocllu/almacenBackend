@@ -1,9 +1,17 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Req } from '@nestjs/common';
 import { MovimientoAreaService } from './services/movimiento-area.service';
 import { CreateMovimientoAreaDto } from './dto/create-movimiento-area.dto';
 import { UpdateMovimientoAreaDto } from './dto/update-movimiento-area.dto';
 import { BuscadorMovimientoArea } from './dto/buscador-movimiento-area.dto';
+import { Request } from 'express';
+import { Modulo } from 'src/autenticacion/decorators/modulos/modulo.decorator';
+import { modulosE } from 'src/rol/enums/administracion/modulos.enum';
+import { TipoUsuario } from 'src/autenticacion/decorators/tipoUsuario/tipoUsuario';
+import { TipoUsuarioE } from 'src/usuarios/enums/tipoUsuario';
 
+
+@Modulo(modulosE.MOVIMIENTO_AREA)
+@TipoUsuario(TipoUsuarioE.AREA,TipoUsuarioE.NINGUNO )
 @Controller('movimiento/area')
 export class MovimientoAreaController {
   constructor(private readonly movimientoAreaService: MovimientoAreaService) {}
@@ -14,8 +22,8 @@ export class MovimientoAreaController {
   }
 
   @Get('ingresos')
-  ingresos(@Query() buscadorMovimientoArea:BuscadorMovimientoArea) {
-    return this.movimientoAreaService.ingresos( buscadorMovimientoArea);
+  ingresos(@Query() buscadorMovimientoArea:BuscadorMovimientoArea, @Req() request:Request) {
+    return this.movimientoAreaService.ingresos( buscadorMovimientoArea, request);
   }
 
   @Get(':id')

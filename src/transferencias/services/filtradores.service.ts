@@ -20,8 +20,6 @@ export class FiltardoresService {
             $gte: fechaInicio,
           $lte:fechaFin,
         } :filtrador
-    console.log(filtrador);
-    
      return filtrador
         
      }

@@ -8,6 +8,7 @@ import {
   UseInterceptors,
   UploadedFile,
   Query,
+  Req,
 
 } from '@nestjs/common';
 import { ProductosService } from './services/productos.service';
@@ -19,9 +20,15 @@ import { FileInterceptor } from '@nestjs/platform-express';
 
 import { configuracionMulter } from './utils/multer.utils';
 import { BuscadorProductoDto } from './dto/buscadorProducto.dto';
+import { Request } from 'express';
+import { Modulo } from 'src/autenticacion/decorators/modulos/modulo.decorator';
+import { modulosE } from 'src/rol/enums/administracion/modulos.enum';
+import { TipoUsuario } from 'src/autenticacion/decorators/tipoUsuario/tipoUsuario';
+import { TipoUsuarioE } from 'src/usuarios/enums/tipoUsuario';
 
 
-
+@Modulo(modulosE.PRODUCTOS)
+@TipoUsuario(TipoUsuarioE.AREA,TipoUsuarioE.NINGUNO )
 @Controller('productos')
 export class ProductosController {
   constructor(private readonly productosService: ProductosService) {}
@@ -31,7 +38,6 @@ export class ProductosController {
     @Body() createProductoDto: CreateProductoDto,
     @UploadedFile() file: Express.Multer.File,
   ) {    
-    console.log(createProductoDto);
       
     if (file) {
       createProductoDto.imagen = file.filename;
@@ -40,9 +46,9 @@ export class ProductosController {
   }
 
   @Get()
-  findAll(@Query() buscadorProductoDto:BuscadorProductoDto ) {
+  findAll(@Req()request :Request , @Query() buscadorProductoDto:BuscadorProductoDto ) {
 
-    return this.productosService.findAll(buscadorProductoDto);
+    return this.productosService.findAll(buscadorProductoDto,request);
   }
 
   @Get(':id')

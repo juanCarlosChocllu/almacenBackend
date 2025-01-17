@@ -7,6 +7,7 @@ import { Model, Types } from 'mongoose';
 import { AreasService } from 'src/areas/areas.service';
 import { flag } from 'src/enums/flag.enum';
 import { ApiResponseI } from 'src/interface/httpRespuesta';
+import { Request } from 'express';
 
 @Injectable()
 export class AlmacenAreaService {
@@ -15,8 +16,15 @@ export class AlmacenAreaService {
     private readonly areasService:AreasService
   ){}
 
-  async create(createAlmacenAreaDto: CreateAlmacenAreaDto):Promise<ApiResponseI> {
-    createAlmacenAreaDto.area= new Types.ObjectId(createAlmacenAreaDto.area)
+  async create(createAlmacenAreaDto: CreateAlmacenAreaDto ,request :Request ):Promise<ApiResponseI> {
+  
+   
+
+    if(request.area && ! createAlmacenAreaDto.area){
+      createAlmacenAreaDto.area= new Types.ObjectId(request.area) 
+    }else{
+      createAlmacenAreaDto.area= new Types.ObjectId(createAlmacenAreaDto.area) 
+    }    
     const area = await this.areasService.bsucarArea(createAlmacenAreaDto.area)
     const almacen = await this.almacenArea.findOne({nombre:createAlmacenAreaDto.nombre})
     if(!area){
@@ -29,9 +37,11 @@ export class AlmacenAreaService {
     return {status:HttpStatus.CREATED,message:'Almacen Registrado'};
   }
 
-  async findAll() {
+  async findAll(request:Request) {
      const areas = await this.almacenArea.aggregate([
-      {$match:{flag:flag.nuevo}},
+      {$match:{flag:flag.nuevo,
+        ...(request.area)? {area: request.area}:{}
+      }},
       {
         $lookup:{
           from:'Area',
@@ -41,6 +51,7 @@ export class AlmacenAreaService {
         }
       },
       {$unwind:{ path:'$area', preserveNullAndEmptyArrays:false}},
+
       {
         $project:{
            nombre:1,
@@ -52,8 +63,8 @@ export class AlmacenAreaService {
     return areas;
   }
 
-  listarAlmacenPorArea(){
-    return  this.almacenArea.find({flag:flag.nuevo});
+  listarAlmacenPorArea(request:Request){
+    return  this.almacenArea.find({flag:flag.nuevo,...(request.area)? {area:request.area }:{}});
   }
 
   findOne(id: number) {

@@ -10,7 +10,7 @@ export interface transferenciaSalidaI {
     tipoDeRegistro: string;
     tipo: string;
     total: number;
-    usuario: string;
+    usuario: Types.ObjectId;
     stock:Types.ObjectId
   }
 
@@ -24,7 +24,7 @@ export interface transferenciaSalidaI {
     tipoDeRegistro: string;
     tipo: string;
     total: number;
-    usuario: string;
+    usuario: Types.ObjectId;
     stock:Types.ObjectId
     transferencia:Types.ObjectId,
     codigo?:string

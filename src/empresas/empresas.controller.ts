@@ -2,7 +2,16 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { EmpresasService } from './empresas.service';
 import { CreateEmpresaDto } from './dto/create-empresa.dto';
 import { UpdateEmpresaDto } from './dto/update-empresa.dto';
+import { Modulo } from 'src/autenticacion/decorators/modulos/modulo.decorator';
+import { modulosE } from 'src/rol/enums/administracion/modulos.enum';
+import { TipoUsuario } from 'src/autenticacion/decorators/tipoUsuario/tipoUsuario';
+import { TipoUsuarioE } from 'src/usuarios/enums/tipoUsuario';
+import { PublicInterno } from 'src/autenticacion/decorators/publicInterno/publicInterno';
 
+
+
+@Modulo(modulosE.EMPRESAS)
+@TipoUsuario(TipoUsuarioE.AREA, TipoUsuarioE.NINGUNO)
 @Controller('empresas')
 export class EmpresasController {
 
@@ -18,6 +27,12 @@ export class EmpresasController {
     return this.empresasService.findAll();
   }
 
+
+  @Get('buscador')
+ @PublicInterno()
+  bsucadorEmpresas() {
+    return this.empresasService.findAll();
+  }
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.empresasService.findOne(+id);

@@ -7,26 +7,39 @@ import {
   Param,
   Delete,
   Query,
+  Req,
 } from '@nestjs/common';
 
 import { CreateStockDto } from './dto/create-stock.dto';
 import { UpdateStockDto } from './dto/update-stock.dto';
 import { ValidateIdPipe } from 'src/utils/validate-id/validate-id.pipe';
-import { PaginadorDto } from 'src/utils/dtos/paginadorDto';
 import { ParametrosStockDto } from './dto/parametros-stock-dto';
 import { Types } from 'mongoose';
 import { StocksService } from './services/stocks.service';
+import { Request } from 'express';
+import { Modulo } from 'src/autenticacion/decorators/modulos/modulo.decorator';
+import { modulosE } from 'src/rol/enums/administracion/modulos.enum';
+import { TipoUsuario } from 'src/autenticacion/decorators/tipoUsuario/tipoUsuario';
+import { TipoUsuarioE } from 'src/usuarios/enums/tipoUsuario';
+import { PublicInterno } from 'src/autenticacion/decorators/publicInterno/publicInterno';
 
+
+@Modulo(modulosE.STOCK)
+@TipoUsuario(TipoUsuarioE.AREA, TipoUsuarioE.NINGUNO)
 @Controller('stocks')
 export class StocksController {
   constructor(private readonly stocksService: StocksService) {}
 
   @Post()
-  async create(@Body() createStockDto: CreateStockDto) {
-    return this.stocksService.create(createStockDto);
+
+  async create(  @Req() request :Request, @Body() createStockDto: CreateStockDto) {
+    return this.stocksService.create(createStockDto , request);
   }
 
+
+
   @Get('verficar/stock/:stock/:tipo')
+
   verficarStock(
     @Param('stock', ValidateIdPipe) stock: string,
     @Param('tipo') tipo: string,
@@ -36,9 +49,9 @@ export class StocksController {
 
   @Get()
   findAll(
-    @Query() parametrosStockDto:ParametrosStockDto, 
+    @Req() request :Request, @Query() parametrosStockDto:ParametrosStockDto, 
 ) {      
-    return this.stocksService.findAll(parametrosStockDto);
+    return this.stocksService.findAll(parametrosStockDto, request);
   }
 
   @Get(':id')
@@ -56,8 +69,10 @@ export class StocksController {
     return this.stocksService.remove(+id);
   }
 
+
+
   @Get('verificar/stock/:producto')
-    vericarStockProducto(@Param('producto', ValidateIdPipe) producto:Types.ObjectId){
-      return this.stocksService.vericarStockProducto(producto)
+    vericarStockProducto(@Param('producto', ValidateIdPipe ) producto:Types.ObjectId, @Req() request :Request){   
+      return this.stocksService.vericarStockProducto(producto, request)
     }
 }

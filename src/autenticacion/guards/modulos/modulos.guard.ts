@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Observable } from 'rxjs';
-import { BUSCADOR_KEY, MODULOS_KEY, Public_KEY } from 'src/autenticacion/constants/contantes';
+import { MODULOS_KEY, PUBLIC_INTERNO_KEY, Public_KEY } from 'src/autenticacion/constants/contantes';
 import { PermisosService } from 'src/permisos/permisos.service';
 
 import { Request } from 'express';
@@ -23,13 +23,11 @@ export class ModulosGuard implements CanActivate {
         Public_KEY,
         context.getHandler(),
       );
-      const buscador = this.reflector.get<boolean>(
-        BUSCADOR_KEY,
+      const publicInterno = this.reflector.get<boolean>(
+        PUBLIC_INTERNO_KEY,
         context.getHandler(),
       );
-      if (buscador) {
-        console.log('hola');
-        
+      if (publicInterno) {
         return true;
       }
       if (publico) {
@@ -40,14 +38,17 @@ export class ModulosGuard implements CanActivate {
       const modulo = this.reflector.get(MODULOS_KEY, context.getClass());
 
       
+      
       if (request.usuario && request.rol) {
         const permisos = await this.permisosService.verificarPemisos(
           request.rol,
         );
+       
+        
         request.acciones = permisos.filter(
           (item) => item.modulo === modulo,
         )[0].acciones;     
-        return permisos.some((item) => item.modulo === modulo);
+            return permisos.some((item) => item.modulo === modulo);
       } else {
         throw new UnauthorizedException();
       }

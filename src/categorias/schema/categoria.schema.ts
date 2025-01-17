@@ -12,6 +12,7 @@ export class Categoria {
 
     @Prop({type:String, enum:flag, default:flag.nuevo })
     flag:string
+    
 
     @Prop({type:Types.ObjectId,ref:'Area'})
     area:Types.ObjectId

@@ -28,7 +28,9 @@ import { FiltardoresService } from './filtradores.service';
 import { StockSucursalService } from 'src/stock-sucursal/services/stock-sucursal.service';
 import { StockSucursalI } from 'src/stock-sucursal/interfaces/stock.sucursal';
 import { ProductosService } from 'src/productos/services/productos.service';
-
+import {Request} from 'express'
+import { TipoUsuarioE } from 'src/usuarios/enums/tipoUsuario';
+import { BuscadorTransferenciaI } from '../interfaces/buscadorTransferencia';
 @Injectable()
 export class TransferenciasService {
   constructor(
@@ -43,17 +45,20 @@ export class TransferenciasService {
   ) {}
   async create(
     createTransferenciaDto: CreateTransferenciaDto,
+    request:Request
   ): Promise<ApiResponseI> {
     try {
-  
+      
+
         const errorStock: httErrorI[] = await this.verificarStock(createTransferenciaDto)//verifica el stock si no devuelve los error con los stock 
         
         if (errorStock.length > 0) {
           throw errorStock;
         }else {
           for (const data of createTransferenciaDto.data) {
-        
-            const stock = await this.stockService.verificarStock(
+              data.usuario = request.usuario
+              data.area = request.area
+              const stock = await this.stockService.verificarStock(
               data.stock,
               data.tipo,
               data.almacenArea
@@ -63,7 +68,7 @@ export class TransferenciasService {
               if (transferencia) {
                     await this.actualizarStock(stock, data);
                    // await this.registraMovimientoSalida(stock, data);
-                    await this.registrarStockTransferencia(data, stock,transferencia._id )
+                    await this.registrarStockTransferencia(data, stock,transferencia._id)
                     await this.registraMovimientoEntradaSucursal(stock, data, transferencia._id)
                   }
               }
@@ -113,19 +118,21 @@ export class TransferenciasService {
   }
 
   private async realizarTransferencia(data: dataTransferenciaDto) {
+    console.log(data.usuario);
+    
     const transferencia = await this.transferencia.create({
       almacenSucursal: new Types.ObjectId(data.almacenSucursal),
       codigo: await this.generarCodigoTransFerencia(),
       area: new Types.ObjectId(data.area),
       cantidad: Number(data.cantidad),
       stock: new Types.ObjectId(data.stock),
-      usuario: 'falta',
+      usuario: data.usuario,
     });
 
     return transferencia;
   }
 
-  private async registraMovimientoSalida(//no es nesesario
+  /*private async registraMovimientoSalida(//no es nesesario
     stock: any,
     data: dataTransferenciaDto,
   ) {
@@ -145,7 +152,7 @@ export class TransferenciasService {
     await this.movimientoAreaService.registarMovimientoAreaSalida(
       transferenciaSalida,
     );
-  }
+  }*/
   
   
   private async registraMovimientoEntradaSucursal(
@@ -163,7 +170,7 @@ export class TransferenciasService {
       tipoDeRegistro: tipoDeRegistroE.INGRESO,
       tipo: data.tipo,
       total: stock.total,
-      usuario: 'falta',
+      usuario: data.usuario,
       stock: stock._id,
       transferencia:tranferencia
     };
@@ -180,25 +187,25 @@ export class TransferenciasService {
       tipo: data.tipo,
       transferencia:tranferencia,
       area:stock.area,
-      stock:stock._id
+      stock:stock._id,
+
       
     };
     await this.stockSucursalService.registrarStockTranferencia(stockTransferencia)
 
   }
 
-  async findAll(buscadorTransferenciaDto:BuscadorTransferenciaDto):Promise<PaginatedResponseI<Transferencia>> {   
-   
-
+  async findAll(buscadorTransferenciaDto:BuscadorTransferenciaDto,request :Request):Promise<PaginatedResponseI<Transferencia>> {   
     const filtardor = this.filtardoresService.filtradorTransferencia(buscadorTransferenciaDto)
     const {sucursal , marca , tipo, ...nuevoFiltardor }=filtardor            
-    const cantidaDocumentos:number = await this.transferencia.countDocuments({flag:flag.nuevo})    
+    const cantidaDocumentos:number = await this.countDocuments(filtardor, request)    
     const paginas = Math.ceil(cantidaDocumentos / Number(buscadorTransferenciaDto.limite))
     const tranferencias = await this.transferencia.aggregate([
       {
         $match:{
           flag:flag.nuevo,
-          ...nuevoFiltardor
+          ...nuevoFiltardor,
+          ...(request.area) ? {area:request.area }:{}
         }
       },
       {
@@ -295,7 +302,7 @@ export class TransferenciasService {
     ]).skip((Number(buscadorTransferenciaDto.pagina) - 1) * Number( buscadorTransferenciaDto.limite))
     .limit(Number(buscadorTransferenciaDto.limite))
     .sort({fecha:-1})
-    console.log(paginas);
+ 
     
     return {data:tranferencias, paginas} ;
   }
@@ -306,6 +313,86 @@ export class TransferenciasService {
     return codigo
    }
 
+
+  async countDocuments (filtardor:BuscadorTransferenciaI, request:Request){ // cuenta la cantidad de coumetos por busqueda
+    const {sucursal , marca , tipo, ...nuevoFiltardor }=filtardor     
+    const cantidad = await this.transferencia.aggregate([
+      {
+        $match:{
+          flag:flag.nuevo,
+          ...nuevoFiltardor,
+          ...(request.area) ? {area:request.area }:{}
+        }
+      },
+      {
+        $lookup:{
+          from:'Stock',
+          foreignField:'_id',
+          localField:'stock',
+          as:'stock'
+        }
+      },
+      {
+        $unwind:{
+          path:'$stock', preserveNullAndEmptyArrays:false
+        }
+      },
+      ...(tipo) ? [{$match:{'stock.tipo':tipo}}]:[],
+      {
+        $lookup:{
+          from:'Producto',
+          foreignField:'_id',
+          localField:'stock.producto',
+          as:'producto'
+        }
+      },
+   
+
+      {
+        $lookup:{
+          from:'Marca',
+          foreignField:'_id',
+          localField:'producto.marca',
+          as:'marca',
+        }
+      },
+    
+      ...(marca) ? [{$match:{'marca._id':marca}}]:[],
+      {
+        $lookup:{
+          from:'AlmacenSucursal',
+          foreignField:'_id',
+          localField:'almacenSucursal',
+          as:'almacenSucursal'
+        }
+      },
+     
+      {
+        $lookup:{
+          from:'Sucursal',
+          foreignField:'_id',
+          localField:'almacenSucursal.sucursal', 
+          as:'sucursal'
+        }
+      },
+     
+      ...(sucursal) ? [{$match:{'sucursal._id':sucursal}}]:[],
+
+      {
+        $group:{
+          _id:null,
+          cantidad:{$sum:1}
+        }
+      },
+      {
+        $project:{
+          cantidad:1,
+      }}
+    ])
+
+    return cantidad.length > 0? cantidad[0].cantidad : 1
+ 
+  }
   findOne(id: number) {
     return `This action returns a #${id} transferencia`;
   }

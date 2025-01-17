@@ -13,8 +13,7 @@ export class FiltradorSucursalService{
     }
 
     buscadorStockSucursal(buscadorStockSucursal:BuscadorStockSucursal):BuscadorStockSucursalI{
-        console.log(buscadorStockSucursal);
-        
+   
         const filtrador : BuscadorStockSucursalI ={}
         buscadorStockSucursal.almacenSucursal ? filtrador.almacenSucursal = new Types.ObjectId(buscadorStockSucursal.almacenSucursal) : filtrador
         buscadorStockSucursal.codigo ? filtrador.codigo = new RegExp(buscadorStockSucursal.codigo, 'i') : filtrador

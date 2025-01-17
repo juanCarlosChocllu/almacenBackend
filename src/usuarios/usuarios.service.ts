@@ -8,6 +8,9 @@ import { Model, Types } from 'mongoose';
 import { flag } from 'src/enums/flag.enum';
 import { ApiResponseI } from 'src/interface/httpRespuesta';
 import { UsuarioI } from './interface/usuario.interface';
+import { DetalleAreaService } from 'src/detalle-area/detalle-area.service';
+import { tipoE } from 'src/stocks/enums/tipo.enum';
+import { TipoUsuarioE } from './enums/tipoUsuario';
 
 @Injectable()
 export class UsuariosService {
@@ -20,12 +23,14 @@ export class UsuariosService {
   };
   constructor(
     @InjectModel(Usuario.name) private readonly usuario: Model<Usuario>,
+
+    private  readonly detalleArea :DetalleAreaService
   ) {}
-  async create(createUsuarioDto: CreateUsuarioDto): Promise<ApiResponseI> {
+
+
+  
+  async create(createUsuarioDto: CreateUsuarioDto): Promise<ApiResponseI> {    
     createUsuarioDto.rol = new Types.ObjectId(createUsuarioDto.rol);
-   if(createUsuarioDto.area){
-    createUsuarioDto.area = new Types.ObjectId(createUsuarioDto.area);
-   }
     if(createUsuarioDto.sucursal){
       createUsuarioDto.sucursal = new Types.ObjectId(createUsuarioDto.sucursal);
     }
@@ -53,7 +58,14 @@ export class UsuariosService {
       createUsuarioDto.password,
       this.opcionesArgon2,
     );
-    await this.usuario.create(createUsuarioDto);
+    const usuario= await this.usuario.create(createUsuarioDto);
+    if(createUsuarioDto.tipo == TipoUsuarioE.AREA){
+    
+      
+      if(createUsuarioDto.area.length > 0){
+        this.detalleArea.crearDetalleArea(createUsuarioDto.area, usuario.id)
+     }
+    }
     return { status: HttpStatus.CREATED, message: 'Usuario registrado' };
   }
 

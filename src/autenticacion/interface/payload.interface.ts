@@ -5,4 +5,6 @@ export interface payloadI{
     id:Types.ObjectId
     rol:Types.ObjectId
 
+    tipo:string
+
 }

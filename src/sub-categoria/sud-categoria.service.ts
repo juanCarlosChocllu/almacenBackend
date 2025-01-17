@@ -11,7 +11,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { flag } from 'src/enums/flag.enum';
 import { ApiResponseI } from 'src/interface/httpRespuesta';
-import { log } from 'node:console';
+import { Request } from 'express';
 
 @Injectable()
 export class SubCategoriaService {
@@ -36,11 +36,12 @@ export class SubCategoriaService {
     return { status: HttpStatus.CREATED, message: 'Sud categoria registrada' };
   }
 
-  findAll() {
+  findAll( request:Request) {
     return this.sudCategoria.aggregate([
       {
         $match: {
           flag: flag.nuevo,
+
         },
       },
       {
@@ -54,6 +55,7 @@ export class SubCategoriaService {
       {
         $unwind: { path: '$categoria' },
       },
+      ...(request.area) ? [ {$match:{'categoria.area': request.area}}] : [],
       {
         $project: {
           nombre: 1,

@@ -1,5 +1,5 @@
 import { Transform } from "class-transformer";
-import { IsMongoId, IsNotEmpty, IsString } from "class-validator"
+import { IsMongoId, IsNotEmpty, IsOptional, IsString } from "class-validator"
 import { Types } from "mongoose"
 
 export class CreateAlmacenAreaDto {
@@ -8,7 +8,7 @@ export class CreateAlmacenAreaDto {
     @Transform(({value}:{value:string})=> value.toUpperCase())
     nombre: string;
   
-    @IsNotEmpty({ message: 'El área no puede estar vacía.' })
+    @IsOptional()
     @IsMongoId({ message: 'El área debe ser un ID de Mongo válido.' })
     area: Types.ObjectId;
   

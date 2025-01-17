@@ -12,7 +12,8 @@ import { flag } from 'src/enums/flag.enum';
 import { BuscadorMovimientoArea } from '../dto/buscador-movimiento-area.dto';
 import { PaginatedResponseI } from 'src/interface/httpRespuesta';
 import { FiltradoresAreaService } from './filtradores-area.service';
-
+import { Request } from 'express';
+import { BuscadorMaI } from '../interface/buscadorMa';
 
 @Injectable()
 export class MovimientoAreaService {
@@ -26,18 +27,16 @@ export class MovimientoAreaService {
   }
 
 
-  async ingresos(buscadorMovimientoArea:BuscadorMovimientoArea):Promise<PaginatedResponseI<MovimientoArea>> {
+  async ingresos(buscadorMovimientoArea:BuscadorMovimientoArea,request:Request):Promise<PaginatedResponseI<MovimientoArea>> {
 
-    const filtardor= this.filtradoresAreaService.filtradorMovimientoArea(buscadorMovimientoArea)    
+    const {codigo, ...nuevoFiltardor}= this.filtradoresAreaService.filtradorMovimientoArea(buscadorMovimientoArea)    
 
-    
-    const countDocuments:number = await this.movimientoArea.countDocuments({flag:flag.nuevo,
-       tipoDeRegistro:tipoDeRegistroE.INGRESO , ...filtardor})
+    const countDocuments:number = await this.countDocuments(codigo, nuevoFiltardor, request)
     const paginas = Math.ceil(countDocuments / Number(buscadorMovimientoArea.limite))
     const movimiento= await this.movimientoArea.aggregate([
       {$match:{flag:flag.nuevo, 
         tipoDeRegistro:tipoDeRegistroE.INGRESO,
-        ...filtardor
+        ...nuevoFiltardor
       }},
       {
         $lookup:{
@@ -52,6 +51,7 @@ export class MovimientoAreaService {
           path:'$producto', preserveNullAndEmptyArrays:false
         }
       },
+      ...(codigo) ? [{$match:{'producto.codigo':codigo}}]:[],
       {
         $lookup:{
           from:'AlmacenArea',
@@ -65,6 +65,7 @@ export class MovimientoAreaService {
           path:'$almacenArea', preserveNullAndEmptyArrays:false
         }
       },
+      ...(request.area) ? [{$match:{'almacenArea.area':request.area}}]:[],
       {
         $lookup:{
           from:'ProveedorPersona',
@@ -93,17 +94,12 @@ export class MovimientoAreaService {
           path:'$proveedorEmpresa', preserveNullAndEmptyArrays:true
         }
       },
-      
-
-      
-
-
        {
         $project:{
           _id: 1,
-          codigo:1,
           almacenArea: '$almacenArea.nombre',
           producto: '$producto.nombre',
+          codigo: '$producto.codigo',
           usuario: 'falta',
           cantidad: 1,
           precio: 1,
@@ -148,6 +144,50 @@ export class MovimientoAreaService {
     return {data:movimiento, paginas:paginas}  }
 
 
+
+
+    private async countDocuments (codigo:RegExp, filtardor:BuscadorMaI,request:Request){
+    
+        const cantidad = await this.movimientoArea.aggregate([
+          {$match:{flag:flag.nuevo, 
+            tipoDeRegistro:tipoDeRegistroE.INGRESO,
+            ...filtardor
+          }},
+          {
+            $lookup:{
+              from:'Producto',
+              foreignField:'_id',
+              localField:'producto',
+              as:'producto'
+            }
+          },
+          ...(codigo) ? [{$match:{'producto.codigo':codigo}}]:[],
+          {
+            $lookup:{
+              from:'AlmacenArea',
+              foreignField:'_id',
+              localField:'almacenArea',
+              as:'almacenArea'
+            }
+          },
+        
+          ...(request.area) ? [{$match:{'almacenArea.area':request.area}}]:[],
+          {
+            $group:{
+              _id:null,
+              cantidad:{$sum:1}
+            }
+          },
+          {
+            $project:{
+              _id:null,
+              cantidad:1
+            }
+          }
+        ])
+      return cantidad.length > 0 ?cantidad[0].cantidad : 1
+    }
+
   findOne(id: number) {
     return `This action returns a #${id} movimientoArea`;
   }
@@ -160,11 +200,11 @@ export class MovimientoAreaService {
     return `This action removes a #${id} movimientoArea`;
   }
 
-  public async registarMovimientoArea(data:DataStockDto, 
+  public async registrarMovimientoArea(data:DataStockDto, 
      tipoDeRegistro:tipoDeRegistroE, stock:Types.ObjectId,
      proveedorEmpresa:Types.ObjectId,
      proveedorPersona:Types.ObjectId,
-     
+     usuario:Types.ObjectId
     ){
       
       await this.movimientoArea.create({
@@ -179,7 +219,7 @@ export class MovimientoAreaService {
         tipoDeRegistro:tipoDeRegistro,
         tipo:data.tipo,
         total:data.total,
-        usuario:'falta',
+        usuario:new Types.ObjectId(usuario),
         stock:stock,
         ...(proveedorEmpresa && {proveedorEmpresa: new Types.ObjectId(proveedorEmpresa)}),
         ...(proveedorPersona && {proveedorPersona: new Types.ObjectId(proveedorPersona)})

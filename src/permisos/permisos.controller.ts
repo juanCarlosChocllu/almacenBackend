@@ -4,7 +4,12 @@ import { CreatePermisoDto } from './dto/create-permiso.dto';
 import { UpdatePermisoDto } from './dto/update-permiso.dto';
 import { ValidateIdPipe } from 'src/utils/validate-id/validate-id.pipe';
 import { Types } from 'mongoose';
+import { Public } from 'src/autenticacion/decorators/public/public.decorator';
+import { Modulo } from 'src/autenticacion/decorators/modulos/modulo.decorator';
+import { modulosE } from 'src/rol/enums/administracion/modulos.enum';
 
+
+@Modulo(modulosE.PERMISO)
 @Controller('permisos')
 export class PermisosController {
   constructor(private readonly permisosService: PermisosService) {}
@@ -36,6 +41,7 @@ export class PermisosController {
   }
 
   @Get(':rol')
+  @Public()
   verificarPemisos(@Param('rol', ValidateIdPipe) rol:Types.ObjectId){
     return this.permisosService.verificarPemisos(rol)
   }

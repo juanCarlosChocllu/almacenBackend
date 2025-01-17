@@ -5,7 +5,16 @@ import { UpdateAlmacenSucursalDto } from './dto/update-almacen-sucursal.dto';
 import { ValidateIdPipe } from 'src/utils/validate-id/validate-id.pipe';
 import { AlmacenSucursalService } from './services/almacen-sucursal.service';
 import { Request } from 'express';
+import { Modulo } from 'src/autenticacion/decorators/modulos/modulo.decorator';
+import { modulosE } from 'src/rol/enums/administracion/modulos.enum';
+import { TipoUsuario } from 'src/autenticacion/decorators/tipoUsuario/tipoUsuario';
+import { tipoRegistro } from 'src/enums/tipo.registro.enum';
+import { TipoUsuarioE } from 'src/usuarios/enums/tipoUsuario';
+import { PublicInterno } from 'src/autenticacion/decorators/publicInterno/publicInterno';
 
+
+@Modulo(modulosE.ALMACEN_SUCURSAL)
+@TipoUsuario(TipoUsuarioE.SUCURSAL, TipoUsuarioE.AREA, TipoUsuarioE.NINGUNO)
 @Controller('almacen/sucursal')
 export class AlmacenSucursalController {
   constructor(private readonly almacenSucursalService: AlmacenSucursalService) {}
@@ -21,6 +30,7 @@ export class AlmacenSucursalController {
   }
 
   @Get('listar/:sucursal')
+  @PublicInterno()
   listarAlmacenSucursal(@Param ('sucursal', ValidateIdPipe) sucursal:string) {
 
     return this.almacenSucursalService.listarAlmacenSucursal(sucursal);

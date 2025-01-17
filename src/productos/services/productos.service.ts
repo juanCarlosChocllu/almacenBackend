@@ -20,6 +20,8 @@ import { ProductoFiltradorService } from './producto.filtardor.service';
 import * as path from 'node:path';
 import * as fs from 'fs';
 
+import {Request} from 'express'
+import { FiltradorProductoI } from '../interfaces/filtradorProducto';
 @Injectable()
 export class ProductosService {
   constructor(
@@ -77,12 +79,11 @@ export class ProductosService {
 
 
 
-  async findAll(buscadorProductoDto:BuscadorProductoDto):Promise<PaginatedResponseI<Producto>> {
-    
+  async findAll(buscadorProductoDto:BuscadorProductoDto,request :Request):Promise<PaginatedResponseI<Producto>> {    
     const filtrador =  this.productoFiltradorService.filtradorProducto(buscadorProductoDto)
     
-    const countDocuments = await this.producto.countDocuments({flag:flag.nuevo, ...filtrador})
-  
+    //const countDocuments = await this.producto.countDocuments({flag:flag.nuevo, ...filtrador})
+    const countDocuments= await this.countDocuments(filtrador, request)
     const paginas = Math.ceil(countDocuments / Number(buscadorProductoDto.limite))
     
     const productos = await this.producto.aggregate([
@@ -110,6 +111,8 @@ export class ProductosService {
       {
         $unwind: { path: '$categoria', preserveNullAndEmptyArrays: false },
       },
+
+      ...(request.area) ?[{$match:{'categoria.area':request.area}}]:[],
       {
         $unwind: { path: '$marca', preserveNullAndEmptyArrays: false },
       },
@@ -159,5 +162,47 @@ export class ProductosService {
     if(fs.existsSync(archivos)){
        fs.unlinkSync(archivos)
     }
+  }
+
+  private async countDocuments(filtrador:FiltradorProductoI, request:Request){
+   
+    const countDocuments = await this.producto.aggregate([
+      {
+        $match:{
+          flag:flag.nuevo,
+          ...filtrador
+        }
+      },  
+      {
+        $lookup: {
+          from: 'Marca',
+          foreignField: '_id',
+          localField: 'marca',
+          as: 'marca',
+        },
+      },
+      {
+        $lookup: {
+          from: 'Categoria',
+          foreignField: '_id',
+          localField: 'categoria',
+          as: 'categoria',
+        },
+      },
+      ...(request.area) ?[{$match:{'categoria.area':request.area}}]:[],
+      {
+        $group:{
+          _id:null,
+          cantidad:{$sum:1}
+        }
+      },
+      {
+        $project:{
+          cantidad:1
+        }
+      }
+    ])
+
+    return countDocuments.length > 0 ? countDocuments[0].cantidad :1
   }
 }

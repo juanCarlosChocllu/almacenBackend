@@ -6,5 +6,5 @@ export class PaginadorDto {
   
     @IsOptional()
     @IsString()
-    limite: string = '10';
+    limite: string = '20';
   }

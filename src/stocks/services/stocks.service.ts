@@ -14,6 +14,10 @@ import { UpdateStockDto } from "../dto/update-stock.dto";
 import { tipoE } from "../enums/tipo.enum";
 import { FiltardorStockService } from "./filtardor.stock.service";
 
+import { Request } from "express";
+import { request } from "http";
+import { BuscadorStockI } from "../interfaces/buscadorStock";
+
 @Injectable()
 export class StocksService {
   constructor(
@@ -21,7 +25,7 @@ export class StocksService {
     private readonly movimientoAreaService: MovimientoAreaService,
     private readonly filtardorStockService: FiltardorStockService,
   ) {}
-  async create(createStockDto: CreateStockDto) {
+  async create(createStockDto: CreateStockDto, request :Request) {
    
     try {
       for (const data of createStockDto.data) {
@@ -29,7 +33,7 @@ export class StocksService {
         const stockExistente = await this.stock.findOne({
           producto: producto,
           tipo: data.tipo,
-         // almacenArea: new Types.ObjectId(data.almacenArea)
+          almacenArea: new Types.ObjectId(data.almacenArea)
         });
 
         if (stockExistente) {
@@ -53,20 +57,20 @@ export class StocksService {
               },
             );
     
-          
-            
-            await this.movimientoAreaService.registarMovimientoArea(
+      
+            await this.movimientoAreaService.registrarMovimientoArea(
               
               data,
               tipoDeRegistroE.INGRESO,
               stockExistente._id,
               createStockDto.proveedorEmpresa,
-              createStockDto.proveedorPersona
+              createStockDto.proveedorPersona,
+              request.usuario
             );
           
         } else {
       
-          await this.crearStock(data,createStockDto.proveedorEmpresa,createStockDto.proveedorPersona);
+          await this.crearStock(data,createStockDto.proveedorEmpresa,createStockDto.proveedorPersona, request.usuario);
         }
       }
       return { status: HttpStatus.CREATED };
@@ -77,8 +81,12 @@ export class StocksService {
     }
   }
 
-  private async crearStock(data: DataStockDto,    proveedorEmpresa:Types.ObjectId,
-    proveedorPersona:Types.ObjectId,) {
+  private async crearStock(
+    data: DataStockDto,   
+     proveedorEmpresa:Types.ObjectId,
+    proveedorPersona:Types.ObjectId,
+    usuario:Types.ObjectId,
+  ) {
     data.producto = new Types.ObjectId(data.producto);
     data.almacenArea = new Types.ObjectId(data.almacenArea);
     const stock= await this.stock.create({
@@ -89,24 +97,22 @@ export class StocksService {
       tipo: data.tipo,
       codigo: await this.generarCodigo()
     });
-    await this.movimientoAreaService.registarMovimientoArea(
+    await this.movimientoAreaService.registrarMovimientoArea(
       data,
       tipoDeRegistroE.INGRESO,
       stock._id,
-      proveedorEmpresa,proveedorPersona
+      proveedorEmpresa,proveedorPersona,
+       usuario
     );
   }
 
 
 
-  async findAll(parametrosStockDto:ParametrosStockDto):Promise<PaginatedResponseI<StockResponse>> { 
+  async findAll(parametrosStockDto:ParametrosStockDto,request :Request):Promise<PaginatedResponseI<StockResponse>> { 
 
   const filtrador=    this.filtardorStockService.filtroBusquedaStock(parametrosStockDto)
     const {marca, codigo, ...filtradorSinMarca}= filtrador
-    let countDocuments =await this.stock.countDocuments({flag:flag.nuevo, ...filtradorSinMarca})
-    if (marca) {
-      countDocuments = await this.cantidadStockConMarca(marca);
-    }
+    const  countDocuments = await this.countDocuments(filtrador, request);    
     const cantidadPaginas= Math.ceil(countDocuments / Number(parametrosStockDto.limite) )
     const stocks:StockResponse[] = await this.stock.aggregate([
       {
@@ -154,6 +160,19 @@ export class StocksService {
       {
         $unwind: { path: '$almacen', preserveNullAndEmptyArrays: false },
       },
+
+      {
+        $lookup: {
+          from: 'Categoria',
+          localField: 'producto.categoria',
+          foreignField: '_id',
+          as: 'categoria',
+        },
+      },
+      {
+        $unwind: { path: '$categoria', preserveNullAndEmptyArrays: false },
+      },
+      ...(request.area ? [ {$match : {'categoria.area':request.area }}]:[]),
       {
         $project: {
           _id: 0,
@@ -192,13 +211,15 @@ export class StocksService {
     return  {data:stocks, paginas:cantidadPaginas}
   }
 
-  private async cantidadStockConMarca (marca:Types.ObjectId):Promise<number>{
+  
+  private async countDocuments (filtrador:BuscadorStockI, request:Request):Promise<number>{
+    const {marca, codigo, ...filtradorSinMarca}= filtrador
     const cantidad = await this.stock.aggregate([
       {
-        $match:{flag:flag.nuevo}
-      }
-      ,
-        
+        $match:{flag:flag.nuevo,
+          ...filtradorSinMarca
+        }
+      }  ,
       {
         
           $lookup: {
@@ -208,14 +229,26 @@ export class StocksService {
             as: 'producto',
           },
         },
-        {
-          $unwind: { path: '$producto', preserveNullAndEmptyArrays: false },
-        },
-      {
+        
+        ...(codigo) ?[ {
+          $match:{
+            'producto.codigo':codigo
+          }
+        }]:[], 
+      ...(marca) ?[ {
         $match:{
           'producto.marca':new Types.ObjectId(marca)
         }
+      }]:[],
+      {
+        $lookup: {
+          from: 'Categoria',
+          localField: 'producto.categoria',
+          foreignField: '_id',
+          as: 'categoria',
+        },
       },
+      ...(request.area ? [ {$match : {'marca._id':request.area }}]:[]),
       {
         $group :{
           _id:null,
@@ -227,9 +260,7 @@ export class StocksService {
           cantidad:1
         }
       }
-
     ])
-         
     return cantidad.length > 0? cantidad[0].cantidad : 1
   }
 
@@ -237,9 +268,40 @@ export class StocksService {
     return `This action returns a #${id} stock`;
   }
 
-  async vericarStockProducto(producto:Types.ObjectId){
-    const stock=await this.stock.findOne({producto:new Types.ObjectId(producto)})
+  async vericarStockProducto(producto:Types.ObjectId, request :Request){      
+    const stock=await this.stock.aggregate([
+      {
+        $match:{
+          flag:flag.nuevo,
+          producto:new Types.ObjectId(producto)
+        }
+      },
+      {
+        $lookup:{
+          from:'AlmacenArea',
+          foreignField:'_id',
+          localField:'almacenArea',
+          as:'almacenArea'
 
+        }
+      },
+      {
+        $unwind:{path:'$almacenArea', preserveNullAndEmptyArrays:true}
+      },
+      {
+        $match:{
+          'almacenArea.area':new Types.ObjectId(request.area)
+        }
+      },
+      {
+        $project:{
+          tipo:1,
+          almacen:'$almacenArea.nombre',
+          idAlmacen:'$almacenArea._id',
+          cantidad:1
+        }
+      }
+    ])    
     return stock
 
   }

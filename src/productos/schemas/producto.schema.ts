@@ -50,6 +50,8 @@ export class Producto {
     @Prop({type:String, enum:flag, default:flag.nuevo })
     flag:flag
 
+    
+
 
 }
 

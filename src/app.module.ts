@@ -27,6 +27,9 @@ import { ModulosGuard } from './autenticacion/guards/modulos/modulos.guard';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { StockSucursalModule } from './stock-sucursal/stock-sucursal.module';
+import { DetalleAreaModule } from './detalle-area/detalle-area.module';
+import { TipoDetalleGuard } from './autenticacion/guards/tipo-detalle/tipo-detalle.guard';
+import { TipoUsuarioGuard } from './autenticacion/guards/tipo-usuario/tipo-usuario.guard';
 
 
 
@@ -58,6 +61,7 @@ import { StockSucursalModule } from './stock-sucursal/stock-sucursal.module';
        RolModule,
        PermisosModule,
        StockSucursalModule,
+       DetalleAreaModule,
 
 
       ],
@@ -66,12 +70,20 @@ import { StockSucursalModule } from './stock-sucursal/stock-sucursal.module';
     {
       provide:APP_GUARD,
       useClass:TokenGuard
-    }
-   /* {
+    },
+    {
       provide:APP_GUARD,
       useClass:ModulosGuard
     },
+      {
+      provide:APP_GUARD,
+      useClass:TipoDetalleGuard
+    },
     {
+      provide:APP_GUARD,
+      useClass:TipoUsuarioGuard
+    },
+     /*   {
       provide:APP_GUARD,
       useClass:PermisosGuard
     }*/

@@ -34,6 +34,7 @@ export class AutenticacionService {
         const payload: payloadI = {
           rol: rol._id,
           id: usuario._id,
+          tipo:usuario.tipo
         };
         const token = await this.jwtService.signAsync(payload, {
           expiresIn: '4h',

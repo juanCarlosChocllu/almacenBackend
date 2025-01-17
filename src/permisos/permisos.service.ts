@@ -44,8 +44,8 @@ public async  registarPermisosRol(data:permiso, rol:Types.ObjectId){
   return HttpStatus.CREATED
 }
 
-public verificarPemisos(rol:Types.ObjectId):Promise<Permiso[]>{
-  const permisos = this.permiso.find({rol:new Types.ObjectId(rol), flag:flag.nuevo})
+public async verificarPemisos(rol:Types.ObjectId):Promise<Permiso[]>{
+  const permisos = await this.permiso.find({rol:new Types.ObjectId(rol), flag:flag.nuevo})  
   return permisos
 }
 

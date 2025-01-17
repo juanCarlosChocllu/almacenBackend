@@ -1,5 +1,6 @@
 import { Types } from "mongoose";
 import { flag } from "src/enums/flag.enum";
+import { TipoUsuarioE } from "../enums/tipoUsuario";
 
 export interface UsuarioI{
       _id:Types.ObjectId
@@ -26,5 +27,8 @@ export interface UsuarioI{
     
   
       fecha: Date;
+
+
+      tipo:string
 
 }
