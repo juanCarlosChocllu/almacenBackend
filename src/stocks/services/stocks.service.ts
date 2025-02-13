@@ -7,9 +7,9 @@ import { CreateStockDto } from "../dto/create-stock.dto";
 import { tipoDeRegistroE } from "src/movimiento-area/enums/tipoRegistro.enum";
 import { DataStockDto } from "../dto/data.stock.dto";
 import { ParametrosStockDto } from "../dto/parametros-stock-dto";
-import { PaginatedResponseI } from "src/interface/httpRespuesta";
+import { PaginatedResponseI } from "src/core/interface/httpRespuesta";
 import { StockResponse } from "../interfaces/stock.interface";
-import { flag } from "src/enums/flag.enum";
+import { flag } from "src/core/enums/flag.enum";
 import { UpdateStockDto } from "../dto/update-stock.dto";
 import { tipoE } from "../enums/tipo.enum";
 import { FiltardorStockService } from "./filtardor.stock.service";
@@ -17,6 +17,8 @@ import { FiltardorStockService } from "./filtardor.stock.service";
 import { Request } from "express";
 import { request } from "http";
 import { BuscadorStockI } from "../interfaces/buscadorStock";
+import { CodigoStockService } from "./codigoStock.service";
+import { Type } from "class-transformer";
 
 @Injectable()
 export class StocksService {
@@ -24,10 +26,12 @@ export class StocksService {
     @InjectModel(Stock.name) private readonly stock: Model<Stock>,
     private readonly movimientoAreaService: MovimientoAreaService,
     private readonly filtardorStockService: FiltardorStockService,
+    private readonly codigoStockService:CodigoStockService
   ) {}
   async create(createStockDto: CreateStockDto, request :Request) {
    
     try {
+      const codigo = await this.codigoStockService.registrarCodigo(request.area)
       for (const data of createStockDto.data) {
         const producto = new Types.ObjectId(data.producto);
         const stockExistente = await this.stock.findOne({
@@ -70,7 +74,7 @@ export class StocksService {
           
         } else {
       
-          await this.crearStock(data,createStockDto.proveedorEmpresa,createStockDto.proveedorPersona, request.usuario);
+          await this.crearStock(data,createStockDto.proveedorEmpresa,createStockDto.proveedorPersona, request.usuario, codigo._id);
         }
       }
       return { status: HttpStatus.CREATED };
@@ -86,13 +90,14 @@ export class StocksService {
      proveedorEmpresa:Types.ObjectId,
     proveedorPersona:Types.ObjectId,
     usuario:Types.ObjectId,
+    codigoStock: Types.ObjectId
   ) {
     data.producto = new Types.ObjectId(data.producto);
     data.almacenArea = new Types.ObjectId(data.almacenArea);
     const stock= await this.stock.create({
       almacenArea: data.almacenArea,
       cantidad: data.cantidad,
-   
+      codigoStock:new Types.ObjectId(codigoStock),
       producto: data.producto,
       tipo: data.tipo,
       codigo: await this.generarCodigo()
