@@ -14,4 +14,8 @@ export interface BuscadorStockSucursalI{
     
 
         tipo?:string
+
+        
+        sucursal?:Types.ObjectId
+    
 }

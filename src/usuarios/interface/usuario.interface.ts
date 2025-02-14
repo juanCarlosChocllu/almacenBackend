@@ -1,5 +1,5 @@
 import { Types } from "mongoose";
-import { flag } from "src/enums/flag.enum";
+import { flag } from "src/core/enums/flag.enum";
 import { TipoUsuarioE } from "../enums/tipoUsuario";
 
 export interface UsuarioI{
@@ -22,6 +22,8 @@ export interface UsuarioI{
     
 
       rol: Types.ObjectId;
+      
+      sucursal: Types.ObjectId;
 
       flag: flag;
     

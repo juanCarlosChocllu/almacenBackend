@@ -4,8 +4,8 @@ import { UpdateRolDto } from './dto/update-rol.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Rol } from './schema/rol.schema';
 import { Model, Types } from 'mongoose';
-import { flag } from 'src/enums/flag.enum';
-import { ApiResponseI } from 'src/interface/httpRespuesta';
+import { flag } from 'src/core/enums/flag.enum';
+import { ApiResponseI } from 'src/core/interface/httpRespuesta';
 import { PermisosService } from 'src/permisos/permisos.service';
 import { RolI } from './interface/rol.interface';
 

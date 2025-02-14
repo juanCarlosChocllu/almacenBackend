@@ -1,7 +1,7 @@
 import { Type } from "@nestjs/common";
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Types } from "mongoose";
-import { flag } from "src/enums/flag.enum";
+import { flag } from "src/core/enums/flag.enum";
 import { tipoE } from "src/stocks/enums/tipo.enum";
 
 @Schema({collection:'MovimientoArea'})
@@ -56,6 +56,8 @@ export class MovimientoArea {
     @Prop({type:String, enum:flag, default:flag.nuevo })
     flag:string
 
+    @Prop({type:Types.ObjectId, ref:'CodigoStock'})
+    codigoStock:Types.ObjectId
 
 }
 export const movimientoAreaSchema:SchemaFactory = SchemaFactory.createForClass(MovimientoArea)

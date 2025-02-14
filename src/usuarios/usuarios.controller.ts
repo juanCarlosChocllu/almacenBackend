@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } from '@nestjs/common';
 import { UsuariosService } from './usuarios.service';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
@@ -10,6 +10,9 @@ import { Permiso } from 'src/autenticacion/decorators/permisos/permisos.decorato
 import { permisosE } from 'src/rol/enums/administracion/permisos.enum';
 import { TipoUsuario } from 'src/autenticacion/decorators/tipoUsuario/tipoUsuario';
 import { TipoUsuarioE } from './enums/tipoUsuario';
+ import {Request } from 'express'
+import { get } from 'mongoose';
+import { PublicInterno } from 'src/autenticacion/decorators/publicInterno/publicInterno';
 
 @Controller('usuarios')
 @Modulo(modulosE.USUARIOS)
@@ -29,9 +32,10 @@ export class UsuariosController {
     return this.usuariosService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usuariosService.findOne(+id);
+  @Get('informacion')
+  @PublicInterno()
+  findOne(@Req() request:Request) {
+    return this.usuariosService.findOne(request);
   }
 
   @Patch(':id')
@@ -43,4 +47,6 @@ export class UsuariosController {
   remove(@Param('id') id: string) {
     return this.usuariosService.remove(+id);
   }
+
+  
 }

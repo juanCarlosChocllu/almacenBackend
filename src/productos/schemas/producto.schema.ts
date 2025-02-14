@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose"
 import { Types } from "mongoose"
-import { flag } from "src/enums/flag.enum"
+import { flag } from "src/core/enums/flag.enum"
 import { generoE } from "../enum/gereno.enum"
 import { tallaE } from "../enum/talla.enum"
 
@@ -36,7 +36,9 @@ export class Producto {
     @Prop({type:Types.ObjectId, ref:'Marca'})
     marca:Types.ObjectId
 
-    
+    @Prop({type:Types.ObjectId, ref:'Area'})
+    area:Types.ObjectId
+
     @Prop()
     color:Types.ObjectId
 

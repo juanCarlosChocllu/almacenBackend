@@ -16,32 +16,43 @@ import {
 export class TipoUsuarioGuard implements CanActivate {
   constructor(private readonly reflector: Reflector) {}
   canActivate(context: ExecutionContext): boolean {
-    const request: Request = context.switchToHttp().getRequest();
-    const publicInterno = this.reflector.get<boolean>(
-      PUBLIC_INTERNO_KEY,
-      context.getHandler(),
-    );
+    try {
+      const request: Request = context.switchToHttp().getRequest();
+      const publicInterno = this.reflector.get<boolean>(
+        PUBLIC_INTERNO_KEY,
+        context.getHandler(),
+      );
 
-    if (publicInterno) {
-      return true;
-    }
-
-    const tipo = this.reflector.get<string[]>(
-      TIPO_USUARIO_KEY,
-      context.getClass(),
-    );    
-    const publico = this.reflector.get<boolean>(
-      Public_KEY,
-      context.getHandler(),
-    );
-    if (publico) {
-      return true;
-    }
-    if (Array.isArray(tipo)) {
-      console.log(tipo.some((item) => item === request.tipo));
       
-      return tipo.some((item) => item === request.tipo);
+      if (publicInterno) {
+        return true;
+      }
+      
+      
+      const publico = this.reflector.get<boolean>(
+        Public_KEY,
+        context.getHandler(),
+      );
+      if (publico) {
+      
+        
+        return true;
+      }
+  
+      const tipo = this.reflector.get<string[]>(
+        TIPO_USUARIO_KEY,
+        context.getClass(),
+      );    
+   
+      if (Array.isArray(tipo)) {
+        return tipo.some((item) => item === request.tipo);
+      }
+     
+      throw new UnauthorizedException('tipo invalido');
+    } catch (error) {
+        console.log(error);
+        
     }
-    throw new UnauthorizedException();
-  }
+}
+
 }

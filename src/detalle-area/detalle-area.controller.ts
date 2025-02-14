@@ -8,25 +8,17 @@ import { TipoUsuario } from 'src/autenticacion/decorators/tipoUsuario/tipoUsuari
 import { TipoUsuarioE } from 'src/usuarios/enums/tipoUsuario';
 import { PublicInterno } from 'src/autenticacion/decorators/publicInterno/publicInterno';
 
-@TipoUsuario(TipoUsuarioE.AREA)
+@TipoUsuario(TipoUsuarioE.AREA, TipoUsuarioE.NINGUNO)
 @Controller('detalle/area')
 export class DetalleAreaController {
   constructor(private readonly detalleAreaService: DetalleAreaService) {}
 
- /* @Post()
-  create(@Body() createDetalleAreaDto: CreateDetalleAreaDto) {
-    return this.detalleAreaService.create(createDetalleAreaDto);
-  }*/
-
-  /*@Get()
-  findAll() {
-    return this.detalleAreaService.findAll();
-  }*/
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.detalleAreaService.findOne(+id);
+  @Get('usuario')
+  @PublicInterno()
+  listarDedalleAreasPorUsuario(@Req() request : Request){
+    return this.detalleAreaService.listarDedalleAreasPorUsuario(request);
   }
+
 
 
   
@@ -41,11 +33,15 @@ export class DetalleAreaController {
     return this.detalleAreaService.remove(+id);
   }
 
+ 
+
+
   @Get()
   @PublicInterno()
-  listarDedalleArea(@Req() request : Request){
-    return this.detalleAreaService.listarDedalleArea(request);
+  listarDedalleAreas(@Req() request : Request){
+    return this.detalleAreaService.listarDedalleAreas(request);
   }
+
 
   @Post()
   @PublicInterno()

@@ -1,1 +1,1 @@
-import { httErrorI } from "src/interface/httpError";
+import { httErrorI } from "src/core/interface/httpError";

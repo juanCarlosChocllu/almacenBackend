@@ -10,12 +10,12 @@ import {
   Req,
 } from '@nestjs/common';
 
-import { CreateStockDto } from './dto/create-stock.dto';
-import { UpdateStockDto } from './dto/update-stock.dto';
+import { CreateStockDto } from '../dto/create-stock.dto';
+import { UpdateStockDto } from '../dto/update-stock.dto';
 import { ValidateIdPipe } from 'src/utils/validate-id/validate-id.pipe';
-import { ParametrosStockDto } from './dto/parametros-stock-dto';
+import { ParametrosStockDto } from '../dto/parametros-stock-dto';
 import { Types } from 'mongoose';
-import { StocksService } from './services/stocks.service';
+import { StocksService } from '../services/stocks.service';
 import { Request } from 'express';
 import { Modulo } from 'src/autenticacion/decorators/modulos/modulo.decorator';
 import { modulosE } from 'src/rol/enums/administracion/modulos.enum';
@@ -75,4 +75,6 @@ export class StocksController {
     vericarStockProducto(@Param('producto', ValidateIdPipe ) producto:Types.ObjectId, @Req() request :Request){   
       return this.stocksService.vericarStockProducto(producto, request)
     }
+
+   
 }

@@ -9,6 +9,7 @@ declare global {
             area?:Types.ObjectId,
             sucursal?:Types.ObjectId,
             tipo:string
+      
 
          }
     }

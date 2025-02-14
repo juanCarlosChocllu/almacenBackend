@@ -3,6 +3,7 @@ import {
   HttpStatus,
   Injectable,
   NotFoundException,
+  Type,
 } from '@nestjs/common';
 import { CreateTransferenciaDto } from '../dto/create-transferencia.dto';
 import { UpdateTransferenciaDto } from '../dto/update-transferencia.dto';
@@ -10,8 +11,8 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Transferencia } from '../schemas/transferencia.schema';
 import { Model, Types } from 'mongoose';
 
-import { httErrorI } from 'src/interface/httpError';
-import { ApiResponseI, PaginatedResponseI } from 'src/interface/httpRespuesta';
+import { httErrorI } from 'src/core/interface/httpError';
+import { ApiResponseI, PaginatedResponseI } from 'src/core/interface/httpRespuesta';
 import { MovimientoAreaService } from 'src/movimiento-area/services/movimiento-area.service';
 import { tipoDeRegistroE } from 'src/movimiento-area/enums/tipoRegistro.enum';
 
@@ -19,7 +20,7 @@ import { transferenciaEntradaSucursalI, transferenciaSalidaI } from '../interfac
 import { dataTransferenciaDto } from '../dto/data-transferencia.dto';
 import { MovimientoSucursalService } from 'src/movimiento-sucursal/movimiento-sucursal.service';
 ;
-import { flag } from 'src/enums/flag.enum';
+import { flag } from 'src/core/enums/flag.enum';
 import { PaginadorDto } from 'src/utils/dtos/paginadorDto';
 import { Console, log } from 'console';
 import { StocksService } from 'src/stocks/services/stocks.service';
@@ -31,17 +32,26 @@ import { ProductosService } from 'src/productos/services/productos.service';
 import {Request} from 'express'
 import { TipoUsuarioE } from 'src/usuarios/enums/tipoUsuario';
 import { BuscadorTransferenciaI } from '../interfaces/buscadorTransferencia';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { NotificacionI } from 'src/notificacion/interface/notificacion';
+import { CodigoTransferencia } from '../schemas/codigoTransferencia';
+import { CodigoTransferenciaI } from '../interfaces/codigoTranferencia';
+import { CodigoTransferenciaService } from './codigoTransferencia.service';
 @Injectable()
 export class TransferenciasService {
   constructor(
     @InjectModel(Transferencia.name)
     private readonly transferencia: Model<Transferencia>,
+
+
     private readonly stockService: StocksService,
     private readonly movimientoAreaService: MovimientoAreaService,
     private readonly movimientoSucursalService: MovimientoSucursalService,
     private readonly stockSucursalService: StockSucursalService,
     private readonly filtardoresService: FiltardoresService,
     private readonly productoService: ProductosService,
+    private readonly codigoTransferenciaService: CodigoTransferenciaService,
+    private emiter :EventEmitter2
   ) {}
   async create(
     createTransferenciaDto: CreateTransferenciaDto,
@@ -55,6 +65,10 @@ export class TransferenciasService {
         if (errorStock.length > 0) {
           throw errorStock;
         }else {
+          if(!request.usuario && !request.area){
+            throw new  BadRequestException('Selecciona una area')
+          }
+          const codigoTransferencia = await this.codigoTransferenciaService.codigoTransferencias(request.usuario, request.area)
           for (const data of createTransferenciaDto.data) {
               data.usuario = request.usuario
               data.area = request.area
@@ -62,19 +76,31 @@ export class TransferenciasService {
               data.stock,
               data.tipo,
               data.almacenArea
+              
             );
           
-              const transferencia = await this.realizarTransferencia(data);
+              const transferencia = await this.realizarTransferencia(data, codigoTransferencia);
+           
               if (transferencia) {
                     await this.actualizarStock(stock, data);
                    // await this.registraMovimientoSalida(stock, data);
                     await this.registrarStockTransferencia(data, stock,transferencia._id)
                     await this.registraMovimientoEntradaSucursal(stock, data, transferencia._id)
+                    const dataNotificacion:NotificacionI={
+                      area:'falta',
+                      cantidad:data.cantidad,
+                      codigoProducto:data.codigoProducto,
+                      producto:data.nombreProducto,
+                      sucursal:String(data.sucursal)
+                    }
+                     this.emiter.emit('notificaciones.create', dataNotificacion)
                   }
               }
         }
         return { message: 'Transferencia realizada', status: HttpStatus.OK };
       } catch (error) { 
+        console.log(error);
+        
          throw new BadRequestException(error)
       }
   }
@@ -94,10 +120,8 @@ export class TransferenciasService {
           }
     
           if (data.cantidad > stock.cantidad) {
-              const producto = await this.productoService.verificarProducto(stock.producto)
-              
               errorStock.push({
-              codigoProducto:producto.codigo,
+              codigoProducto:data.codigoProducto,
               propiedad: 'cantidad',
               message: 'Cantidad mayor a la de stock',
               status: HttpStatus.BAD_REQUEST,
@@ -117,8 +141,8 @@ export class TransferenciasService {
     return stockActulizado;
   }
 
-  private async realizarTransferencia(data: dataTransferenciaDto) {
-    console.log(data.usuario);
+  private async realizarTransferencia(data: dataTransferenciaDto ,codigoTransferencia:Types.ObjectId) {
+
     
     const transferencia = await this.transferencia.create({
       almacenSucursal: new Types.ObjectId(data.almacenSucursal),
@@ -127,6 +151,7 @@ export class TransferenciasService {
       cantidad: Number(data.cantidad),
       stock: new Types.ObjectId(data.stock),
       usuario: data.usuario,
+      codigoTransferencia:codigoTransferencia
     });
 
     return transferencia;
@@ -188,9 +213,13 @@ export class TransferenciasService {
       transferencia:tranferencia,
       area:stock.area,
       stock:stock._id,
+      fechaVencimiento:stock.fechaVencimiento
+
 
       
     };
+  
+    
     await this.stockSucursalService.registrarStockTranferencia(stockTransferencia)
 
   }
@@ -393,6 +422,10 @@ export class TransferenciasService {
     return cantidad.length > 0? cantidad[0].cantidad : 1
  
   }
+
+
+
+
   findOne(id: number) {
     return `This action returns a #${id} transferencia`;
   }
@@ -404,4 +437,107 @@ export class TransferenciasService {
   remove(id: number) {
     return `This action removes a #${id} transferencia`;
   }
+
+  async listarTransferenciaPorCodigo(id:Types.ObjectId){
+    const tranferencias = await this.transferencia.aggregate([
+      {
+        $match:{
+          flag:flag.nuevo,
+          codigoTransferencia:new Types.ObjectId(id)
+        }
+      },
+      {
+        $lookup:{
+          from:'Stock',
+          foreignField:'_id',
+          localField:'stock',
+          as:'stock'
+        }
+      },
+      {
+        $unwind:{
+          path:'$stock', preserveNullAndEmptyArrays:false
+        }
+      },
+
+      {
+        $lookup:{
+          from:'Producto',
+          foreignField:'_id',
+          localField:'stock.producto',
+          as:'producto'
+        }
+      },
+      {
+        $unwind:{
+          path:'$producto' , preserveNullAndEmptyArrays:false
+        }
+      },
+
+      {
+        $lookup:{
+          from:'Marca',
+          foreignField:'_id',
+          localField:'producto.marca',
+          as:'marca',
+        }
+      },
+      {
+        $unwind:{
+          path:'$marca', preserveNullAndEmptyArrays:false
+        }
+      },
+      {
+        $lookup:{
+          from:'AlmacenSucursal',
+          foreignField:'_id',
+          localField:'almacenSucursal',
+          as:'almacenSucursal'
+        }
+      },
+      {
+        $unwind:{
+          path:'$almacenSucursal', preserveNullAndEmptyArrays:false
+        }
+      },
+      {
+        $lookup:{
+          from:'Sucursal',
+          foreignField:'_id',
+          localField:'almacenSucursal.sucursal', 
+          as:'sucursal'
+        }
+      },
+      {
+        $unwind:{
+          path:'$sucursal', preserveNullAndEmptyArrays:false
+        }
+      },
+    
+      {
+        $project:{
+          
+          codigo:'$producto.codigo',
+          producto:'$producto.nombre',
+          color:'$producto.color',
+          marca:'$marca.nombre',
+          cantidad:1,
+          almacenSucursal:'$almacenSucursal.nombre',
+          sucursal:'$sucursal.nombre',
+          tipo:'$stock.tipo',
+          estado:1,
+          fecha: {
+            $dateToString: {
+              format: '%Y-%m-%d',
+              date: '$fecha',
+            },
+          },
+
+        }
+      }    
+    ])    
+    return tranferencias
+  }
+
+
 }

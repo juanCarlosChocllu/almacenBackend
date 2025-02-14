@@ -4,7 +4,7 @@ import { UpdateColorDto } from './dto/update-color.dto';
 import { Color } from './schemas/color.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { ApiResponseI } from 'src/interface/httpRespuesta';
+import { ApiResponseI } from 'src/core/interface/httpRespuesta';
 
 @Injectable()
 export class ColorService {

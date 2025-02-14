@@ -33,13 +33,18 @@ export class TokenGuard implements CanActivate {
     if (publico) {
       return true;
     }
+    
     try {
       const request: Request = context.switchToHttp().getRequest();
-      const token = request.headers.authorization.split(' ')[1];      
+      const token = request.headers.authorization.split(' ')[1];     
+   
+       
       const payload: payloadI = this.jwtService.verify(token, {
         secret: jwtConstants.secret,
       });
       const usuario = await this.usuariosService.verificarUsuario(payload.id); 
+
+      
       if (usuario) {        
         request.usuario = usuario._id;
         request.rol = new Types.ObjectId(usuario.rol);
@@ -50,10 +55,12 @@ export class TokenGuard implements CanActivate {
         }
         return true;
       } else {
-        throw new UnauthorizedException();
+        throw new UnauthorizedException('token invalido');
       }
-    } catch (error) {
-      throw new UnauthorizedException();
+    } catch (error) {  
+      console.log(error);
+          
+      throw new UnauthorizedException('token invalido');
     }
   }
 

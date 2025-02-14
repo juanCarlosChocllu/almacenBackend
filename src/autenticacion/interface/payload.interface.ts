@@ -7,4 +7,8 @@ export interface payloadI{
 
     tipo:string
 
+    sucursal?:Types.ObjectId
+
+
+
 }

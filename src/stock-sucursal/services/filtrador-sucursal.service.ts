@@ -13,12 +13,12 @@ export class FiltradorSucursalService{
     }
 
     buscadorStockSucursal(buscadorStockSucursal:BuscadorStockSucursal):BuscadorStockSucursalI{
-   
         const filtrador : BuscadorStockSucursalI ={}
         buscadorStockSucursal.almacenSucursal ? filtrador.almacenSucursal = new Types.ObjectId(buscadorStockSucursal.almacenSucursal) : filtrador
         buscadorStockSucursal.codigo ? filtrador.codigo = new RegExp(buscadorStockSucursal.codigo, 'i') : filtrador
         buscadorStockSucursal.marca ? filtrador.marca = new Types.ObjectId( buscadorStockSucursal.marca ) : filtrador
         buscadorStockSucursal.tipo ? filtrador.tipo = buscadorStockSucursal.tipo  : filtrador      
+        buscadorStockSucursal.sucursal ? filtrador.sucursal = buscadorStockSucursal.sucursal  : filtrador      
         return  filtrador
     }
 }

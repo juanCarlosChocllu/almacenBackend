@@ -1,16 +1,18 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Req } from '@nestjs/common';
-import { TransferenciasService } from './services/transferencias.service';
-import { CreateTransferenciaDto } from './dto/create-transferencia.dto';
-import { UpdateTransferenciaDto } from './dto/update-transferencia.dto';
+import { TransferenciasService } from '../services/transferencias.service';
+import { CreateTransferenciaDto } from '../dto/create-transferencia.dto';
+import { UpdateTransferenciaDto } from '../dto/update-transferencia.dto';
 
-import { BuscadorTransferenciaDto } from './dto/buscador-transferencia.dto';
+import { BuscadorTransferenciaDto } from '../dto/buscador-transferencia.dto';
 import { Request } from 'express';
 import { TipoUsuario } from 'src/autenticacion/decorators/tipoUsuario/tipoUsuario';
 import { tipoDeRegistroE } from 'src/movimiento-area/enums/tipoRegistro.enum';
 import { TipoUsuarioE } from 'src/usuarios/enums/tipoUsuario';
-import { tipoRegistro } from 'src/enums/tipo.registro.enum';
+import { tipoRegistro } from 'src/core/enums/tipo.registro.enum';
 import { Modulo } from 'src/autenticacion/decorators/modulos/modulo.decorator';
 import { modulosE } from 'src/rol/enums/administracion/modulos.enum';
+import { ValidateIdPipe } from 'src/utils/validate-id/validate-id.pipe';
+import { Types } from 'mongoose';
 
 @Modulo(modulosE.TRANSFERENCIAS)
 @TipoUsuario(TipoUsuarioE.AREA,TipoUsuarioE.NINGUNO)  
@@ -46,5 +48,12 @@ export class TransferenciasController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.transferenciasService.remove(+id);
+  }
+
+  @Get('codigo/:id')
+  listarTransferenciaPorCodigo(@Param('id',ValidateIdPipe) id: Types.ObjectId){
+    
+    
+    return this.transferenciasService.listarTransferenciaPorCodigo(id)
   }
 }

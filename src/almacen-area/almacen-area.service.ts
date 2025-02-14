@@ -5,8 +5,8 @@ import { InjectModel } from '@nestjs/mongoose';
 import { AlmacenArea } from './schemas/almacen-area.schema';
 import { Model, Types } from 'mongoose';
 import { AreasService } from 'src/areas/areas.service';
-import { flag } from 'src/enums/flag.enum';
-import { ApiResponseI } from 'src/interface/httpRespuesta';
+import { flag } from 'src/core/enums/flag.enum';
+import { ApiResponseI } from 'src/core/interface/httpRespuesta';
 import { Request } from 'express';
 
 @Injectable()
@@ -25,7 +25,7 @@ export class AlmacenAreaService {
     }else{
       createAlmacenAreaDto.area= new Types.ObjectId(createAlmacenAreaDto.area) 
     }    
-    const area = await this.areasService.bsucarArea(createAlmacenAreaDto.area)
+    const area = await this.areasService.buscarArea(createAlmacenAreaDto.area)
     const almacen = await this.almacenArea.findOne({nombre:createAlmacenAreaDto.nombre})
     if(!area){
       throw new NotFoundException('El area no existe')

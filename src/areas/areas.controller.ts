@@ -6,6 +6,7 @@ import { Modulo } from 'src/autenticacion/decorators/modulos/modulo.decorator';
 import { modulosE } from 'src/rol/enums/administracion/modulos.enum';
 import { TipoUsuario } from 'src/autenticacion/decorators/tipoUsuario/tipoUsuario';
 import { TipoUsuarioE } from 'src/usuarios/enums/tipoUsuario';
+import { Types } from 'mongoose';
 
 
 @Modulo(modulosE.AREAS)
@@ -26,8 +27,8 @@ export class AreasController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.areasService.findOne(+id);
+  findOne(@Param('id') id: Types.ObjectId) {
+    return this.areasService.findOne(id);
   }
 
   @Patch(':id')

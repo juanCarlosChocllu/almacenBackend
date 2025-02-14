@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose"
 import { Types } from "mongoose"
-import { flag } from "src/enums/flag.enum"
+import { flag } from "src/core/enums/flag.enum"
 import { tipoE } from "../enums/tipo.enum"
 
 @Schema({collection:'Stock'})
@@ -20,12 +20,14 @@ export class Stock {
     @Prop({type:Types.ObjectId, ref:'Producto'})
     producto:Types.ObjectId
 
+    @Prop()
+    fechaVencimiento:Date
+
     @Prop({type:Date, default:Date.now()})
     fecha:Date
 
     @Prop({type:String, enum:flag, default:flag.nuevo })
     flag:flag
-    
 }
 
 export const stockSchema = SchemaFactory.createForClass(Stock)

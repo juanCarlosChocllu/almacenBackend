@@ -6,7 +6,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
 import { transferenciaEntradaSucursalI } from 'src/transferencias/interfaces/transferencias';
-import { flag } from 'src/enums/flag.enum';
+import { flag } from 'src/core/enums/flag.enum';
 
 @Injectable()
 export class MovimientoSucursalService {

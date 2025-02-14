@@ -14,6 +14,9 @@ export class BuscadorStockSucursal extends PaginadorDto {
     @IsOptional()
     almacenSucursal:Types.ObjectId
 
+    @IsMongoId()
+    @IsOptional()
+    sucursal:Types.ObjectId
 
     @IsMongoId()
     @IsOptional()

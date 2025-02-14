@@ -8,6 +8,7 @@ import { Modulo } from 'src/autenticacion/decorators/modulos/modulo.decorator';
 import { modulosE } from './enums/administracion/modulos.enum';
 import { TipoUsuario } from 'src/autenticacion/decorators/tipoUsuario/tipoUsuario';
 import { TipoUsuarioE } from 'src/usuarios/enums/tipoUsuario';
+import { Public } from 'src/autenticacion/decorators/public/public.decorator';
 
 
 @Modulo(modulosE.ROL)
@@ -17,11 +18,13 @@ export class RolController {
   constructor(private readonly rolService: RolService) {}
 
   @Post()
+
   create(@Body() createRolDto: CreateRolDto) {
     return this.rolService.create(createRolDto);
   }
 
   @Get()
+
   findAll() {
     return this.rolService.findAll();
   }

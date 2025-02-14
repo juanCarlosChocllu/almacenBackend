@@ -4,7 +4,7 @@ import { UpdateCategoriaDto } from './dto/update-categoria.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Categoria } from './schema/categoria.schema';
 import { Model, Types } from 'mongoose';
-import { flag } from 'src/enums/flag.enum';
+import { flag } from 'src/core/enums/flag.enum';
 import {Request} from 'express'
 @Injectable()
 export class CategoriasService {

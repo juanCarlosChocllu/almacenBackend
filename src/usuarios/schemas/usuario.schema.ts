@@ -1,7 +1,7 @@
 import { Types } from 'mongoose';
 
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { flag } from 'src/enums/flag.enum';
+import { flag } from 'src/core/enums/flag.enum';
 
 @Schema({ collection: 'Usuario' })
 export class Usuario {

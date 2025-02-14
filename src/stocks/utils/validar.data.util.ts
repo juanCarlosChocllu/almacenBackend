@@ -6,7 +6,7 @@ import {
     ValidationOptions,
   } from 'class-validator';
   import { DataStockDto } from '../dto/data.stock.dto';
-  import { httErrorI } from 'src/interface/httpError';
+  import { httErrorI } from 'src/core/interface/httpError';
   import { BadRequestException, HttpStatus } from '@nestjs/common';
   import { tipoE } from '../enums/tipo.enum';
   
@@ -105,13 +105,13 @@ import {
                 }
   
 
-                if (!isDateString(atributo.fechaVencimiento)) {
+                if ( atributo.fechaVencimiento && !isDateString(atributo.fechaVencimiento)) {
                   errores.push({
                     status: HttpStatus.BAD_REQUEST,
                     message: 'La "fechaVencimiento" debe ser una fecha válida',
                     propiedad: 'fechaVencimiento',
                   });
-                }
+                } 
   
      
                 if (!isDateString(atributo.fechaCompra)) {

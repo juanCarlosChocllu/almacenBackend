@@ -50,10 +50,10 @@ export class ModulosGuard implements CanActivate {
         )[0].acciones;     
             return permisos.some((item) => item.modulo === modulo);
       } else {
-        throw new UnauthorizedException();
+        throw new UnauthorizedException('Modulos invalidos');
       }
     } catch (error) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('Modulos invalidos');
     }
   }
 }

@@ -1,8 +1,8 @@
 import { BadRequestException, HttpStatus } from "@nestjs/common";
-import { registerDecorator, ValidationOptions, ValidationArguments } from 'class-validator';
+import { registerDecorator, ValidationOptions, ValidationArguments, isString } from 'class-validator';
 import { isMongoId } from "class-validator";
 
-import { httErrorI } from "src/interface/httpError";
+import { httErrorI } from "src/core/interface/httpError";
 import { tipoE } from "src/stocks/enums/tipo.enum";
 import { dataTransferenciaDto } from "src/transferencias/dto/data-transferencia.dto";
 
@@ -59,8 +59,37 @@ export function IsvalidarDataTranferencia(validationOptions?:ValidationOptions){
                           message: 'El tipo solo puede ser REGALO || VENTA ',
                           propiedad: 'tipo',
                         });
-                      }                    
+                      }       
+                      
+                      
+                      if(! isMongoId(atributo.sucursal) ){
+                        errores.push({
+                            status: HttpStatus.BAD_REQUEST,
+                            message: 'sucursal requerido',
+                            propiedad: 'sucursal',
+                          });
+                        }  
+
+                        if(!isString(atributo.codigoProducto) ){
+                          errores.push({
+                              status: HttpStatus.BAD_REQUEST,
+                              message: 'Codigo producto requerido',
+                              propiedad: 'codigoProducto',
+                            });
+                          }  
+
+                          if(!isString(atributo.nombreProducto) ){
+                            errores.push({
+                                status: HttpStatus.BAD_REQUEST,
+                                message: 'Nombre Producto requerido',
+                                propiedad: 'nombreProducto',
+                              });
+                            }  
                 }
+
+                
+
+
                 if (errores.length > 0) {
                   throw new BadRequestException({
                     statusCode: HttpStatus.BAD_REQUEST,

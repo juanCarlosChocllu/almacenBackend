@@ -10,12 +10,12 @@ import { UpdateProductoDto } from '../dto/update-producto.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Producto } from '../schemas/producto.schema';
 import { Model, Types } from 'mongoose';
-import { flag } from 'src/enums/flag.enum';
+import { flag } from 'src/core/enums/flag.enum';
 import { CategoriasService } from 'src/categorias/categorias.service';
 import { codigoProducto } from '../utils/codigoProducto.utils';
 
 import { BuscadorProductoDto } from '../dto/buscadorProducto.dto';
-import {PaginatedResponseI } from 'src/interface/httpRespuesta';
+import {PaginatedResponseI } from 'src/core/interface/httpRespuesta';
 import { ProductoFiltradorService } from './producto.filtardor.service';
 import * as path from 'node:path';
 import * as fs from 'fs';
@@ -30,14 +30,18 @@ export class ProductosService {
     private readonly productoFiltradorService: ProductoFiltradorService,
   ) {}
   async create(createProductoDto: CreateProductoDto) {    
+   
+    
     try {
-      const codigoBarra: Producto = await this.producto.findOne({
-        codigoBarra: createProductoDto.codigoBarra,
-        flag: flag.nuevo,
-      });
-      if (codigoBarra) {
-        await this.elimarImagen(createProductoDto.imagen)
-        throw new ConflictException('El codigo ya existe');
+      if(createProductoDto.codigoBarra){
+        const codigoBarra: Producto = await this.producto.findOne({
+          codigoBarra: createProductoDto.codigoBarra,
+          flag: flag.nuevo,
+        });
+        if (codigoBarra) {
+          await this.elimarImagen(createProductoDto.imagen)
+          throw new ConflictException('El codigo ya existe');
+        }
       }
 
       const categoria = await this.categoriasService.verificarCategoria(

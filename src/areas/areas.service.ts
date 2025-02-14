@@ -4,8 +4,8 @@ import { UpdateAreaDto } from './dto/update-area.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Area } from './schemas/area.schema';
 import { Model, Types } from 'mongoose';
-import { flag } from 'src/enums/flag.enum';
-import { ApiResponseI } from 'src/interface/httpRespuesta';
+import { flag } from 'src/core/enums/flag.enum';
+import { ApiResponseI } from 'src/core/interface/httpRespuesta';
 
 @Injectable()
 export class AreasService {
@@ -23,10 +23,7 @@ export class AreasService {
     return this.area.find({flag:flag.nuevo});
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} area`;
-  }
-
+ 
   update(id: number, updateAreaDto: UpdateAreaDto) {
     return `This action updates a #${id} area`;
   }
@@ -35,9 +32,17 @@ export class AreasService {
     return `This action removes a #${id} area`;
   }
 
-  public async bsucarArea(area:Types.ObjectId){
+  public async buscarArea(area:Types.ObjectId){
     const a = await this.area.exists({_id:new Types.ObjectId(area), flag:flag.nuevo})
     return a
 
   }
+
+  public async findOne(area:Types.ObjectId){
+    const a = await this.area.findOne({_id:new Types.ObjectId(area), flag:flag.nuevo})
+    return a
+
+  }
+
+
 }

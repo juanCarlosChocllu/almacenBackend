@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { UsuariosService } from './usuarios.service';
 import { UsuariosController } from './usuarios.controller';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -7,7 +7,7 @@ import { DetalleAreaModule } from 'src/detalle-area/detalle-area.module';
 
 @Module({
     imports:[
-      DetalleAreaModule
+    forwardRef(()=> DetalleAreaModule)
       ,MongooseModule.forFeature([{name:Usuario.name, schema:usuarioSchema}])],
   controllers: [UsuariosController],
   providers: [UsuariosService],

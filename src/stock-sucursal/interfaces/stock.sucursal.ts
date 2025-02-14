@@ -20,6 +20,8 @@ export interface StockSucursalI{
             transferencia:Types.ObjectId
     
             producto:Types.ObjectId
+
+            fechaVencimiento:Types.ObjectId
             
             stock:Types.ObjectId
             codigo?:string

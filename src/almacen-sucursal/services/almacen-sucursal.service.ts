@@ -2,8 +2,8 @@ import { ConflictException, HttpStatus, Injectable, BadRequestException } from '
 
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
-import { ApiResponseI } from 'src/interface/httpRespuesta';
-import { flag } from 'src/enums/flag.enum';
+import { ApiResponseI } from 'src/core/interface/httpRespuesta';
+import { flag } from 'src/core/enums/flag.enum';
 import { sucursalEmpresaI } from 'src/sucursal/interfaces/sucursalesEmpresa.Interface';
 import { log } from 'node:console';
 import { AlmacenSucursal } from '../schemas/almacen-sucursal.schema';
@@ -58,6 +58,19 @@ export class AlmacenSucursalService {
   listarAlmacenSucursal(sucursal:string){
     try {
       return this.almacenSucursal.find({sucursal:new Types.ObjectId(sucursal), flag:flag.nuevo})
+
+    } catch (error) {
+      
+     throw new BadRequestException()
+      
+      
+    }    
+
+  }
+
+  listarAlmacenSucursalBuscador(sucursal:string,request:Request){
+    try {
+      return this.almacenSucursal.find({sucursal: request.sucursal ?new Types.ObjectId( request.sucursal ): new Types.ObjectId(sucursal)  , flag:flag.nuevo})
 
     } catch (error) {
       

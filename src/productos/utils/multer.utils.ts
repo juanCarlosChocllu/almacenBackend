@@ -25,8 +25,8 @@ export const configuracionMulter: MulterOptions = {
     if (
       !createProductoDto.categoria ||
       !createProductoDto.marca ||
-      !createProductoDto.nombre ||
-      !createProductoDto.codigoBarra
+      !createProductoDto.nombre 
+     
     ) {
       return callback(null, false);
     }

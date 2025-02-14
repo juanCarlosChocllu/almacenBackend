@@ -10,6 +10,11 @@ import { permiso } from 'src/permisos/interface/permisos';
 import { PermisoPayloadI } from './interface/permisos.interface';
 import { log } from 'node:console';
 import { jwtConstants } from './constants/jwtSecret';
+import { UsuarioI } from 'src/usuarios/interface/usuario.interface';
+import { tipoE } from 'src/stocks/enums/tipo.enum';
+import { TipoDetalleGuard } from './guards/tipo-detalle/tipo-detalle.guard';
+import { TipoUsuario } from './decorators/tipoUsuario/tipoUsuario';
+import { TipoUsuarioE } from 'src/usuarios/enums/tipoUsuario';
 
 @Injectable()
 export class AutenticacionService {
@@ -30,27 +35,37 @@ export class AutenticacionService {
  
       
       if (await argon2.verify(usuario.password, autenticacionDto.password)) {
-        const rol = await this.rolService.verificarRol(usuario.rol);
-        const payload: payloadI = {
-          rol: rol._id,
-          id: usuario._id,
-          tipo:usuario.tipo
-        };
-        const token = await this.jwtService.signAsync(payload, {
-          expiresIn: '4h',
-          secret:jwtConstants.secret
-        });
         return {
           status:HttpStatus.OK,
-          token:token
+          token:await this.generarToken(usuario)
         }
       } else {
         throw new UnauthorizedException();
       }
     } catch (error) {   
-      console.log(error);
     
       throw new UnauthorizedException();
     }
+  }
+
+
+  private async generarToken(usuario:UsuarioI){
+    const rol = await this.rolService.verificarRol(usuario.rol);
+    const payload: payloadI = {
+      rol: rol._id,
+      id: usuario._id,
+      tipo:usuario.tipo
+      
+    };
+  
+    if(usuario.tipo == TipoUsuarioE.SUCURSAL ){
+        payload.sucursal = usuario.sucursal
+    }
+    const token = await this.jwtService.signAsync(payload, {
+      expiresIn: '4h',
+      secret:jwtConstants.secret
+    });    
+    return token
+
   }
 }

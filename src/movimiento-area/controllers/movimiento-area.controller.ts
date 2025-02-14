@@ -1,13 +1,16 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Req } from '@nestjs/common';
-import { MovimientoAreaService } from './services/movimiento-area.service';
-import { CreateMovimientoAreaDto } from './dto/create-movimiento-area.dto';
-import { UpdateMovimientoAreaDto } from './dto/update-movimiento-area.dto';
-import { BuscadorMovimientoArea } from './dto/buscador-movimiento-area.dto';
+
 import { Request } from 'express';
 import { Modulo } from 'src/autenticacion/decorators/modulos/modulo.decorator';
 import { modulosE } from 'src/rol/enums/administracion/modulos.enum';
 import { TipoUsuario } from 'src/autenticacion/decorators/tipoUsuario/tipoUsuario';
 import { TipoUsuarioE } from 'src/usuarios/enums/tipoUsuario';
+import { ValidateIdPipe } from 'src/utils/validate-id/validate-id.pipe';
+import { Types } from 'mongoose';
+import { MovimientoAreaService } from '../services/movimiento-area.service';
+import { CreateMovimientoAreaDto } from '../dto/create-movimiento-area.dto';
+import { BuscadorMovimientoArea } from '../dto/buscador-movimiento-area.dto';
+import { UpdateMovimientoAreaDto } from '../dto/update-movimiento-area.dto';
 
 
 @Modulo(modulosE.MOVIMIENTO_AREA)
@@ -41,5 +44,9 @@ export class MovimientoAreaController {
     return this.movimientoAreaService.remove(+id);
   }
 
+  @Get('informacion/stock/:codigo')
+  listarStockMovimientoPorCodigoStock(@Param('codigo', ValidateIdPipe ) codigo:Types.ObjectId) {
+    return this.movimientoAreaService.listarStockMovimientoPorCodigoStock(codigo)
+  }
 
 }

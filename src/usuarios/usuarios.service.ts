@@ -1,16 +1,18 @@
-import { ConflictException, HttpStatus, Injectable } from '@nestjs/common';
+import { ConflictException, forwardRef, HttpStatus, Inject, Injectable, Type } from '@nestjs/common';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
 import * as argon2 from 'argon2';
 import { InjectModel } from '@nestjs/mongoose';
 import { Usuario } from './schemas/usuario.schema';
 import { Model, Types } from 'mongoose';
-import { flag } from 'src/enums/flag.enum';
-import { ApiResponseI } from 'src/interface/httpRespuesta';
+import { flag } from 'src/core/enums/flag.enum';
+import { ApiResponseI } from 'src/core/interface/httpRespuesta';
 import { UsuarioI } from './interface/usuario.interface';
 import { DetalleAreaService } from 'src/detalle-area/detalle-area.service';
 import { tipoE } from 'src/stocks/enums/tipo.enum';
 import { TipoUsuarioE } from './enums/tipoUsuario';
+
+import { Request } from 'express';
 
 @Injectable()
 export class UsuariosService {
@@ -24,7 +26,7 @@ export class UsuariosService {
   constructor(
     @InjectModel(Usuario.name) private readonly usuario: Model<Usuario>,
 
-    private  readonly detalleArea :DetalleAreaService
+     @Inject(forwardRef(() => DetalleAreaService))   private  readonly detalleArea :DetalleAreaService
   ) {}
 
 
@@ -101,8 +103,162 @@ export class UsuariosService {
     ]);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} usuario`;
+  private   async  userInfoTipoNinguno  (id:Types.ObjectId){
+    const user=await this.usuario.aggregate([
+      {
+        $match: {
+          flag: flag.nuevo,
+          _id:new Types.ObjectId(id)
+        },
+      },
+      {
+        $lookup: {
+          from: 'Rol',
+          foreignField: '_id',
+          localField: 'rol',
+          as: 'rol',
+        },
+      },
+      {
+        $unwind: { path: '$rol', preserveNullAndEmptyArrays: false },
+      },
+      {
+        $project: {
+          ci: 1,
+          nombres: 1,
+          apellidos: 1,
+          username: 1,
+          celular: 1,
+          rol: '$rol.nombre'
+        },
+      },
+    ]);    
+    return user[0]
+  }
+
+  private  async  userInfoTipoSucursal (id:Types.ObjectId){
+    const user=  await this.usuario.aggregate([
+      {
+        $match: {
+          flag: flag.nuevo,
+          _id:new Types.ObjectId(id)
+        },
+      },
+      {
+        $lookup: {
+          from: 'Rol',
+          foreignField: '_id',
+          localField: 'rol',
+          as: 'rol',
+        },
+      },
+
+      {
+        $unwind: { path: '$rol', preserveNullAndEmptyArrays: false },
+      },
+      {
+        $lookup: {
+          from: 'Sucursal',
+          foreignField: '_id',
+          localField: 'sucursal',
+          as: 'sucursal',
+        },
+      },
+    {  $unwind: { path: '$sucursal', preserveNullAndEmptyArrays: false } },
+      {
+        $project: {
+          ci: 1,
+          nombres: 1,
+          apellidos: 1,
+          username: 1,
+          celular: 1,
+          rol:  '$rol.nombre',
+         
+          sucursal:'$sucursal.nombre'
+        },
+      },
+    ]);    
+    return  user[0]
+  }
+
+
+  private   async  userInfoTipoArea (id:Types.ObjectId){
+    const user=await this.usuario.aggregate([
+      {
+        $match: {
+          flag: flag.nuevo,
+          _id:new Types.ObjectId(id)
+        },
+      },
+      {
+        $lookup: {
+          from: 'Rol',
+          foreignField: '_id',
+          localField: 'rol',
+          as: 'rol',
+        },
+      },
+      {
+        $unwind: { path: '$rol', preserveNullAndEmptyArrays: false },
+      },
+      {
+        $lookup:{
+          from :'DetalleArea',
+          foreignField:'usuario',
+          localField:'_id',
+          as:'detalleArea'
+        }
+      },
+      {
+        $unwind:'$detalleArea'
+      },
+      {
+        $match:{
+          'detalleArea.ingreso':true
+        }
+      },
+      {
+        $lookup:{
+          from :'Area',
+          foreignField:'_id',
+          localField:'detalleArea.area',
+          as:'area'
+        }
+      },
+      {
+        $unwind:'$area'
+      },
+
+    
+      {
+        $project: {
+          ci: 1,
+          nombres: 1,
+          apellidos: 1,
+          username: 1,
+          celular: 1,
+          rol: '$rol.nombre',
+         
+          area: '$area.nombre',
+        },
+      },
+    ]);    
+    return user[0]
+  }
+
+
+
+  async findOne(request: Request) {
+    
+      if(request.tipo == TipoUsuarioE.NINGUNO) {
+        return this.userInfoTipoNinguno(request.usuario)
+      }
+      if(request.tipo == TipoUsuarioE.SUCURSAL) {
+        return this.userInfoTipoSucursal(request.usuario)
+      }
+      if(request.tipo == TipoUsuarioE.AREA) {
+        return this.userInfoTipoArea(request.usuario)
+      }
   }
 
   update(id: number, updateUsuarioDto: UpdateUsuarioDto) {
@@ -121,6 +277,12 @@ export class UsuariosService {
   }
 
   public async verificarUsuario(usuario: Types.ObjectId) {
+
+    
     return this.usuario.findOne({ _id: new Types.ObjectId(usuario) });
   }
+
+  
+
+  
 }

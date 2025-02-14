@@ -4,8 +4,8 @@ import { UpdateProveedorPersonaDto } from './dto/update-proveedor-persona.dto';
 import { ProveedorPersona } from './schemas/proveedor-persona.schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { ApiResponseI } from 'src/interface/httpRespuesta';
-import { flag } from 'src/enums/flag.enum';
+import { ApiResponseI } from 'src/core/interface/httpRespuesta';
+import { flag } from 'src/core/enums/flag.enum';
 
 @Injectable()
 export class ProveedorPersonaService {

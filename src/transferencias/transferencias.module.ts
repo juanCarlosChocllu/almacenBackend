@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TransferenciasService } from './services/transferencias.service';
-import { TransferenciasController } from './transferencias.controller';
+import { TransferenciasController } from './controller/transferencias.controller';
 import { Transferencia, transferenciaSchema } from './schemas/transferencia.schema';
 import { MongooseModule } from '@nestjs/mongoose';
 import { StocksModule } from 'src/stocks/stocks.module';
@@ -10,18 +10,32 @@ import { MovimientoSucursalModule } from 'src/movimiento-sucursal/movimiento-suc
 import { FiltardoresService } from './services/filtradores.service';
 import { StockSucursalModule } from 'src/stock-sucursal/stock-sucursal.module';
 import { ProductosModule } from 'src/productos/productos.module';
+import { CodigoTransferencia, CodigoTransferenciaSchema } from './schemas/codigoTransferencia';
+import { CodigoTransferenciaService } from './services/codigoTransferencia.service';
+import { CodigoTransferenciaController } from './controller/codigoTrasnferencia.controller';
+import { CoreModule } from 'src/core/core.module';
+import { AreasModule } from 'src/areas/areas.module';
+import { DetalleAreaModule } from 'src/detalle-area/detalle-area.module';
 
 @Module({
     imports:[MongooseModule.forFeature([{
-      name:Transferencia.name, schema:transferenciaSchema
-    }]),
+      name:Transferencia.name, schema:transferenciaSchema,
+    },
+  
+    {
+      name:CodigoTransferencia.name, schema:CodigoTransferenciaSchema,
+    }
+  ]),
     StocksModule,
     MovimientoAreaModule,
     MovimientoSucursalModule,
     StockSucursalModule,
-    ProductosModule
+    ProductosModule,
+    CoreModule,
+    AreasModule,
+    DetalleAreaModule
   ],
-  controllers: [TransferenciasController],
-  providers: [TransferenciasService, FiltardoresService],
+  controllers: [TransferenciasController, CodigoTransferenciaController],
+  providers: [TransferenciasService, FiltardoresService, CodigoTransferenciaService],
 })
 export class TransferenciasModule {}

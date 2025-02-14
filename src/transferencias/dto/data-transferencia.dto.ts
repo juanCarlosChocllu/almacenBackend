@@ -10,12 +10,19 @@ export class dataTransferenciaDto {
 
 
   area?: Types.ObjectId;
-
+  fechaVencimiento?: Types.ObjectId;
 
   usuario?: Types.ObjectId;
 
 
   stock: Types.ObjectId;
+
+
+   sucursal: Types.ObjectId
+
+  codigoProducto:string
+
+  nombreProducto:string
 
 
   tipo: tipoE;

@@ -9,8 +9,8 @@ import { UpdateSubCategoriaDto } from './dto/update-sud-categoria.dto';
 import { SudCategoria } from './schemas/sud-categoria.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
-import { flag } from 'src/enums/flag.enum';
-import { ApiResponseI } from 'src/interface/httpRespuesta';
+import { flag } from 'src/core/enums/flag.enum';
+import { ApiResponseI } from 'src/core/interface/httpRespuesta';
 import { Request } from 'express';
 
 @Injectable()

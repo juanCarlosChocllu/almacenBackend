@@ -25,6 +25,8 @@ import { Modulo } from 'src/autenticacion/decorators/modulos/modulo.decorator';
 import { modulosE } from 'src/rol/enums/administracion/modulos.enum';
 import { TipoUsuario } from 'src/autenticacion/decorators/tipoUsuario/tipoUsuario';
 import { TipoUsuarioE } from 'src/usuarios/enums/tipoUsuario';
+import { Types } from 'mongoose';
+
 
 
 @Modulo(modulosE.PRODUCTOS)
@@ -37,11 +39,16 @@ export class ProductosController {
    async create(
     @Body() createProductoDto: CreateProductoDto,
     @UploadedFile() file: Express.Multer.File,
+    @Req() request :Request
   ) {    
+
+    console.log(file);
+    
       
     if (file) {
       createProductoDto.imagen = file.filename;
     }
+     createProductoDto.area = new Types.ObjectId(createProductoDto.area)
      return this.productosService.create(createProductoDto);
   }
 

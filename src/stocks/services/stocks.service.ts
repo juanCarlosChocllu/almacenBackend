@@ -17,8 +17,8 @@ import { FiltardorStockService } from "./filtardor.stock.service";
 import { Request } from "express";
 import { request } from "http";
 import { BuscadorStockI } from "../interfaces/buscadorStock";
-import { CodigoStockService } from "./codigoStock.service";
-import { Type } from "class-transformer";
+import { CodigoStockService } from "../../movimiento-area/services/codigoStock.service";
+
 
 @Injectable()
 export class StocksService {
@@ -31,17 +31,28 @@ export class StocksService {
   async create(createStockDto: CreateStockDto, request :Request) {
    
     try {
-      const codigo = await this.codigoStockService.registrarCodigo(request.area)
+      const codigo = await this.codigoStockService.registrarCodigo(request.area, request.usuario)
+
+      
       for (const data of createStockDto.data) {
+
+
         const producto = new Types.ObjectId(data.producto);
         const stockExistente = await this.stock.findOne({
           producto: producto,
           tipo: data.tipo,
+          ...(data.fechaVencimiento) ? {fechaVencimiento:data.fechaVencimiento}:{},
           almacenArea: new Types.ObjectId(data.almacenArea)
         });
+          
 
+        
+        
+          
         if (stockExistente) {
-            const nuevaCantidad: number =   stockExistente.cantidad + data.cantidad;
+      
+            
+             const nuevaCantidad: number =   stockExistente.cantidad + data.cantidad;
             data.almacenArea = new Types.ObjectId(data.almacenArea);
             data.producto = new Types.ObjectId(data.producto);
             await this.stock.updateOne(
@@ -49,11 +60,7 @@ export class StocksService {
               {
                 $set: {
                   cantidad: nuevaCantidad,
-                  precio: data.precio,
-                  total: data.total,
                   fechaCompra: new Date(data.fechaCompra),
-                  fechaVencimiento: new Date(data.fechaVencimiento),
-                  almacenArea: new Types.ObjectId(data.almacenArea),
                   factura: data.factura,
                   tipo: data.tipo,
                   codigo: stockExistente.codigo ? stockExistente.codigo : await this.generarCodigo()
@@ -69,9 +76,12 @@ export class StocksService {
               stockExistente._id,
               createStockDto.proveedorEmpresa,
               createStockDto.proveedorPersona,
-              request.usuario
+              request.usuario,
+              codigo._id
             );
-          
+            
+            
+           
         } else {
       
           await this.crearStock(data,createStockDto.proveedorEmpresa,createStockDto.proveedorPersona, request.usuario, codigo._id);
@@ -94,11 +104,13 @@ export class StocksService {
   ) {
     data.producto = new Types.ObjectId(data.producto);
     data.almacenArea = new Types.ObjectId(data.almacenArea);
+    console.log(data.fechaVencimiento);
+    
     const stock= await this.stock.create({
       almacenArea: data.almacenArea,
       cantidad: data.cantidad,
-      codigoStock:new Types.ObjectId(codigoStock),
       producto: data.producto,
+      fechaVencimiento:data.fechaVencimiento,
       tipo: data.tipo,
       codigo: await this.generarCodigo()
     });
@@ -107,7 +119,9 @@ export class StocksService {
       tipoDeRegistroE.INGRESO,
       stock._id,
       proveedorEmpresa,proveedorPersona,
-       usuario
+       usuario,
+       codigoStock
+       
     );
   }
 
@@ -210,6 +224,7 @@ export class StocksService {
           imagen:'$producto.imagen',
           codigoProducto:'$producto.codigo',
           iamgen:'$producto.imagen',
+          
         },
       },
     ]).skip((Number(parametrosStockDto.pagina) - 1) * Number( parametrosStockDto.limite)).limit(Number(parametrosStockDto.limite));       
@@ -303,7 +318,13 @@ export class StocksService {
           tipo:1,
           almacen:'$almacenArea.nombre',
           idAlmacen:'$almacenArea._id',
-          cantidad:1
+          cantidad:1,
+          fechaVencimiento: {
+            $dateToString: {
+              format: '%Y-%m-%d',
+              date: '$fechaVencimiento',
+            },
+          },
         }
       }
     ])    
@@ -353,4 +374,8 @@ export class StocksService {
   const codigo = 'STK-'+cantidadDoc.toString().padStart(8,'0')
   return codigo
  }
+
+
+  
+
 }

@@ -8,7 +8,7 @@ import { Request } from 'express';
 import { Modulo } from 'src/autenticacion/decorators/modulos/modulo.decorator';
 import { modulosE } from 'src/rol/enums/administracion/modulos.enum';
 import { TipoUsuario } from 'src/autenticacion/decorators/tipoUsuario/tipoUsuario';
-import { tipoRegistro } from 'src/enums/tipo.registro.enum';
+import { tipoRegistro } from 'src/core/enums/tipo.registro.enum';
 import { TipoUsuarioE } from 'src/usuarios/enums/tipoUsuario';
 import { PublicInterno } from 'src/autenticacion/decorators/publicInterno/publicInterno';
 
@@ -32,8 +32,15 @@ export class AlmacenSucursalController {
   @Get('listar/:sucursal')
   @PublicInterno()
   listarAlmacenSucursal(@Param ('sucursal', ValidateIdPipe) sucursal:string) {
-
     return this.almacenSucursalService.listarAlmacenSucursal(sucursal);
+  }
+
+
+  @Get('listar/buscador/:sucursal')
+  @PublicInterno()
+  listarAlmacenSucursalBuscador(@Param ('sucursal')  sucursal:string  | undefined, @Req() request:Request) {
+   
+    return this.almacenSucursalService.listarAlmacenSucursalBuscador(sucursal, request);
   }
 
   @Get(':id')

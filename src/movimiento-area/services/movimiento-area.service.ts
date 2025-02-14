@@ -8,9 +8,9 @@ import {tipoDeRegistroE } from '../enums/tipoRegistro.enum';
 import { DataStockDto } from 'src/stocks/dto/data.stock.dto';
 
 import { transferenciaSalidaI } from 'src/transferencias/interfaces/transferencias';
-import { flag } from 'src/enums/flag.enum';
+import { flag } from 'src/core/enums/flag.enum';
 import { BuscadorMovimientoArea } from '../dto/buscador-movimiento-area.dto';
-import { PaginatedResponseI } from 'src/interface/httpRespuesta';
+import { PaginatedResponseI } from 'src/core/interface/httpRespuesta';
 import { FiltradoresAreaService } from './filtradores-area.service';
 import { Request } from 'express';
 import { BuscadorMaI } from '../interface/buscadorMa';
@@ -204,7 +204,8 @@ export class MovimientoAreaService {
      tipoDeRegistro:tipoDeRegistroE, stock:Types.ObjectId,
      proveedorEmpresa:Types.ObjectId,
      proveedorPersona:Types.ObjectId,
-     usuario:Types.ObjectId
+     usuario:Types.ObjectId,
+     codigoStock:Types.ObjectId
     ){
       
       await this.movimientoArea.create({
@@ -219,6 +220,7 @@ export class MovimientoAreaService {
         tipoDeRegistro:tipoDeRegistro,
         tipo:data.tipo,
         total:data.total,
+        codigoStock:new Types.ObjectId(codigoStock),
         usuario:new Types.ObjectId(usuario),
         stock:stock,
         ...(proveedorEmpresa && {proveedorEmpresa: new Types.ObjectId(proveedorEmpresa)}),
@@ -243,5 +245,109 @@ export class MovimientoAreaService {
      const codigo = 'IG-A-'+ countDocuments.toString().padStart(8,'0')
      return codigo
    }
+
+
+   async listarStockMovimientoPorCodigoStock(codigo:Types.ObjectId){
+
+    
+    const stocks = await this.movimientoArea.aggregate([
+      {
+        $match: {
+          flag: flag.nuevo,
+          codigoStock:new Types.ObjectId(codigo)
+        },
+      },
+      {
+        $lookup: {
+          from: 'Producto',
+          localField: 'producto',
+          foreignField: '_id',
+          as: 'producto',
+        },
+      },
+      {
+        $unwind: { path: '$producto', preserveNullAndEmptyArrays: false },
+      },
+      
+
+
+      {
+        $lookup: {
+          from: 'Marca',
+          localField: 'producto.marca',
+          foreignField: '_id',
+          as: 'marca',
+        },
+      },
+      {
+        $unwind: { path: '$marca', preserveNullAndEmptyArrays: false },
+      },
+        
+
+      
+      {
+        $lookup: {
+          from: 'AlmacenArea',
+          localField: 'almacenArea',
+          foreignField: '_id',
+          as: 'almacen',
+        },
+      },
+      {
+        $unwind: { path: '$almacen', preserveNullAndEmptyArrays: false },
+      },
+
+      {
+        $lookup: {
+          from: 'Categoria',
+          localField: 'producto.categoria',
+          foreignField: '_id',
+          as: 'categoria',
+        },
+      },
+      {
+        $unwind: { path: '$categoria', preserveNullAndEmptyArrays: false },
+      },
+
+      {
+        $project: {
+          _id: 0,
+          idStock: '$_id',
+          idProducto: '$producto._id',
+          cantidad: 1,
+          precio: 1,
+          total: 1,
+          tipo: 1,
+          fechaCompra: {
+            $dateToString: {
+              format: '%Y-%m-%d',
+              date: '$fechaCompra',
+            },
+          },
+
+          fechaVencimiento: {
+            $dateToString: {
+              format: '%Y-%m-%d',
+              date: '$fechaVencimiento',
+            },
+          },
+          codigoBarra: '$producto.codigoBarra',
+          producto: '$producto.nombre',
+          color: '$producto.color',
+          codigo: '$producto.codigo',
+          marca: '$marca.nombre',
+          almacen: '$almacen.nombre',
+          almacenArea:'$almacen._id',
+          imagen:'$producto.imagen',
+          codigoProducto:'$producto.codigo',
+       
+        },
+      },
+    ])
+
+    console.log(stocks);
+    
+    return stocks
+  }
    
 }

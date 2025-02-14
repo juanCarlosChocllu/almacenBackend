@@ -4,8 +4,8 @@ import { UpdateSucursalDto } from './dto/update-sucursal.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Sucursal } from './schemas/sucursal.schema';
 import { Model, Types } from 'mongoose';
-import { flag } from 'src/enums/flag.enum';
-import { ApiResponseI } from 'src/interface/httpRespuesta';
+import { flag } from 'src/core/enums/flag.enum';
+import { ApiResponseI } from 'src/core/interface/httpRespuesta';
 import { sucursalEmpresaI } from './interfaces/sucursalesEmpresa.Interface';
 
 @Injectable()

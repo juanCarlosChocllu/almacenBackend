@@ -21,45 +21,61 @@ export class TipoDetalleGuard implements CanActivate {
     private readonly reflector: Reflector,
   ) {}
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const publico = this.reflector.get<boolean>(
-      Public_KEY,
-      context.getHandler(),
-    );
+     try {
+      const publico = this.reflector.get<boolean>(
+        Public_KEY,
+        context.getHandler(),
+      );
+  
+      const publicInterno = this.reflector.get<boolean>(
+        PUBLIC_INTERNO_KEY,
+        context.getHandler(),
+      );
 
-    const publicInterno = this.reflector.get<boolean>(
-      PUBLIC_INTERNO_KEY,
-      context.getHandler(),
-    );
-    if (publicInterno) {
-      return true;
-    }
-    if (publico) {
-      return true;
-    }
-    const request: Request = context.switchToHttp().getRequest();
+      
+      if (publicInterno) {
 
-    if (request.usuario && request.tipo) {
-      if (request.tipo === TipoUsuarioE.AREA) {
-        const areaDetalle = await this.detalleAreaService.verifcarDetalleArea(
-          request.usuario,
-        );
-        const detalle = areaDetalle.find((item) => item.ingreso == true);
 
-        if (detalle) {
-          request.area = new Types.ObjectId(detalle.area);
+        return true;
+      }
+      if (publico) {
+        return true;
+      }
+      const request: Request = context.switchToHttp().getRequest();
+
+      
+      
+      if (request.usuario && request.tipo) {
+        if (request.tipo === TipoUsuarioE.AREA) {
+          const areaDetalle = await this.detalleAreaService.verifcarDetalleArea(
+            request.usuario,
+            
+          );        
+          const detalle = areaDetalle.find((item) => item.ingreso == true);
+      
+          
+          if (detalle) {
+            request.area = new Types.ObjectId(detalle.area);
+    
+            
+            return true;
+          }
+          throw new UnauthorizedException('Seleccione una area');
+        }
+        if (request.tipo === TipoUsuarioE.SUCURSAL) {
+          //request.sucursal = new Types.ObjectId(usuario.sucursal);
           return true;
         }
-        throw new UnauthorizedException('Seleccione una area');
+        if (request.tipo === TipoUsuarioE.NINGUNO) {
+          return true;
+        }
+      } else {
+       
+        throw new UnauthorizedException('tipo detalle invalido');
       }
-      if (request.tipo === TipoUsuarioE.SUCURSAL) {
-        //request.sucursal = new Types.ObjectId(usuario.sucursal);
-        return true;
-      }
-      if (request.tipo === TipoUsuarioE.NINGUNO) {
-        return true;
-      }
-    } else {
-      throw new UnauthorizedException();
-    }
+     } catch (error) {
+      
+      throw new UnauthorizedException('tipo detalle invalido');
+     }
   }
 }

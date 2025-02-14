@@ -4,8 +4,8 @@ import { UpdateMarcaDto } from './dto/update-marca.dto';
 import { Marca } from './schemas/marca.schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import {  ApiResponseI } from 'src/interface/httpRespuesta';
-import { flag } from 'src/enums/flag.enum';
+import {  ApiResponseI } from 'src/core/interface/httpRespuesta';
+import { flag } from 'src/core/enums/flag.enum';
 
 @Injectable()
 export class MarcaService {

@@ -4,8 +4,8 @@ import { UpdateEmpresaDto } from './dto/update-empresa.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Empresa } from './schemas/empresa.schema';
-import { flag } from 'src/enums/flag.enum';
-import { ApiResponseI } from 'src/interface/httpRespuesta';
+import { flag } from 'src/core/enums/flag.enum';
+import { ApiResponseI } from 'src/core/interface/httpRespuesta';
 
 @Injectable()
 export class EmpresasService {

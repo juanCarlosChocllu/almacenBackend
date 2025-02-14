@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Types } from "mongoose";
 import { estadoE } from "../enums/estado.enum";
 import { Min } from "class-validator";
-import { flag } from "src/enums/flag.enum";
+import { flag } from "src/core/enums/flag.enum";
 
 @Schema({collection:'Transferencia'})
 export class Transferencia {
@@ -28,6 +28,10 @@ export class Transferencia {
 
     @Prop({type:Types.ObjectId , ref:'AlmacenSucursal'})
     almacenSucursal:Types.ObjectId
+
+    
+    @Prop({type:Types.ObjectId , ref:'CodigoTransferencia'})
+    codigoTransferencia:Types.ObjectId
 
     @Prop({type:Date, default:Date.now()})
     fecha:Date

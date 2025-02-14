@@ -30,11 +30,15 @@ import { StockSucursalModule } from './stock-sucursal/stock-sucursal.module';
 import { DetalleAreaModule } from './detalle-area/detalle-area.module';
 import { TipoDetalleGuard } from './autenticacion/guards/tipo-detalle/tipo-detalle.guard';
 import { TipoUsuarioGuard } from './autenticacion/guards/tipo-usuario/tipo-usuario.guard';
+import { NotificacionModule } from './notificacion/notificacion.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
+import { CoreModule } from './core/core.module';
 
 
 
 @Module({
   imports: [
+    EventEmitterModule.forRoot(),
     ServeStaticModule.forRoot({
       rootPath:join(__dirname,'..','upload')
     }),
@@ -62,6 +66,8 @@ import { TipoUsuarioGuard } from './autenticacion/guards/tipo-usuario/tipo-usuar
        PermisosModule,
        StockSucursalModule,
        DetalleAreaModule,
+       NotificacionModule,
+       CoreModule,
 
 
       ],
@@ -71,11 +77,11 @@ import { TipoUsuarioGuard } from './autenticacion/guards/tipo-usuario/tipo-usuar
       provide:APP_GUARD,
       useClass:TokenGuard
     },
-    {
+   {
       provide:APP_GUARD,
       useClass:ModulosGuard
     },
-      {
+    {
       provide:APP_GUARD,
       useClass:TipoDetalleGuard
     },

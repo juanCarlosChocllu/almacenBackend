@@ -16,8 +16,9 @@ export class CreateProductoDto {
     nombre: string;
   
     @IsString({ message: 'El código debe ser una cadena de texto válida.' })
-    @IsNotEmpty({ message: 'El código es obligatorio.' })
+    @IsOptional()
     codigoBarra: string;
+    
   
     @IsEnum(generoE, { message: 'El género debe ser uno de los valores válidos: "masculino", "femenino", etc.' })
     @IsOptional({ message: 'El género es opcional.' })
@@ -34,6 +35,10 @@ export class CreateProductoDto {
 
     @IsOptional()
     imagen:string;
+
+
+
+    area:Types.ObjectId;
 
 
 

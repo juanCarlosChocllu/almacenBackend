@@ -6,12 +6,12 @@ import { Model, Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { StockSucursalI } from '../interfaces/stock.sucursal';
 import { tipoE } from 'src/stocks/enums/tipo.enum';
-import { flag } from 'src/enums/flag.enum';
+import { flag } from 'src/core/enums/flag.enum';
 import { Request } from 'express';
 import { FiltradorSucursalService } from './filtrador-sucursal.service';
 import { BuscadorStockSucursal } from '../dto/buscador-stock-sucursal.dto';
 
-import { PaginatedResponseI } from 'src/interface/httpRespuesta';
+import { PaginatedResponseI } from 'src/core/interface/httpRespuesta';
 import { BuscadorStockSucursalI } from '../interfaces/buscador';
 @Injectable()
 export class StockSucursalService {
@@ -30,18 +30,23 @@ export class StockSucursalService {
   ): Promise<PaginatedResponseI<StockSucursal>> {
 
 
-    const { codigo, marca, ...filtrador } =
+    
+    
+    const { codigo, marca, sucursal, ...filtrador} =
       this.filtradorSucursalService.buscadorStockSucursal(
         buscadorStockSucursal,
       );
 
-
+ 
+      
 
     const countDocuments = await this.countDocuments(
       codigo,
       marca,
       filtrador,
       request.sucursal,
+      sucursal
+      
     );
     const paginas = Math.ceil(
       countDocuments / Number(buscadorStockSucursal.limite),
@@ -92,6 +97,17 @@ export class StockSucursalService {
             ]
           : []),
 
+          ...(sucursal
+            ? [
+                {
+                  $match: {
+                    'almacenSucursal.sucursal': new Types.ObjectId(sucursal),
+                  },
+                },
+              ]
+            : []),
+
+          
         {
           $project: {
             codigo: 1,
@@ -104,6 +120,12 @@ export class StockSucursalService {
             color: '$producto.color',
             imagen: '$producto.imagen',
             almacen: '$almacenSucursal.nombre',
+            fechaVencimiento: {
+              $dateToString: {
+                format: '%Y-%m-%d',
+                date: '$fechaVencimiento',
+              },
+            },
           },
         },
       ])
@@ -116,11 +138,18 @@ export class StockSucursalService {
 
     return { paginas: paginas, data: stock };
   }
+
+
+
+
   private async countDocuments(
     codigo: RegExp,
     marca: Types.ObjectId,
     filtrador: BuscadorStockSucursalI,
+    sucursalRequest: Types.ObjectId,
     sucursal: Types.ObjectId,
+    
+
   ) {
     const cantidad = await this.stockSucursal.aggregate([
       {
@@ -157,9 +186,19 @@ export class StockSucursalService {
           as: 'almacenSucursal',
         },
       },
-      ...(sucursal
-        ? [{ $match: { 'almacenSucursal.sucursal': sucursal } }]
+      ...(sucursalRequest
+        ? [{ $match: { 'almacenSucursal.sucursal': sucursalRequest } }]
         : []),
+
+        ...(sucursal
+          ? [
+              {
+                $match: {
+                  'almacenSucursal.sucursal': new Types.ObjectId(sucursal),
+                },
+              },
+            ]
+          : []),
       {
         $group: {
           _id: null,
@@ -181,6 +220,7 @@ export class StockSucursalService {
       producto: data.producto,
       tipo: data.tipo,
       almacenSucursal: new Types.ObjectId(data.almacenSucursal),
+      fechaVencimiento:data.fechaVencimiento
     });
     if (stockTransferencia) {
       const cantidad = stockTransferencia.cantidad + data.cantidad;

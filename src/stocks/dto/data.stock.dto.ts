@@ -29,4 +29,6 @@ export class DataStockDto{
     almacenArea:Types.ObjectId
 
 
+  
+
 }
