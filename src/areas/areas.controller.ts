@@ -3,10 +3,11 @@ import { AreasService } from './areas.service';
 import { CreateAreaDto } from './dto/create-area.dto';
 import { UpdateAreaDto } from './dto/update-area.dto';
 import { Modulo } from 'src/autenticacion/decorators/modulos/modulo.decorator';
-import { modulosE } from 'src/rol/enums/administracion/modulos.enum';
+import { modulosE } from 'src/core/enums/modulos.enum';
 import { TipoUsuario } from 'src/autenticacion/decorators/tipoUsuario/tipoUsuario';
 import { TipoUsuarioE } from 'src/usuarios/enums/tipoUsuario';
 import { Types } from 'mongoose';
+import { PublicInterno } from 'src/autenticacion/decorators/publicInterno/publicInterno';
 
 
 @Modulo(modulosE.AREAS)
@@ -26,6 +27,11 @@ export class AreasController {
     return this.areasService.findAll();
   }
 
+  @PublicInterno()
+  @Get('publico')
+  areasPublica() {
+    return this.areasService.findAll();
+  }
   @Get(':id')
   findOne(@Param('id') id: Types.ObjectId) {
     return this.areasService.findOne(id);

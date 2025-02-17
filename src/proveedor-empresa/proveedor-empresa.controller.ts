@@ -3,7 +3,7 @@ import { ProveedorEmpresaService } from './proveedor-empresa.service';
 import { CreateProveedorEmpresaDto } from './dto/create-proveedor-empresa.dto';
 import { UpdateProveedorEmpresaDto } from './dto/update-proveedor-empresa.dto';
 import { Modulo } from 'src/autenticacion/decorators/modulos/modulo.decorator';
-import { modulosE } from 'src/rol/enums/administracion/modulos.enum';
+import { modulosE } from 'src/core/enums/modulos.enum';
 import { TipoUsuarioE } from 'src/usuarios/enums/tipoUsuario';
 import { TipoUsuario } from 'src/autenticacion/decorators/tipoUsuario/tipoUsuario';
 

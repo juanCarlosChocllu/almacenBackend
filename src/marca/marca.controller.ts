@@ -1,12 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { MarcaService } from './marca.service';
 import { CreateMarcaDto } from './dto/create-marca.dto';
 import { UpdateMarcaDto } from './dto/update-marca.dto';
 import { Modulo } from 'src/autenticacion/decorators/modulos/modulo.decorator';
-import { modulosE } from 'src/rol/enums/administracion/modulos.enum';
+import { modulosE } from 'src/core/enums/modulos.enum';
 import { TipoUsuario } from 'src/autenticacion/decorators/tipoUsuario/tipoUsuario';
 import { TipoUsuarioE } from 'src/usuarios/enums/tipoUsuario';
 import { PublicInterno } from 'src/autenticacion/decorators/publicInterno/publicInterno';
+import { query } from 'express';
+import { PaginadorDto } from 'src/utils/dtos/paginadorDto';
 
 
 @Modulo(modulosE.MARCAS)
@@ -21,14 +23,14 @@ export class MarcaController {
   }
 
   @Get()
-  findAll() {
-    return this.marcaService.findAll();
+  findAll(@Query() paginadorDto:PaginadorDto) {
+    return this.marcaService.findAll(paginadorDto);
   }
 
   @Get('buscador')
   @PublicInterno()
   listarBuscador() {
-    return this.marcaService.findAll();
+    return this.marcaService.marcasPublicas();
   }
   @Get(':id')
   findOne(@Param('id') id: string) {

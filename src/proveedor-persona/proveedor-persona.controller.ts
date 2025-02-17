@@ -3,7 +3,7 @@ import { ProveedorPersonaService } from './proveedor-persona.service';
 import { CreateProveedorPersonaDto } from './dto/create-proveedor-persona.dto';
 import { UpdateProveedorPersonaDto } from './dto/update-proveedor-persona.dto';
 import { Modulo } from 'src/autenticacion/decorators/modulos/modulo.decorator';
-import { modulosE } from 'src/rol/enums/administracion/modulos.enum';
+import { modulosE } from 'src/core/enums/modulos.enum';
 import { TipoUsuario } from 'src/autenticacion/decorators/tipoUsuario/tipoUsuario';
 import { TipoUsuarioE } from 'src/usuarios/enums/tipoUsuario';
 

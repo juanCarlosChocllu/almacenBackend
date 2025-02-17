@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsString } from "class-validator";
+import { IsEmail, IsNotEmpty, IsOptional, IsString } from "class-validator";
 
 export class CreateProveedorEmpresaDto {
  
@@ -7,7 +7,7 @@ export class CreateProveedorEmpresaDto {
     nombre: string;
  
     @IsString({ message: 'El NIT debe ser una cadena de texto.' })
-    @IsNotEmpty({ message: 'El NIT de la empresa es obligatorio.' })
+    @IsOptional()
     nit: string;
 
     @IsString({ message: 'El correo debe ser una cadena de texto.' })

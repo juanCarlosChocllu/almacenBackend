@@ -15,12 +15,14 @@ export class ProveedorEmpresaService {
 
 
   async create(createProveedorEmpresaDto: CreateProveedorEmpresaDto):Promise<ApiResponseI> {
-    console.log(createProveedorEmpresaDto);
-     
+    if(createProveedorEmpresaDto.nit){
+       
     const nit:ProveedorEmpresa = await this.proveedorEmpresa.findOne({nit:createProveedorEmpresaDto.nit})
     if(nit){
       throw new ConflictException('El nit ya existe')
     }
+    }
+    
     await this.proveedorEmpresa.create(createProveedorEmpresaDto)
      return {status:HttpStatus.CREATED, message:'Proveedor registrado'};
   }

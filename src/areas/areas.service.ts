@@ -23,6 +23,10 @@ export class AreasService {
     return this.area.find({flag:flag.nuevo});
   }
 
+
+  areaPublica() {
+    return this.area.find({flag:flag.nuevo});
+  }
  
   update(id: number, updateAreaDto: UpdateAreaDto) {
     return `This action updates a #${id} area`;

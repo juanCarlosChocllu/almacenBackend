@@ -10,7 +10,7 @@ import { tipoDeRegistroE } from 'src/movimiento-area/enums/tipoRegistro.enum';
 import { TipoUsuarioE } from 'src/usuarios/enums/tipoUsuario';
 import { tipoRegistro } from 'src/core/enums/tipo.registro.enum';
 import { Modulo } from 'src/autenticacion/decorators/modulos/modulo.decorator';
-import { modulosE } from 'src/rol/enums/administracion/modulos.enum';
+import { modulosE } from 'src/core/enums/modulos.enum';
 import { ValidateIdPipe } from 'src/utils/validate-id/validate-id.pipe';
 import { Types } from 'mongoose';
 
@@ -35,10 +35,6 @@ export class TransferenciasController {
     return this.transferenciasService.findAll(buscadorTransferenciaDto, request);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.transferenciasService.findOne(+id);
-  }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateTransferenciaDto: UpdateTransferenciaDto) {
@@ -55,5 +51,10 @@ export class TransferenciasController {
     
     
     return this.transferenciasService.listarTransferenciaPorCodigo(id)
+  }
+
+  @Get('sucursal')
+  listarTransferenciasSucursal(){
+    return this.transferenciasService.listarTransferenciasSucursal()
   }
 }

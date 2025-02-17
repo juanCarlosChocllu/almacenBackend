@@ -1,7 +1,5 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Types } from "mongoose";
-import { modulosE } from "../enums/administracion/modulos.enum";
-import { permisosE } from "../enums/administracion/permisos.enum";
+
 import { flag } from "src/core/enums/flag.enum";
 
 @Schema({collection:'Rol'})

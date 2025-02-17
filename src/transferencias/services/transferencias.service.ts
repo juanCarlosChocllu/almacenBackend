@@ -37,6 +37,9 @@ import { NotificacionI } from 'src/notificacion/interface/notificacion';
 import { CodigoTransferencia } from '../schemas/codigoTransferencia';
 import { CodigoTransferenciaI } from '../interfaces/codigoTranferencia';
 import { CodigoTransferenciaService } from './codigoTransferencia.service';
+import { fail } from 'assert';
+import { Area } from 'src/areas/schemas/area.schema';
+import { codigoProducto } from 'src/productos/utils/codigoProducto.utils';
 @Injectable()
 export class TransferenciasService {
   constructor(
@@ -540,4 +543,78 @@ export class TransferenciasService {
   }
 
 
+  async listarTransferenciasSucursal(){
+      const transferencias = await this.transferencia.aggregate([
+        {
+          $match:{
+            flag:flag.nuevo
+          }
+        },
+        {
+          $lookup:{
+            from :'Stock',
+            foreignField:'_id',
+            localField:'stock',
+            as:'stock'
+          }
+        },
+          {
+            $unwind:{path:'$stock', preserveNullAndEmptyArrays:false}
+          },
+          {
+            $lookup:{
+              from :'Producto',
+              foreignField:'_id',
+              localField:'stock.producto',
+              as:'producto'
+            }
+          },
+          {
+            $unwind:{path:'$producto', preserveNullAndEmptyArrays:false}
+          },
+          {
+            $lookup:{
+              from :'Area',
+              foreignField:'_id',
+              localField:'area',
+              as:'area'
+            }
+          },
+          {
+            $unwind:{path:'$area', preserveNullAndEmptyArrays:false}
+          },
+
+          {
+            $lookup:{
+              from :'AlmacenSucursal',
+              foreignField:'_id',
+              localField:'almacenSucursal',
+              as:'almacenSucursal'
+            }
+          },
+          {
+            $unwind:{path:'$almacenSucursal', preserveNullAndEmptyArrays:false}
+          },
+
+          {
+            $project:{
+              codigoProducto:'$producto.codigo',
+              producto:'$producto.nombre',
+              area:'$area.nombre',
+              almacen:'$almacenSucursal.nombre',
+              cantidad:1,
+              fecha: {
+                $dateToString: {
+                  format: '%Y-%m-%d',
+                  date: '$fecha',
+                },
+              }
+            }
+          }
+
+        ])
+    
+    return transferencias
+    
+  }
 }

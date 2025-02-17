@@ -1,5 +1,5 @@
 export enum estadoE {
     PENDIENTE='PENDIENTE',
     APROBADO='APROBADO',
-    RECHAZAD='RECHAZAD'
+    RECHAZAD='RECHAZADO'
 }

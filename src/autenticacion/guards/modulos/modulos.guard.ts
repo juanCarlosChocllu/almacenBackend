@@ -38,11 +38,13 @@ export class ModulosGuard implements CanActivate {
       const modulo = this.reflector.get(MODULOS_KEY, context.getClass());
 
       
+ 
       
       if (request.usuario && request.rol) {
         const permisos = await this.permisosService.verificarPemisos(
           request.rol,
         );
+        
        
         
         request.acciones = permisos.filter(

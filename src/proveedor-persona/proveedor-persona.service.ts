@@ -13,11 +13,13 @@ export class ProveedorPersonaService {
     @InjectModel(ProveedorPersona.name) private readonly proveedorPersona:Model<ProveedorPersona>,
   ){}
   async create(createProveedorPersonaDto: CreateProveedorPersonaDto):Promise<ApiResponseI> {
-    const ci:ProveedorPersona = await this.proveedorPersona.findOne({ci:createProveedorPersonaDto.ci, flag:flag.nuevo})
-    if(ci){
-      throw new ConflictException('El ci ya existe')
-    }
     
+    if(createProveedorPersonaDto.ci){
+      const ci:ProveedorPersona = await this.proveedorPersona.findOne({ci:createProveedorPersonaDto.ci, flag:flag.nuevo})
+      if(ci){
+        throw new ConflictException('El ci ya existe')
+      }
+    }
     await this.proveedorPersona.create(createProveedorPersonaDto)
     return  {status:HttpStatus.CREATED, message:'Proveedor registrado'};
   }

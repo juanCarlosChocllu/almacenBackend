@@ -4,8 +4,9 @@ import { UpdateMarcaDto } from './dto/update-marca.dto';
 import { Marca } from './schemas/marca.schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import {  ApiResponseI } from 'src/core/interface/httpRespuesta';
+import {  ApiResponseI, PaginatedResponseI } from 'src/core/interface/httpRespuesta';
 import { flag } from 'src/core/enums/flag.enum';
+import { PaginadorDto } from 'src/utils/dtos/paginadorDto';
 
 @Injectable()
 export class MarcaService {
@@ -19,9 +20,19 @@ export class MarcaService {
     return {status:HttpStatus.CREATED, message:'Marca registrada'};
   }
 
-  findAll() {
-    return  this.marca.find({flag:flag.nuevo});
+  async findAll( paginadorDto:PaginadorDto):Promise<PaginatedResponseI<Marca>>{
+   const countDocuments = await this.marca.countDocuments({flag:flag.nuevo})
+    const paginas = Math.ceil( (countDocuments / (Number(paginadorDto.limite) )))
+    const marcas =  await this.marca.find({flag:flag.nuevo}).sort({fecha:-1})
+    .skip((Number(paginadorDto.pagina) - 1) * Number( paginadorDto.limite))
+    .limit(Number(paginadorDto.limite))
+    return {data:marcas,paginas:paginas};
   }
+
+  async marcasPublicas( ){
+
+     return  this.marca.find({flag:flag.nuevo});
+   }
 
   findOne(id: number) {
     return `This action returns a #${id} marca`;

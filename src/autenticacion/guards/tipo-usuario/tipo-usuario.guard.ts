@@ -50,7 +50,7 @@ export class TipoUsuarioGuard implements CanActivate {
      
       throw new UnauthorizedException('tipo invalido');
     } catch (error) {
-        console.log(error);
+      throw new UnauthorizedException('tipo invalido');
         
     }
 }

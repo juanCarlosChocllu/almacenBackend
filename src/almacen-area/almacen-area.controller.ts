@@ -4,7 +4,7 @@ import { CreateAlmacenAreaDto } from './dto/create-almacen-area.dto';
 import { UpdateAlmacenAreaDto } from './dto/update-almacen-area.dto';
 import { Request } from 'express';
 import { Modulo } from 'src/autenticacion/decorators/modulos/modulo.decorator';
-import { modulosE } from 'src/rol/enums/administracion/modulos.enum';
+import { modulosE } from 'src/core/enums/modulos.enum';
 import { TipoUsuario } from 'src/autenticacion/decorators/tipoUsuario/tipoUsuario';
 import { TipoUsuarioE } from 'src/usuarios/enums/tipoUsuario';
 

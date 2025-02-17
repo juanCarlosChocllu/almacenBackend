@@ -4,10 +4,10 @@ import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
 import { Public } from 'src/autenticacion/decorators/public/public.decorator';
 import { Modulo } from 'src/autenticacion/decorators/modulos/modulo.decorator';
-import { modulosE } from 'src/rol/enums/administracion/modulos.enum';
+import { modulosE } from 'src/core/enums/modulos.enum';
 import { PermisosGuard } from 'src/autenticacion/guards/permisos/permisos.guard';
 import { Permiso } from 'src/autenticacion/decorators/permisos/permisos.decorator';
-import { permisosE } from 'src/rol/enums/administracion/permisos.enum';
+
 import { TipoUsuario } from 'src/autenticacion/decorators/tipoUsuario/tipoUsuario';
 import { TipoUsuarioE } from './enums/tipoUsuario';
  import {Request } from 'express'

@@ -89,7 +89,7 @@ import { CoreModule } from './core/core.module';
       provide:APP_GUARD,
       useClass:TipoUsuarioGuard
     },
-     /*   {
+    /* {
       provide:APP_GUARD,
       useClass:PermisosGuard
     }*/

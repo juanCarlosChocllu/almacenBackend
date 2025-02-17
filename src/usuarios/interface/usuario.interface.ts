@@ -1,6 +1,6 @@
 import { Types } from "mongoose";
 import { flag } from "src/core/enums/flag.enum";
-import { TipoUsuarioE } from "../enums/tipoUsuario";
+
 
 export interface UsuarioI{
       _id:Types.ObjectId

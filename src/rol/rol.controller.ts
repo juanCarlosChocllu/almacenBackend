@@ -5,7 +5,7 @@ import { UpdateRolDto } from './dto/update-rol.dto';
 import { Type } from 'class-transformer';
 import { Types } from 'mongoose';
 import { Modulo } from 'src/autenticacion/decorators/modulos/modulo.decorator';
-import { modulosE } from './enums/administracion/modulos.enum';
+import { modulosE } from '../core/enums/modulos.enum';
 import { TipoUsuario } from 'src/autenticacion/decorators/tipoUsuario/tipoUsuario';
 import { TipoUsuarioE } from 'src/usuarios/enums/tipoUsuario';
 import { Public } from 'src/autenticacion/decorators/public/public.decorator';

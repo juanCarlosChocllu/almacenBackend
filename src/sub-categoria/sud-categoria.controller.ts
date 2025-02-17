@@ -5,7 +5,7 @@ import { UpdateSubCategoriaDto } from './dto/update-sud-categoria.dto';
 import { ValidateIdPipe } from 'src/utils/validate-id/validate-id.pipe';
 import {Request}from 'express'
 import { Modulo } from 'src/autenticacion/decorators/modulos/modulo.decorator';
-import { modulosE } from 'src/rol/enums/administracion/modulos.enum';
+import { modulosE } from 'src/core/enums/modulos.enum';
 import { TipoUsuario } from 'src/autenticacion/decorators/tipoUsuario/tipoUsuario';
 import { TipoUsuarioE } from 'src/usuarios/enums/tipoUsuario';
 

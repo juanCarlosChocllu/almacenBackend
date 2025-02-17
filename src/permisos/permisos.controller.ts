@@ -6,7 +6,7 @@ import { ValidateIdPipe } from 'src/utils/validate-id/validate-id.pipe';
 import { Types } from 'mongoose';
 import { Public } from 'src/autenticacion/decorators/public/public.decorator';
 import { Modulo } from 'src/autenticacion/decorators/modulos/modulo.decorator';
-import { modulosE } from 'src/rol/enums/administracion/modulos.enum';
+import { modulosE } from 'src/core/enums/modulos.enum';
 
 
 @Modulo(modulosE.PERMISO)

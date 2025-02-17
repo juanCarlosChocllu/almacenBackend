@@ -3,7 +3,7 @@ import { MovimientoSucursalService } from './movimiento-sucursal.service';
 import { CreateMovimientoSucursalDto } from './dto/create-movimiento-sucursal.dto';
 import { UpdateMovimientoSucursalDto } from './dto/update-movimiento-sucursal.dto';
 import { Modulo } from 'src/autenticacion/decorators/modulos/modulo.decorator';
-import { modulosE } from 'src/rol/enums/administracion/modulos.enum';
+import { modulosE } from 'src/core/enums/modulos.enum';
 
 @Modulo(modulosE.MOVIMIENTO_SUCURSAL)
 @Controller('movimiento/sucursal')
