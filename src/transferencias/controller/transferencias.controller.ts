@@ -15,7 +15,7 @@ import { ValidateIdPipe } from 'src/utils/validate-id/validate-id.pipe';
 import { Types } from 'mongoose';
 
 @Modulo(modulosE.TRANSFERENCIAS)
-@TipoUsuario(TipoUsuarioE.AREA,TipoUsuarioE.NINGUNO)  
+@TipoUsuario(TipoUsuarioE.AREA,TipoUsuarioE.NINGUNO , TipoUsuarioE.SUCURSAL)  
 @Controller('transferencias')
 export class TransferenciasController {
   constructor(private readonly transferenciasService: TransferenciasService) {}
@@ -56,5 +56,10 @@ export class TransferenciasController {
   @Get('sucursal')
   listarTransferenciasSucursal(){
     return this.transferenciasService.listarTransferenciasSucursal()
+  }
+
+  @Get('aprobar/sucursal/:transferencia')
+  aprobarTransferenciaSucursal(@Param('transferencia', ValidateIdPipe) trasferencia:Types.ObjectId){
+    return this.transferenciasService.aprobarTransferenciaSucursal(trasferencia)
   }
 }

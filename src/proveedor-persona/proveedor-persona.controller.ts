@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { ProveedorPersonaService } from './proveedor-persona.service';
 import { CreateProveedorPersonaDto } from './dto/create-proveedor-persona.dto';
 import { UpdateProveedorPersonaDto } from './dto/update-proveedor-persona.dto';
@@ -6,6 +6,7 @@ import { Modulo } from 'src/autenticacion/decorators/modulos/modulo.decorator';
 import { modulosE } from 'src/core/enums/modulos.enum';
 import { TipoUsuario } from 'src/autenticacion/decorators/tipoUsuario/tipoUsuario';
 import { TipoUsuarioE } from 'src/usuarios/enums/tipoUsuario';
+import { BuscadorProveedorPersonaDto } from './dto/bsucadorProveedorPersona.dto';
 
 
 @Modulo(modulosE.PROVEEDOR_PERSONA)
@@ -20,8 +21,8 @@ export class ProveedorPersonaController {
   }
 
   @Get()
-  findAll() {
-    return this.proveedorPersonaService.findAll();
+  findAll(@Query () buscadorProveedorPersonaDto:BuscadorProveedorPersonaDto) {
+    return this.proveedorPersonaService.findAll(buscadorProveedorPersonaDto);
   }
 
   @Get(':id')

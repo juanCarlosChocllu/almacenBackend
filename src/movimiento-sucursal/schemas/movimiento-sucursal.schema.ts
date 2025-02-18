@@ -28,14 +28,6 @@ export class MovimientoSucursal {
         @Prop()
         cantidad:number
     
-        @Prop()
-        precio:number
-    
-        @Prop()
-        total:number
-    
-        @Prop()
-        factura:string
     
         @Prop({type:String , enum:tipoE} )
         tipo:string

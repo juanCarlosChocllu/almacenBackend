@@ -21,7 +21,7 @@ export interface StockSucursalI{
     
             producto:Types.ObjectId
 
-            fechaVencimiento:Types.ObjectId
+            fechaVencimiento:string
             
             stock:Types.ObjectId
             codigo?:string

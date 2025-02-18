@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { CreateStockSucursalDto } from '../dto/create-stock-sucursal.dto';
 import { UpdateStockSucursalDto } from '../dto/update-stock-sucursal.dto';
 import { StockSucursal } from '../schemas/stock-sucursal.schema';
@@ -224,12 +224,14 @@ export class StockSucursalService {
     });
     if (stockTransferencia) {
       const cantidad = stockTransferencia.cantidad + data.cantidad;
-      await this.stockSucursal.updateOne(
+      return this.stockSucursal.updateOne(
         { _id: stockTransferencia._id },
         { $set: { cantidad: cantidad } },
       );
+    
     } else {
-      await this.stockSucursal.create(data);
+      return this.stockSucursal.create(data);
+   
     }
   }
 

@@ -17,13 +17,13 @@ export interface transferenciaSalidaI {
   export interface transferenciaEntradaSucursalI {
     almacenSucursal: Types.ObjectId;
     cantidad: number;
-    fechaCompra: Date;
-    fechaVencimiento: Date;
-    precio: number;
+    fechaCompra: string;
+    fechaVencimiento: string;
+    precio?: number;
     producto: Types.ObjectId;
     tipoDeRegistro: string;
     tipo: string;
-    total: number;
+    total?: number;
     usuario: Types.ObjectId;
     stock:Types.ObjectId
     transferencia:Types.ObjectId,

@@ -3,7 +3,7 @@ import {
   HttpStatus,
   Injectable,
   NotFoundException,
-  Type,
+
 } from '@nestjs/common';
 import { CreateTransferenciaDto } from '../dto/create-transferencia.dto';
 import { UpdateTransferenciaDto } from '../dto/update-transferencia.dto';
@@ -40,6 +40,10 @@ import { CodigoTransferenciaService } from './codigoTransferencia.service';
 import { fail } from 'assert';
 import { Area } from 'src/areas/schemas/area.schema';
 import { codigoProducto } from 'src/productos/utils/codigoProducto.utils';
+import { estadoE } from '../enums/estado.enum';
+import { TransferenciaData } from '../interfaces/transferenciaData';
+import { Type } from 'class-transformer';
+import { types } from 'util';
 @Injectable()
 export class TransferenciasService {
   constructor(
@@ -87,8 +91,8 @@ export class TransferenciasService {
               if (transferencia) {
                     await this.actualizarStock(stock, data);
                    // await this.registraMovimientoSalida(stock, data);
-                    await this.registrarStockTransferencia(data, stock,transferencia._id)
-                    await this.registraMovimientoEntradaSucursal(stock, data, transferencia._id)
+                    //await this.registrarStockTransferencia(data, stock,transferencia._id)
+                   // await this.registraMovimientoEntradaSucursal(stock, data, transferencia._id)*/
                     const dataNotificacion:NotificacionI={
                       area:'falta',
                       cantidad:data.cantidad,
@@ -183,49 +187,8 @@ export class TransferenciasService {
   }*/
   
   
-  private async registraMovimientoEntradaSucursal(
-    stock: any,
-    data: dataTransferenciaDto,
-    tranferencia:Types.ObjectId
-  ) {
-    const transferencia: transferenciaEntradaSucursalI = {
-      almacenSucursal:new Types.ObjectId(data.almacenSucursal),
-      cantidad: data.cantidad,
-      fechaCompra: stock.fechaCompra,
-      fechaVencimiento: stock.fechaVencimiento,
-      precio: stock.precio,
-      producto: stock.producto,
-      tipoDeRegistro: tipoDeRegistroE.INGRESO,
-      tipo: data.tipo,
-      total: stock.total,
-      usuario: data.usuario,
-      stock: stock._id,
-      transferencia:tranferencia
-    };
-    await this.movimientoSucursalService.registarMovimientoSucursal(transferencia);
-  }
 
-
-  private async registrarStockTransferencia(data:dataTransferenciaDto, stock:any,  tranferencia:Types.ObjectId){
-    
-    const stockTransferencia: StockSucursalI = {
-      almacenSucursal:new Types.ObjectId(data.almacenSucursal),
-      cantidad: data.cantidad,
-      producto: stock.producto,
-      tipo: data.tipo,
-      transferencia:tranferencia,
-      area:stock.area,
-      stock:stock._id,
-      fechaVencimiento:stock.fechaVencimiento
-
-
-      
-    };
   
-    
-    await this.stockSucursalService.registrarStockTranferencia(stockTransferencia)
-
-  }
 
   async findAll(buscadorTransferenciaDto:BuscadorTransferenciaDto,request :Request):Promise<PaginatedResponseI<Transferencia>> {   
     const filtardor = this.filtardoresService.filtradorTransferencia(buscadorTransferenciaDto)
@@ -617,4 +580,91 @@ export class TransferenciasService {
     return transferencias
     
   }
+
+  async aprobarTransferenciaSucursal(transferencia:Types.ObjectId){
+    const transferenciaEncontrada:TransferenciaData[] = await this.transferencia.aggregate([
+      {
+        $match:{_id:new Types.ObjectId(transferencia), flag:flag.nuevo, estado:estadoE.PENDIENTE}
+      },
+      {
+        $lookup:{
+          from:'Stock',
+          foreignField:'_id',
+          localField:'stock',
+          as:'stock'
+        }
+      },
+      {
+        $unwind:{path:'$stock', preserveNullAndEmptyArrays:false}
+      },
+      {
+        $project:{
+          almacenSucursal:1,
+          cantidad:1,
+          stock:'$stock._id',
+          producto:'$stock.producto',
+          tipo:'$stock.tipo',
+          area:1,
+          fechaVencimiento:'$stock.fechaVencimiento',
+          fechaCompra:'$stock.fechaCompra',
+          precio:'$stock.precio',
+          usuario:1
+
+        }
+      }
+      
+    ])
+    
+    
+      if(transferenciaEncontrada.length < 0) {
+        throw new NotFoundException('Tranferecian no encontrara')
+      }
+      await  this.registrarStockTransferencia(transferenciaEncontrada[0], transferencia)
+      await this.transferencia.findOneAndUpdate({_id:new Types.ObjectId(transferencia), flag:flag.nuevo}, {estado:estadoE.APROBADO})
+      return {status:HttpStatus.OK}
+  }
+
+
+  private async registrarStockTransferencia(data:TransferenciaData,   tranferencia:Types.ObjectId){
+    
+    const stockTransferencia: StockSucursalI = {
+      almacenSucursal:new Types.ObjectId(data.almacenSucursal),
+      cantidad: data.cantidad,
+      producto: data.producto,
+      tipo: data.tipo,
+      transferencia:new Types.ObjectId(tranferencia),
+      area:data.area,
+      stock:data.stock,
+      fechaVencimiento:data.fechaVencimiento
+    };
+  
+    
+    await this.stockSucursalService.registrarStockTranferencia(stockTransferencia)
+    await this.registraMovimientoEntradaSucursal(data, tranferencia)
+    
+
+  }
+
+  private async registraMovimientoEntradaSucursal(
+  
+    data: TransferenciaData,
+    tranferencia:Types.ObjectId
+  ) {
+    const transferencia: transferenciaEntradaSucursalI = {
+      almacenSucursal:new Types.ObjectId(data.almacenSucursal),
+      cantidad: data.cantidad,
+      fechaCompra: data.fechaCompra,
+      fechaVencimiento: data.fechaVencimiento,
+      producto: data.producto,
+      tipoDeRegistro: tipoDeRegistroE.INGRESO,
+      tipo: data.tipo, 
+      stock: data.stock,
+      usuario:new Types.ObjectId(data.usuario),
+      transferencia:new Types.ObjectId(tranferencia),
+
+    };
+    await this.movimientoSucursalService.registarMovimientoSucursal(transferencia);
+  }
+
+
 }
