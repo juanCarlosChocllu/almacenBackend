@@ -42,8 +42,7 @@ import { Area } from 'src/areas/schemas/area.schema';
 import { codigoProducto } from 'src/productos/utils/codigoProducto.utils';
 import { estadoE } from '../enums/estado.enum';
 import { TransferenciaData } from '../interfaces/transferenciaData';
-import { Type } from 'class-transformer';
-import { types } from 'util';
+
 @Injectable()
 export class TransferenciasService {
   constructor(
@@ -52,11 +51,11 @@ export class TransferenciasService {
 
 
     private readonly stockService: StocksService,
-    private readonly movimientoAreaService: MovimientoAreaService,
+
     private readonly movimientoSucursalService: MovimientoSucursalService,
     private readonly stockSucursalService: StockSucursalService,
     private readonly filtardoresService: FiltardoresService,
-    private readonly productoService: ProductosService,
+  
     private readonly codigoTransferenciaService: CodigoTransferenciaService,
     private emiter :EventEmitter2
   ) {}
@@ -75,7 +74,8 @@ export class TransferenciasService {
           if(!request.usuario && !request.area){
             throw new  BadRequestException('Selecciona una area')
           }
-          const codigoTransferencia = await this.codigoTransferenciaService.codigoTransferencias(request.usuario, request.area)
+          let cantidad:number=0
+          const codigoTransferencia = await this.codigoTransferenciaService.codigoTransferencias(request.usuario, request.area, createTransferenciaDto.sucursal)
           for (const data of createTransferenciaDto.data) {
               data.usuario = request.usuario
               data.area = request.area
@@ -86,28 +86,25 @@ export class TransferenciasService {
               
             );
           
-              const transferencia = await this.realizarTransferencia(data, codigoTransferencia);
-           
+              const transferencia = await this.realizarTransferencia(data, codigoTransferencia._id);
               if (transferencia) {
                     await this.actualizarStock(stock, data);
-                   // await this.registraMovimientoSalida(stock, data);
-                    //await this.registrarStockTransferencia(data, stock,transferencia._id)
-                   // await this.registraMovimientoEntradaSucursal(stock, data, transferencia._id)*/
-                    const dataNotificacion:NotificacionI={
-                      area:'falta',
-                      cantidad:data.cantidad,
-                      codigoProducto:data.codigoProducto,
-                      producto:data.nombreProducto,
-                      sucursal:String(data.sucursal)
-                    }
-                     this.emiter.emit('notificaciones.create', dataNotificacion)
+                   cantidad += data.cantidad
                   }
               }
+              const dataNotificacion:NotificacionI={
+                area:'',
+                cantidad:cantidad,
+                codigoProducto:codigoTransferencia.codigo,
+                producto:'',
+                sucursal:String(createTransferenciaDto.sucursal)
+              }
+               this.emiter.emit('notificaciones.create', dataNotificacion)
         }
+
+      
         return { message: 'Transferencia realizada', status: HttpStatus.OK };
-      } catch (error) { 
-        console.log(error);
-        
+      } catch (error) {
          throw new BadRequestException(error)
       }
   }
@@ -635,7 +632,8 @@ export class TransferenciasService {
       transferencia:new Types.ObjectId(tranferencia),
       area:data.area,
       stock:data.stock,
-      fechaVencimiento:data.fechaVencimiento
+      fechaVencimiento:data.fechaVencimiento,
+      
     };
   
     
@@ -666,5 +664,65 @@ export class TransferenciasService {
     await this.movimientoSucursalService.registarMovimientoSucursal(transferencia);
   }
 
+ rechazarTransferenciaSucursal(transferencia:Types.ObjectId) {
+    console.log(transferencia);
+    
+
+  }
+
+  async aprobarTodasTransferenciaCodigo(codigo:Types.ObjectId){
+    const date = new Date()
+    const transferencias = await this.transferencia.find({codigoTransferencia:new Types.ObjectId(codigo), estado:estadoE.PENDIENTE, flag:flag.nuevo})
+          
+    for (const data of transferencias) {
+   
+      
+      const aprobado= await this.aprobarTransferenciaSucursal(data._id)
+      if(aprobado.status == HttpStatus.OK){
+        await this.transferencia.updateOne({_id:new Types.ObjectId(data._id)},{estado:estadoE.APROBADO,fechaAprobacion: date})
+
+      }
+    }
+    
+    const aprobado=   await  this.codigoTransferenciaService.aprobarTransferenciaCodigo(codigo)
+    if(aprobado.acknowledged == true) {
+        return {status:HttpStatus.OK}
+    }
+    
+  }
+
+  async rechazarCodigoTransferencia(codigo:Types.ObjectId){
+    const transferencia = await this.transferencia.updateMany({codigoTransferencia:new Types.ObjectId(codigo), flag:flag.nuevo, estado:estadoE.PENDIENTE}, {estado:estadoE.RECHAZADO})
+    const codigoTransferencia=  await this.codigoTransferenciaService.rechazarTransferenciaCodigo(codigo)
+    if(transferencia.acknowledged == true && codigoTransferencia.acknowledged == true){
+      return {status:HttpStatus.OK}
+
+      }
+    throw new BadRequestException('Ocucrrio un error ')
+      
+  }
+
+  async cancelarCodigoTransferencia(codigo:Types.ObjectId) {
+      const transferencias= await this.transferencia.find(
+        {codigoTransferencia:new Types.ObjectId(codigo),
+          flag:flag.nuevo,
+           estado:estadoE.PENDIENTE,
+      })
+      if(transferencias.length > 0) {
+        for (const data of transferencias) {
+          const stkActualiza=  await this.stockService.reingresoStock(data.stock, data.cantidad)
+          if(stkActualiza.acknowledged ==true){
+            await this.transferencia.updateMany({_id:data._id, flag:flag.nuevo, estado:estadoE.PENDIENTE},{estado:estadoE.CANCELADO})
+          
+          }
+        
+        }
+        await this.codigoTransferenciaService.cancelarTransferenciaCodigo(transferencias[0].codigoTransferencia)
+         return  {status:HttpStatus.OK
+
+         }
+      }
+      
+  }
 
 }

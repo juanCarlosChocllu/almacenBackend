@@ -217,11 +217,12 @@ export class StockSucursalService {
   public async registrarStockTranferencia(data: StockSucursalI) {
     data.codigo = await this.generarCodigo();
     const stockTransferencia = await this.stockSucursal.findOne({
-      producto: data.producto,
+      producto: new Types.ObjectId(data.producto),
       tipo: data.tipo,
       almacenSucursal: new Types.ObjectId(data.almacenSucursal),
-      fechaVencimiento:data.fechaVencimiento
+      ...(data.fechaVencimiento)? {fechaVencimiento:data.fechaVencimiento} : {}
     });
+
     if (stockTransferencia) {
       const cantidad = stockTransferencia.cantidad + data.cantidad;
       return this.stockSucursal.updateOne(

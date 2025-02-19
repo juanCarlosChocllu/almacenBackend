@@ -36,6 +36,11 @@ export class Transferencia {
     @Prop({type:Date, default:Date.now()})
     fecha:Date
     
+    @Prop()
+    fechaAprobacion:Date
+
+    
+
     @Prop({type:String, enum:flag, default:flag.nuevo })
     flag:string
     

@@ -18,6 +18,7 @@ import { Request } from "express";
 import { request } from "http";
 import { BuscadorStockI } from "../interfaces/buscadorStock";
 import { CodigoStockService } from "../../movimiento-area/services/codigoStock.service";
+import { Socket } from "dgram";
 
 
 @Injectable()
@@ -375,6 +376,12 @@ export class StocksService {
   return codigo
  }
 
+
+  async  reingresoStock(stock:Types.ObjectId, cantidad:number){
+    const stk = await this.stock.findOne({_id:new Types.ObjectId(stock), flag:flag.nuevo})
+     let stkCantidad= stk.cantidad + cantidad
+     return  this.stock.updateOne({_id:stk._id},{cantidad:stkCantidad})  
+    }
 
   
 

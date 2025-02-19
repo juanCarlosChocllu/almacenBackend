@@ -1,6 +1,7 @@
 import { Transform } from "class-transformer";
-import { IsDateString, IsMongoId, IsOptional, IsString } from "class-validator";
+import { IsDateString, IsEnum, IsMongoId, IsOptional, IsString } from "class-validator";
 import { PaginadorDto } from "src/utils/dtos/paginadorDto";
+import { estadoE } from "../enums/estado.enum";
 
 export class BuscadorCodigoTransferenciaDto extends PaginadorDto {
     
@@ -13,6 +14,11 @@ export class BuscadorCodigoTransferenciaDto extends PaginadorDto {
     @IsMongoId()
     @IsOptional()
     area:string
+
+    @IsString()
+    @IsEnum(estadoE)
+    @IsOptional()
+    estado:string
 
     @IsDateString()
     @IsOptional()

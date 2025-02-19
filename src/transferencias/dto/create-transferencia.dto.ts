@@ -1,4 +1,4 @@
-import { IsArray, IsEmpty, IsMongoId, IsNotEmpty, IsOptional, ValidateNested } from "class-validator";
+import { IsArray, IsEmpty, IsMongoId, isNotEmpty, IsNotEmpty, IsOptional, ValidateNested } from "class-validator";
 import { dataTransferenciaDto } from "./data-transferencia.dto";
 import { Type } from "class-transformer";
 import { IsvalidarDataTranferencia } from "../utils/validar.data.util";
@@ -9,5 +9,8 @@ export class CreateTransferenciaDto {
     @IsvalidarDataTranferencia()
     data: dataTransferenciaDto[];
 
+    @IsMongoId()
+    @IsNotEmpty()
+    sucursal:Types.ObjectId
 
-  }
+  } 

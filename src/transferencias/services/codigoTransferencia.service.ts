@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { CodigoTransferenciaI } from '../interfaces/codigoTranferencia';
@@ -10,6 +10,9 @@ import {Request} from 'express'
 import { CoreService } from 'src/core/core.service';
 import { AreasService } from 'src/areas/areas.service';
 import { DetalleAreaService } from 'src/detalle-area/detalle-area.service';
+import { estadoE } from '../enums/estado.enum';
+import { log } from 'console';
+import { TransferenciasService } from './transferencias.service';
 @Injectable()
 export class CodigoTransferenciaService {
   constructor(
@@ -17,24 +20,27 @@ export class CodigoTransferenciaService {
     private readonly codigoTransferencia: Model<CodigoTransferencia>,
     private readonly coreService: CoreService,
     private readonly areaService: AreasService,
-    private readonly detalleAreaService: DetalleAreaService
+    private readonly detalleAreaService: DetalleAreaService,
+   
   ) {}
 
-  async codigoTransferencias(usuario:Types.ObjectId, area:Types.ObjectId): Promise<Types.ObjectId> {
+  async codigoTransferencias(usuario:Types.ObjectId, area:Types.ObjectId, sucursal:Types.ObjectId) {
     const codigo= await this.codigoArea(area)
     const codigoTransferencia: CodigoTransferenciaI =
       await this.codigoTransferencia.create({
         codigo: codigo,
         flag: flag.nuevo,
         usuario:new Types.ObjectId(usuario),
-        area:new Types.ObjectId(area)
+        area:new Types.ObjectId(area),
+        sucursal:new Types.ObjectId(sucursal)
       });
-    return codigoTransferencia._id;
+    return codigoTransferencia;
   }
 
   async listarCodigosTransferencia(
     buscadorCodigoTransferenciaDto: BuscadorCodigoTransferenciaDto,
     request:Request
+  
   ): Promise<PaginatedResponseI<CodigoTransferencia>> {
     try {
      
@@ -42,17 +48,9 @@ export class CodigoTransferenciaService {
       const [fechaInicio, fechaFin ] = this.coreService.formateoFechasUTC(buscadorCodigoTransferenciaDto.fechaInicio, buscadorCodigoTransferenciaDto.fechaFin)
       const areas = await this.detalleAreaService.listarAreasPorUsuario(request.usuario)
    
+  
+      console.log(buscadorCodigoTransferenciaDto);
       
-      const countDocuments: number =
-        await this.codigoTransferencia.countDocuments({   
-            flag:flag.nuevo,
-          ...(request.area) ?{ area:request.area} :{},
-          ...(buscadorCodigoTransferenciaDto.codigo) ? { codigo: new RegExp(buscadorCodigoTransferenciaDto.codigo,'i')} :{},
-          ...(fechaInicio && fechaFin) ?{ fecha:{ $gte : fechaInicio , $lte: fechaFin}} :{} });
-        const paginas = Math.ceil(
-        countDocuments / Number(buscadorCodigoTransferenciaDto.limite) 
-      );
- 
       
       const codigoTranferencias = await this.codigoTransferencia
         .aggregate([
@@ -61,8 +59,8 @@ export class CodigoTransferenciaService {
               flag:flag.nuevo,
               ...(request.area) ?{ area:request.area} :{},
               ...(buscadorCodigoTransferenciaDto.codigo) ?{ codigo: new RegExp(buscadorCodigoTransferenciaDto.codigo,'i')} :{},
-              ...(fechaInicio && fechaFin) ?{ fecha:{ $gte : fechaInicio , $lte: fechaFin}} :{}
-              
+              ...(fechaInicio && fechaFin) ?{ fecha:{ $gte : fechaInicio , $lte: fechaFin}} :{},
+              ...(buscadorCodigoTransferenciaDto.estado) ?{ estado:buscadorCodigoTransferenciaDto.estado} :{estado:estadoE.PENDIENTE}
             }
           },
           {
@@ -76,9 +74,23 @@ export class CodigoTransferenciaService {
           {
             $unwind:{path:'$usuario', preserveNullAndEmptyArrays:false}
           },
+
+          {
+            $lookup:{
+              from :'Area',
+              localField:'area',
+              foreignField:'_id',
+              as:'area'
+            }
+          },
+          {
+            $unwind:{path:'$area', preserveNullAndEmptyArrays:false}
+          },
           {
             $project:{
                 codigo:1,
+                area:'$area.nombre',
+                estado:1,
                 fecha:{
                   $dateToString: {
                     format: '%Y-%m-%d',
@@ -87,21 +99,39 @@ export class CodigoTransferenciaService {
                 },
                 usuario:'$usuario.username'
             }
+          },
+          {
+            $facet: {
+              data: [
+                {
+                  $skip: (Number(buscadorCodigoTransferenciaDto.pagina) - 1) * Number(buscadorCodigoTransferenciaDto.limite)
+                },
+                {
+                  $limit: Number(buscadorCodigoTransferenciaDto.limite)
+                },
+                {
+                  $sort: { fecha: -1 } 
+                }
+              ],
+              totalCount: [
+                {
+                  $count: 'total'
+                }]
+            },
+       
           }
         ])
-        .skip(
-          (Number(buscadorCodigoTransferenciaDto.pagina) - 1) *
-            Number(buscadorCodigoTransferenciaDto.limite),
-        )
-        .limit(Number(buscadorCodigoTransferenciaDto.limite))
-        .sort({ codigo: -1 });
 
-         
+
+        const totalItems = codigoTranferencias[0]?.totalCount[0]?.total || 0;
+        const totalPages = Math.ceil(totalItems / Number(buscadorCodigoTransferenciaDto.limite));
+                
          
           
-      return { data: codigoTranferencias, paginas: paginas };
+      return { data: codigoTranferencias[0].data||[], paginas: totalPages };
     } catch (error) {
     
+      console.log(error);
       
       throw new BadRequestException();
     }
@@ -125,6 +155,25 @@ export class CodigoTransferenciaService {
       return codigo
     }
 
+    
+     async  aprobarTransferenciaCodigo(codigo:Types.ObjectId){   
+   
+        const actulizado = await this.codigoTransferencia.updateOne({_id:new Types.ObjectId(codigo), estado:estadoE.PENDIENTE, flag:flag.nuevo} , {estado:estadoE.APROBADO})
+      return actulizado
+      }
+
+      
+     async  rechazarTransferenciaCodigo(codigo:Types.ObjectId){   
+   
+      const actulizado = await this.codigoTransferencia.updateOne({_id:new Types.ObjectId(codigo), estado:estadoE.PENDIENTE, flag:flag.nuevo} , {estado:estadoE.RECHAZADO})
+    return actulizado
+    }
+
+    async  cancelarTransferenciaCodigo(codigo:Types.ObjectId){   
+   
+      const actulizado = await this.codigoTransferencia.updateOne({_id:new Types.ObjectId(codigo), estado:estadoE.PENDIENTE, flag:flag.nuevo} , {estado:estadoE.CANCELADO})
+    return actulizado
+    }
 
 
   

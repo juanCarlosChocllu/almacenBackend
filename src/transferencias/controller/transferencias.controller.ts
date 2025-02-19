@@ -62,4 +62,24 @@ export class TransferenciasController {
   aprobarTransferenciaSucursal(@Param('transferencia', ValidateIdPipe) trasferencia:Types.ObjectId){
     return this.transferenciasService.aprobarTransferenciaSucursal(trasferencia)
   }
+
+  @Get('rechazar/sucursal/:transferencia')
+  rechazarTransferenciaSucursal(@Param('transferencia', ValidateIdPipe) trasferencia:Types.ObjectId){
+    return this.transferenciasService.rechazarTransferenciaSucursal(trasferencia)
+  }
+
+  @Get('codigo/aprobar/:codigo')
+  aprobarTransferenciaCodigo(@Param ('codigo', ValidateIdPipe) codigo:Types.ObjectId){
+      return  this.transferenciasService.aprobarTodasTransferenciaCodigo(codigo)
+  }
+
+  @Get('codigo/rechazar/:codigo')
+  rechazarCodigoTransferencia(@Param ('codigo', ValidateIdPipe) codigo:Types.ObjectId){
+      return  this.transferenciasService.rechazarCodigoTransferencia(codigo)
+  }
+
+  @Get('codigo/cancelar/:codigo')
+  cancelarCodigoTransferencia(@Param ('codigo', ValidateIdPipe) codigo:Types.ObjectId){
+      return  this.transferenciasService.cancelarCodigoTransferencia(codigo)
+  }
 }
