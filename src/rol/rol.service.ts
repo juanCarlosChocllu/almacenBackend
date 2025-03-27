@@ -8,6 +8,8 @@ import { flag } from 'src/core/enums/flag.enum';
 import { ApiResponseI } from 'src/core/interface/httpRespuesta';
 import { PermisosService } from 'src/permisos/permisos.service';
 import { RolI } from './interface/rol.interface';
+import { log } from 'node:console';
+import { console } from 'node:inspector';
 
 @Injectable()
 export class RolService {
@@ -35,8 +37,24 @@ export class RolService {
 
 
 
-  update(id: number, updateRolDto: UpdateRolDto) {
-    return `This action updates a #${id} rol`;
+  async actulizar(id: Types.ObjectId, updateRolDto: UpdateRolDto) {
+    try {
+      const rol = await this.rol.findOne({nombre:updateRolDto.nombre, _id:{$ne:new Types.ObjectId(id)}})
+      console.log(rol);
+      
+      if(rol){
+        throw new ConflictException('El rol ya existe')
+      }
+     await this.permisoService.eliminarPermisosPorRol(id)
+     for (const r of updateRolDto.permisos) {
+      await this.permisoService.registarPermisosRol(r, id)
+   }
+      return {status:HttpStatus.OK}
+    } catch (error) {
+
+        throw error
+        
+    }
   }
 
   remove(id: number) {

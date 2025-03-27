@@ -7,6 +7,8 @@ import { Modulo } from 'src/autenticacion/decorators/modulos/modulo.decorator';
 import { modulosE } from 'src/core/enums/modulos.enum';
 import { TipoUsuario } from 'src/autenticacion/decorators/tipoUsuario/tipoUsuario';
 import { TipoUsuarioE } from 'src/usuarios/enums/tipoUsuario';
+import { Types } from 'mongoose';
+import { ValidateIdPipe } from 'src/core/utils/validate-id/validate-id.pipe';
 
 @Modulo(modulosE.ALMACEN_AREA)
 @TipoUsuario(TipoUsuarioE.AREA, TipoUsuarioE.NINGUNO)
@@ -39,12 +41,12 @@ export class AlmacenAreaController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAlmacenAreaDto: UpdateAlmacenAreaDto) {
-    return this.almacenAreaService.update(+id, updateAlmacenAreaDto);
+  actulizar(@Param('id', ValidateIdPipe) id: Types.ObjectId, @Body() updateAlmacenAreaDto: UpdateAlmacenAreaDto) {
+    return this.almacenAreaService.actulizar(id, updateAlmacenAreaDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.almacenAreaService.remove(+id);
+  softDelete(@Param('id', ValidateIdPipe) id: Types.ObjectId) {
+    return this.almacenAreaService.softDelete(id);
   }
 }

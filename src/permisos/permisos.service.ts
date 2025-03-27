@@ -7,6 +7,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { log } from 'node:console';
 import { flag } from 'src/core/enums/flag.enum';
+import { Type } from 'class-transformer';
 
 @Injectable()
 export class PermisosService {
@@ -49,6 +50,10 @@ public async verificarPemisos(rol:Types.ObjectId):Promise<Permiso[]>{
   return permisos
 }
 
+
+ public async eliminarPermisosPorRol (rol: Types.ObjectId) {
+    return this.permiso.deleteMany({rol:new Types.ObjectId(rol)})
+ }
 
   
 }

@@ -1,12 +1,12 @@
-import { ConflictException, HttpStatus, Injectable } from '@nestjs/common';
+import { ConflictException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateMarcaDto } from './dto/create-marca.dto';
 import { UpdateMarcaDto } from './dto/update-marca.dto';
 import { Marca } from './schemas/marca.schema';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import {  ApiResponseI, PaginatedResponseI } from 'src/core/interface/httpRespuesta';
 import { flag } from 'src/core/enums/flag.enum';
-import { PaginadorDto } from 'src/utils/dtos/paginadorDto';
+import { PaginadorDto } from 'src/core/utils/dtos/paginadorDto';
 
 @Injectable()
 export class MarcaService {
@@ -38,11 +38,21 @@ export class MarcaService {
     return `This action returns a #${id} marca`;
   }
 
-  update(id: number, updateMarcaDto: UpdateMarcaDto) {
-    return `This action updates a #${id} marca`;
+  async actualizar(id: Types.ObjectId, updateMarcaDto: UpdateMarcaDto) {
+      const marca = await this.marca.findOne({_id:new Types.ObjectId(id), flag:flag.nuevo})
+      if(!marca) {
+        throw new NotFoundException()
+      }
+      await this.marca.updateOne({_id:new Types.ObjectId(id)}, updateMarcaDto)
+      return {status:HttpStatus.OK}
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} marca`;
-  }
+  async softDelete(id: Types.ObjectId) {
+    const marca = await this.marca.findOne({_id:new Types.ObjectId(id), flag:flag.nuevo})
+      if(!marca) {
+        throw new NotFoundException()
+      }
+      await this.marca.updateOne({_id:new Types.ObjectId(id)}, {flag:flag.eliminado})
+      return {status:HttpStatus.OK}
+  } 
 }

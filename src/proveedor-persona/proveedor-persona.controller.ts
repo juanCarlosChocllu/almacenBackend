@@ -9,7 +9,7 @@ import { TipoUsuarioE } from 'src/usuarios/enums/tipoUsuario';
 import { BuscadorProveedorPersonaDto } from './dto/bsucadorProveedorPersona.dto';
 
 
-@Modulo(modulosE.PROVEEDOR_PERSONA)
+@Modulo(modulosE.PROVEEDORES)
 @TipoUsuario(TipoUsuarioE.AREA,TipoUsuarioE.NINGUNO )
 @Controller('proveedor/persona')
 export class ProveedorPersonaController {

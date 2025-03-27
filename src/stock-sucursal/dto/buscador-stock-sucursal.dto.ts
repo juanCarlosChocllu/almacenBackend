@@ -1,7 +1,7 @@
 import { IsEnum, IsMongoId, IsOptional, IsString } from "class-validator";
 import { Types } from "mongoose";
 import { tipoE } from "src/stocks/enums/tipo.enum";
-import { PaginadorDto } from "src/utils/dtos/paginadorDto";
+import { PaginadorDto } from "src/core/utils/dtos/paginadorDto";
 
 export class BuscadorStockSucursal extends PaginadorDto {
 

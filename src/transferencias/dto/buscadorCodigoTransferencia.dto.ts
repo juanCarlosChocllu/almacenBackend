@@ -1,6 +1,6 @@
 import { Transform } from "class-transformer";
 import { IsDateString, IsEnum, IsMongoId, IsOptional, IsString } from "class-validator";
-import { PaginadorDto } from "src/utils/dtos/paginadorDto";
+import { PaginadorDto } from "src/core/utils/dtos/paginadorDto";
 import { estadoE } from "../enums/estado.enum";
 
 export class BuscadorCodigoTransferenciaDto extends PaginadorDto {

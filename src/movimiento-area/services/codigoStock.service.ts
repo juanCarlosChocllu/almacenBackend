@@ -32,8 +32,6 @@ export class CodigoStockService {
 
 
      private async codigoArea(area:Types.ObjectId){
-          
-          
          const data= await this.areaService.findOne(area)
           const letras = data.nombre.split('')
           let consonastes:String=''

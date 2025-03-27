@@ -7,6 +7,8 @@ import { modulosE } from 'src/core/enums/modulos.enum';
 import { TipoUsuario } from 'src/autenticacion/decorators/tipoUsuario/tipoUsuario';
 import { TipoUsuarioE } from 'src/usuarios/enums/tipoUsuario';
 import { PublicInterno } from 'src/autenticacion/decorators/publicInterno/publicInterno';
+import { ValidateIdPipe } from 'src/core/utils/validate-id/validate-id.pipe';
+import { Types } from 'mongoose';
 
 
 
@@ -33,18 +35,15 @@ export class EmpresasController {
   bsucadorEmpresas() {
     return this.empresasService.findAll();
   }
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.empresasService.findOne(+id);
-  }
+  
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateEmpresaDto: UpdateEmpresaDto) {
-    return this.empresasService.update(+id, updateEmpresaDto);
+  actulizaEmpresa(@Param('id', ValidateIdPipe) id: Types.ObjectId, @Body() updateEmpresaDto: UpdateEmpresaDto) {
+    return this.empresasService.actualizar(id, updateEmpresaDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.empresasService.remove(+id);
+  softDelete(@Param('id', ValidateIdPipe) id: Types.ObjectId) {
+    return this.empresasService.softDelete(id);
   }
 }

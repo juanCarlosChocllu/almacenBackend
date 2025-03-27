@@ -2,12 +2,13 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { SucursalService } from './sucursal.service';
 import { CreateSucursalDto } from './dto/create-sucursal.dto';
 import { UpdateSucursalDto } from './dto/update-sucursal.dto';
-import { ValidateIdPipe } from 'src/utils/validate-id/validate-id.pipe';
+import { ValidateIdPipe } from 'src/core/utils/validate-id/validate-id.pipe';
 import { Modulo } from 'src/autenticacion/decorators/modulos/modulo.decorator';
 import { modulosE } from 'src/core/enums/modulos.enum';
 import { TipoUsuarioE } from 'src/usuarios/enums/tipoUsuario';
 import { TipoUsuario } from 'src/autenticacion/decorators/tipoUsuario/tipoUsuario';
 import { PublicInterno } from 'src/autenticacion/decorators/publicInterno/publicInterno';
+import { Types } from 'mongoose';
 
 @Modulo(modulosE.SUCURSALES)
 @TipoUsuario(TipoUsuarioE.AREA, TipoUsuarioE.NINGUNO)
@@ -19,7 +20,7 @@ export class SucursalController {
   create(@Body() createSucursalDto: CreateSucursalDto) {
     return this.sucursalService.create(createSucursalDto);
   }
-  @Get('')
+  @Get()
    listarSucursal() {
     return this.sucursalService.listarSucursal();
   }
@@ -30,18 +31,14 @@ export class SucursalController {
     return this.sucursalService.listarSucursalPorEmpresa(empresa);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.sucursalService.findOne(+id);
-  }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateSucursalDto: UpdateSucursalDto) {
-    return this.sucursalService.update(+id, updateSucursalDto);
+  actualizar(@Param('id' ,ValidateIdPipe) id: Types.ObjectId, @Body() updateSucursalDto: UpdateSucursalDto) {
+    return this.sucursalService.actualizar(id, updateSucursalDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.sucursalService.remove(+id);
+  softDelete(@Param('id', ValidateIdPipe) id: Types.ObjectId) {
+    return this.sucursalService.softDelete(id);
   }
 }

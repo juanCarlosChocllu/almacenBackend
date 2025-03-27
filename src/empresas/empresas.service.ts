@@ -1,8 +1,8 @@
-import { ConflictException, HttpStatus, Injectable } from '@nestjs/common';
+import { ConflictException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateEmpresaDto } from './dto/create-empresa.dto';
 import { UpdateEmpresaDto } from './dto/update-empresa.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { Empresa } from './schemas/empresa.schema';
 import { flag } from 'src/core/enums/flag.enum';
 import { ApiResponseI } from 'src/core/interface/httpRespuesta';
@@ -27,16 +27,21 @@ export class EmpresasService {
   findAll() {
     return this.empresa.find({ flag: flag.nuevo });
   }
-
-  findOne(id: number) {
-    return `This action returns a #${id} empresa`;
+  async actualizar(id: Types.ObjectId, updateMarcaDto: UpdateEmpresaDto) {
+      const empresa = await this.empresa.findOne({_id:new Types.ObjectId(id), flag:flag.nuevo})
+      if(!empresa) {
+        throw new NotFoundException()
+      }
+      await this.empresa.updateOne({_id:new Types.ObjectId(id)}, updateMarcaDto)
+      return {status:HttpStatus.OK}
   }
 
-  update(id: number, updateEmpresaDto: UpdateEmpresaDto) {
-    return `This action updates a #${id} empresa`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} empresa`;
-  }
+  async softDelete(id: Types.ObjectId) {
+    const empresa = await this.empresa.findOne({_id:new Types.ObjectId(id), flag:flag.nuevo})
+      if(!empresa) {
+        throw new NotFoundException()
+      }
+      await this.empresa.updateOne({_id:new Types.ObjectId(id)}, {flag:flag.eliminado})
+      return {status:HttpStatus.OK}
+  } 
 }

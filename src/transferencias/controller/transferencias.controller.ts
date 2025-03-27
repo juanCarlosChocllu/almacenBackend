@@ -11,8 +11,9 @@ import { TipoUsuarioE } from 'src/usuarios/enums/tipoUsuario';
 import { tipoRegistro } from 'src/core/enums/tipo.registro.enum';
 import { Modulo } from 'src/autenticacion/decorators/modulos/modulo.decorator';
 import { modulosE } from 'src/core/enums/modulos.enum';
-import { ValidateIdPipe } from 'src/utils/validate-id/validate-id.pipe';
+import { ValidateIdPipe } from 'src/core/utils/validate-id/validate-id.pipe';
 import { Types } from 'mongoose';
+import { EditarTransferenciaRechazadaDto } from '../dto/editarTransferenciaRechazada.dto';
 
 @Modulo(modulosE.TRANSFERENCIAS)
 @TipoUsuario(TipoUsuarioE.AREA,TipoUsuarioE.NINGUNO , TipoUsuarioE.SUCURSAL)  
@@ -82,4 +83,14 @@ export class TransferenciasController {
   cancelarCodigoTransferencia(@Param ('codigo', ValidateIdPipe) codigo:Types.ObjectId){
       return  this.transferenciasService.cancelarCodigoTransferencia(codigo)
   }
+  @Get('editar/rechazada/:transferencia/:cantidad/:almacenSucursal')
+  editarTransferenciaRechazada(@Param () params :{transferencia:Types.ObjectId, cantidad:number,almacenSucursal:Types.ObjectId  } ){
+    const editarTransferenciaRechazadaDto: EditarTransferenciaRechazadaDto = {
+      transferencia: params.transferencia,
+      cantidad: Number(params.cantidad),
+      almacenSucursal: params.almacenSucursal,
+    };
+     return  this.transferenciasService.editarTransferenciaRechazada(editarTransferenciaRechazadaDto)
+  }
+
 }

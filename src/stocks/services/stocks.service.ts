@@ -15,10 +15,8 @@ import { tipoE } from "../enums/tipo.enum";
 import { FiltardorStockService } from "./filtardor.stock.service";
 
 import { Request } from "express";
-import { request } from "http";
 import { BuscadorStockI } from "../interfaces/buscadorStock";
 import { CodigoStockService } from "../../movimiento-area/services/codigoStock.service";
-import { Socket } from "dgram";
 
 
 @Injectable()
@@ -88,7 +86,7 @@ export class StocksService {
           await this.crearStock(data,createStockDto.proveedorEmpresa,createStockDto.proveedorPersona, request.usuario, codigo._id);
         }
       }
-      return { status: HttpStatus.CREATED };
+      return { status: HttpStatus.CREATED, data:codigo._id};
     } catch (error) {
       console.log(error);
 
@@ -105,7 +103,7 @@ export class StocksService {
   ) {
     data.producto = new Types.ObjectId(data.producto);
     data.almacenArea = new Types.ObjectId(data.almacenArea);
-    console.log(data.fechaVencimiento);
+
     
     const stock= await this.stock.create({
       almacenArea: data.almacenArea,
@@ -132,9 +130,9 @@ export class StocksService {
 
   const filtrador=    this.filtardorStockService.filtroBusquedaStock(parametrosStockDto)
     const {marca, codigo, ...filtradorSinMarca}= filtrador
-    const  countDocuments = await this.countDocuments(filtrador, request);    
-    const cantidadPaginas= Math.ceil(countDocuments / Number(parametrosStockDto.limite) )
-    const stocks:StockResponse[] = await this.stock.aggregate([
+
+
+    const stocks = await this.stock.aggregate([
       {
         $match: {
           flag: flag.nuevo,
@@ -224,66 +222,34 @@ export class StocksService {
           almacenArea:'$almacen._id',
           imagen:'$producto.imagen',
           codigoProducto:'$producto.codigo',
-          iamgen:'$producto.imagen',
+        
+        
           
         },
+        
       },
-    ]).skip((Number(parametrosStockDto.pagina) - 1) * Number( parametrosStockDto.limite)).limit(Number(parametrosStockDto.limite));       
-    return  {data:stocks, paginas:cantidadPaginas}
-  }
+      {
+        $facet:{
+          data:[
+            {
+              $skip:(Number(parametrosStockDto.pagina) - 1) * Number( parametrosStockDto.limite)
+            },
+            {
+              $limit:Number(parametrosStockDto.limite)
+            }
 
-  
-  private async countDocuments (filtrador:BuscadorStockI, request:Request):Promise<number>{
-    const {marca, codigo, ...filtradorSinMarca}= filtrador
-    const cantidad = await this.stock.aggregate([
-      {
-        $match:{flag:flag.nuevo,
-          ...filtradorSinMarca
-        }
-      }  ,
-      {
-        
-          $lookup: {
-            from: 'Producto',
-            localField: 'producto',
-            foreignField: '_id',
-            as: 'producto',
-          },
-        },
-        
-        ...(codigo) ?[ {
-          $match:{
-            'producto.codigo':codigo
-          }
-        }]:[], 
-      ...(marca) ?[ {
-        $match:{
-          'producto.marca':new Types.ObjectId(marca)
-        }
-      }]:[],
-      {
-        $lookup: {
-          from: 'Categoria',
-          localField: 'producto.categoria',
-          foreignField: '_id',
-          as: 'categoria',
-        },
-      },
-      ...(request.area ? [ {$match : {'marca._id':request.area }}]:[]),
-      {
-        $group :{
-          _id:null,
-          cantidad : {$sum:1}
-        }
-      },
-      {
-        $project:{
-          cantidad:1
+          ],
+          countDocuments:[{$count:'total'}]
         }
       }
     ])
-    return cantidad.length > 0? cantidad[0].cantidad : 1
+    const countDocuments= stocks[0].countDocuments[0] ?stocks[0].countDocuments[0].total :1
+    const cantidadPaginas= Math.ceil(countDocuments / Number(parametrosStockDto.limite) )
+    
+    return  {data:stocks[0].data, paginas:cantidadPaginas}
   }
+
+  
 
   findOne(id: number) {
     return `This action returns a #${id} stock`;
@@ -378,11 +344,23 @@ export class StocksService {
 
 
   async  reingresoStock(stock:Types.ObjectId, cantidad:number){
-    const stk = await this.stock.findOne({_id:new Types.ObjectId(stock), flag:flag.nuevo})
-     let stkCantidad= stk.cantidad + cantidad
-     return  this.stock.updateOne({_id:stk._id},{cantidad:stkCantidad})  
+  
+    const stk = await this.stock.findOne({_id:new Types.ObjectId(stock), flag:flag.nuevo})    
+     let stkCantidad= stk.cantidad + cantidad   
+     return  await this.stock.updateOne({_id:stk._id, flag:flag.nuevo},{cantidad:stkCantidad})  
     }
 
-  
 
+
+
+  async buscarStockPorId (stock:Types.ObjectId){
+    const stk = await this.stock.findOne({_id:new Types.ObjectId(stock), flag:flag.nuevo})
+    return stk
+  }
+
+  async actuliarcantidadStock(stock:Types.ObjectId, cantidad:number) {
+  
+    return  this.stock.updateOne({_id:new Types.ObjectId(stock)},{cantidad:cantidad})
+  }
+  
 }

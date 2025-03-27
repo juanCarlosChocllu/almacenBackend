@@ -6,7 +6,7 @@ import { modulosE } from "src/core/enums/modulos.enum";
 import { TipoUsuarioE } from "src/usuarios/enums/tipoUsuario";
 import { BuscadorCodigoTransferenciaDto } from "../dto/buscadorCodigoTransferencia.dto";
 import { Request } from 'express';
-import { ValidateIdPipe } from "src/utils/validate-id/validate-id.pipe";
+import { ValidateIdPipe } from "src/core/utils/validate-id/validate-id.pipe";
 import { Types } from "mongoose";
 
 @Modulo(modulosE.TRANSFERENCIAS)

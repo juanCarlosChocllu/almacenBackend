@@ -1,6 +1,6 @@
 import { IsEnum, isEnum, IsOptional, isString, IsString } from "class-validator"
 import { tipoE } from "../enums/tipo.enum"
-import { PaginadorDto } from "src/utils/dtos/paginadorDto"
+import { PaginadorDto } from "src/core/utils/dtos/paginadorDto"
 
 export class ParametrosStockDto extends PaginadorDto{
     @IsString()

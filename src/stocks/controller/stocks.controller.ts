@@ -12,7 +12,7 @@ import {
 
 import { CreateStockDto } from '../dto/create-stock.dto';
 import { UpdateStockDto } from '../dto/update-stock.dto';
-import { ValidateIdPipe } from 'src/utils/validate-id/validate-id.pipe';
+import { ValidateIdPipe } from 'src/core/utils/validate-id/validate-id.pipe';
 import { ParametrosStockDto } from '../dto/parametros-stock-dto';
 import { Types } from 'mongoose';
 import { StocksService } from '../services/stocks.service';

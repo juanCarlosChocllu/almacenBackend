@@ -51,7 +51,11 @@ export class AlmacenAreaService {
         }
       },
       {$unwind:{ path:'$area', preserveNullAndEmptyArrays:false}},
-
+      {
+        $match:{
+          'area.flag':flag.nuevo
+        }
+      },
       {
         $project:{
            nombre:1,
@@ -71,11 +75,29 @@ export class AlmacenAreaService {
     return `This action returns a #${id} almacenArea`;
   }
 
-  update(id: number, updateAlmacenAreaDto: UpdateAlmacenAreaDto) {
-    return `This action updates a #${id} almacenArea`;
+  async actulizar(id: Types.ObjectId, updateAlmacenAreaDto: UpdateAlmacenAreaDto) {
+    const almacen = await this.almacenArea.findOne({nombre:updateAlmacenAreaDto.nombre, _id:{$ne:new Types.ObjectId(id)}
+  })
+    if(almacen){
+      throw new ConflictException('El almacen ya existe')
+    }
+    updateAlmacenAreaDto.area = new Types.ObjectId(updateAlmacenAreaDto.area)
+    await this.almacenArea.updateOne({_id:new Types.ObjectId(id)}, updateAlmacenAreaDto)
+    return {status:HttpStatus.OK}
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} almacenArea`;
+  async softDelete(id: Types.ObjectId) {
+    const almacenArea = await this.almacenArea.findOne({
+      _id: new Types.ObjectId(id),
+      flag: flag.nuevo,
+    });
+    if (!almacenArea) {
+      throw new NotFoundException();
+    }
+    await this.almacenArea.updateOne(
+      { _id: new Types.ObjectId(id) },
+      { flag: flag.eliminado },
+    );
+    return { status: HttpStatus.OK };
   }
 }

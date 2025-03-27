@@ -26,10 +26,7 @@ export class NotificacionGateway implements OnGatewayConnection, OnGatewayDiscon
 
 
   @OnEvent('notificaciones.create')
-    notificacionDeEnvioDeTransferencia(data:NotificacionI){  
-      console.log(data.sucursal);
-      
-            
+    notificacionDeEnvioDeTransferencia(data:NotificacionI){         
     return this.server.to(data.sucursal).emit('notificaciones', data)
     
   }

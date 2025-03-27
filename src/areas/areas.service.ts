@@ -1,4 +1,4 @@
-import { ConflictException, HttpStatus, Injectable } from '@nestjs/common';
+import { ConflictException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateAreaDto } from './dto/create-area.dto';
 import { UpdateAreaDto } from './dto/update-area.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -28,13 +28,7 @@ export class AreasService {
     return this.area.find({flag:flag.nuevo});
   }
  
-  update(id: number, updateAreaDto: UpdateAreaDto) {
-    return `This action updates a #${id} area`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} area`;
-  }
+  
 
   public async buscarArea(area:Types.ObjectId){
     const a = await this.area.exists({_id:new Types.ObjectId(area), flag:flag.nuevo})
@@ -48,5 +42,29 @@ export class AreasService {
 
   }
 
+   async softDelete(id: Types.ObjectId) {
+       const almacenSucursal = await this.area.findOne({
+         _id: new Types.ObjectId(id),
+         flag: flag.nuevo,
+       });
+       if (!almacenSucursal) {
+         throw new NotFoundException();
+       }
+       await this.area.updateOne(
+         { _id: new Types.ObjectId(id) },
+         { flag: flag.eliminado },
+       );
+       return { status: HttpStatus.OK };
+     }
+
+     async  actulizar(id:Types.ObjectId, updateAreaDto: UpdateAreaDto) {
+      const area = await this.area.exists({nombre:updateAreaDto.nombre, flag:flag.nuevo , _id:{$ne: new Types.ObjectId(id)}})
+      if(area){
+         throw new ConflictException('El area ya existe')
+      }
+      await this.area.updateOne({_id:new Types.ObjectId(id)}, updateAreaDto)
+      return  {status:HttpStatus.OK};
+    }
+  
 
 }

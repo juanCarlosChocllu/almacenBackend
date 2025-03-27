@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Req } from '@nestjs/
 
 import { CreateAlmacenSucursalDto } from './dto/create-almacen-sucursal.dto';
 import { UpdateAlmacenSucursalDto } from './dto/update-almacen-sucursal.dto';
-import { ValidateIdPipe } from 'src/utils/validate-id/validate-id.pipe';
+import { ValidateIdPipe } from 'src/core/utils/validate-id/validate-id.pipe';
 import { AlmacenSucursalService } from './services/almacen-sucursal.service';
 import { Request } from 'express';
 import { Modulo } from 'src/autenticacion/decorators/modulos/modulo.decorator';
@@ -11,6 +11,7 @@ import { TipoUsuario } from 'src/autenticacion/decorators/tipoUsuario/tipoUsuari
 import { tipoRegistro } from 'src/core/enums/tipo.registro.enum';
 import { TipoUsuarioE } from 'src/usuarios/enums/tipoUsuario';
 import { PublicInterno } from 'src/autenticacion/decorators/publicInterno/publicInterno';
+import { Types } from 'mongoose';
 
 
 @Modulo(modulosE.ALMACEN_SUCURSAL)
@@ -44,17 +45,17 @@ export class AlmacenSucursalController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.almacenSucursalService.findOne(+id);
+  findOne(@Param('id',ValidateIdPipe) id: Types.ObjectId) {
+    return this.almacenSucursalService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAlmacenSucursalDto: UpdateAlmacenSucursalDto) {
-    return this.almacenSucursalService.update(+id, updateAlmacenSucursalDto);
+  actulizar(@Param('id', ValidateIdPipe) id: Types.ObjectId, @Body() updateAlmacenSucursalDto: UpdateAlmacenSucursalDto) {
+    return this.almacenSucursalService.actulizar(id, updateAlmacenSucursalDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.almacenSucursalService.remove(+id);
+  softDelete(@Param('id', ValidateIdPipe) id: Types.ObjectId) {
+    return this.almacenSucursalService.softDelete(id);
   }
 }

@@ -1,5 +1,5 @@
 import { IsOptional, IsString } from "class-validator"
-import { PaginadorDto } from "src/utils/dtos/paginadorDto"
+import { PaginadorDto } from "src/core/utils/dtos/paginadorDto"
 
 export class BuscadorProveedorPersonaDto extends PaginadorDto {
     @IsString()

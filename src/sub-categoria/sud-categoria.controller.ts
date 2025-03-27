@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Req } from '@nestjs/
 import { SubCategoriaService } from './sud-categoria.service';
 import { CreateSubCategoriaDto } from './dto/create-sud-categoria.dto';
 import { UpdateSubCategoriaDto } from './dto/update-sud-categoria.dto';
-import { ValidateIdPipe } from 'src/utils/validate-id/validate-id.pipe';
+import { ValidateIdPipe } from 'src/core/utils/validate-id/validate-id.pipe';
 import {Request}from 'express'
 import { Modulo } from 'src/autenticacion/decorators/modulos/modulo.decorator';
 import { modulosE } from 'src/core/enums/modulos.enum';

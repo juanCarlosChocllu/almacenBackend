@@ -9,6 +9,7 @@ import { modulosE } from '../core/enums/modulos.enum';
 import { TipoUsuario } from 'src/autenticacion/decorators/tipoUsuario/tipoUsuario';
 import { TipoUsuarioE } from 'src/usuarios/enums/tipoUsuario';
 import { Public } from 'src/autenticacion/decorators/public/public.decorator';
+import { ValidateIdPipe } from 'src/core/utils/validate-id/validate-id.pipe';
 
 
 @Modulo(modulosE.ROL)
@@ -33,8 +34,8 @@ export class RolController {
 
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateRolDto: UpdateRolDto) {
-    return this.rolService.update(+id, updateRolDto);
+  actulizar(@Param('id', ValidateIdPipe) id: Types.ObjectId, @Body() updateRolDto: UpdateRolDto) {
+    return this.rolService.actulizar(id, updateRolDto);
   }
 
   @Delete(':id')

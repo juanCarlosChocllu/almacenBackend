@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { PermisosService } from './permisos.service';
 import { CreatePermisoDto } from './dto/create-permiso.dto';
 import { UpdatePermisoDto } from './dto/update-permiso.dto';
-import { ValidateIdPipe } from 'src/utils/validate-id/validate-id.pipe';
+import { ValidateIdPipe } from 'src/core/utils/validate-id/validate-id.pipe';
 import { Types } from 'mongoose';
 import { Public } from 'src/autenticacion/decorators/public/public.decorator';
 import { Modulo } from 'src/autenticacion/decorators/modulos/modulo.decorator';

@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Req, Query } from '@
 import { StockSucursalService } from './services/stock-sucursal.service';
 import { CreateStockSucursalDto } from './dto/create-stock-sucursal.dto';
 import { UpdateStockSucursalDto } from './dto/update-stock-sucursal.dto';
-import { ValidateIdPipe } from 'src/utils/validate-id/validate-id.pipe';
+import { ValidateIdPipe } from 'src/core/utils/validate-id/validate-id.pipe';
 import { Types } from 'mongoose';
 import { tipoE } from 'src/stocks/enums/tipo.enum';
 import {Request}from 'express'

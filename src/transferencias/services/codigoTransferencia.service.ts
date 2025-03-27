@@ -49,9 +49,6 @@ export class CodigoTransferenciaService {
       const areas = await this.detalleAreaService.listarAreasPorUsuario(request.usuario)
    
   
-      console.log(buscadorCodigoTransferenciaDto);
-      
-      
       const codigoTranferencias = await this.codigoTransferencia
         .aggregate([
           {

@@ -5,7 +5,7 @@ import { Modulo } from 'src/autenticacion/decorators/modulos/modulo.decorator';
 import { modulosE } from 'src/core/enums/modulos.enum';
 import { TipoUsuario } from 'src/autenticacion/decorators/tipoUsuario/tipoUsuario';
 import { TipoUsuarioE } from 'src/usuarios/enums/tipoUsuario';
-import { ValidateIdPipe } from 'src/utils/validate-id/validate-id.pipe';
+import { ValidateIdPipe } from 'src/core/utils/validate-id/validate-id.pipe';
 import { Types } from 'mongoose';
 import { MovimientoAreaService } from '../services/movimiento-area.service';
 import { CreateMovimientoAreaDto } from '../dto/create-movimiento-area.dto';

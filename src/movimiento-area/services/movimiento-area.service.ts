@@ -13,7 +13,7 @@ import { BuscadorMovimientoArea } from '../dto/buscador-movimiento-area.dto';
 import { PaginatedResponseI } from 'src/core/interface/httpRespuesta';
 import { FiltradoresAreaService } from './filtradores-area.service';
 import { Request } from 'express';
-import { BuscadorMaI } from '../interface/buscadorMa';
+
 
 @Injectable()
 export class MovimientoAreaService {
@@ -31,8 +31,7 @@ export class MovimientoAreaService {
 
     const {codigo, ...nuevoFiltardor}= this.filtradoresAreaService.filtradorMovimientoArea(buscadorMovimientoArea)    
 
-    const countDocuments:number = await this.countDocuments(codigo, nuevoFiltardor, request)
-    const paginas = Math.ceil(countDocuments / Number(buscadorMovimientoArea.limite))
+   
     const movimiento= await this.movimientoArea.aggregate([
       {$match:{flag:flag.nuevo, 
         tipoDeRegistro:tipoDeRegistroE.INGRESO,
@@ -132,61 +131,37 @@ export class MovimientoAreaService {
             format: '%Y-%m-%d',
             date: '$fecha',
           },
-        },
-      
-      
+        },      
+        }
+       },
+       {
+        $facet:{
+          data:[
+            {
+              $skip:(Number(buscadorMovimientoArea.pagina) - 1) * Number( buscadorMovimientoArea.limite)
+            },
+            {
+              $limit:Number(buscadorMovimientoArea.limite)
+            }
+          ],
+          countDocuments:[
+            {
+              $count:'total'
+            }
+          ]
+
         }
        }
       
-    ]).skip((Number(buscadorMovimientoArea.pagina) - 1) * Number( buscadorMovimientoArea.limite)).limit(Number(buscadorMovimientoArea.limite));
+    ])
+    const countDocuments = await movimiento[0].countDocuments ?movimiento[0].countDocuments[0].total : 1
+    const paginas = Math.ceil(countDocuments / Number(buscadorMovimientoArea.limite))
     
 
-    return {data:movimiento, paginas:paginas}  }
+    return {data:movimiento[0].data, paginas:paginas}  }
 
 
 
-
-    private async countDocuments (codigo:RegExp, filtardor:BuscadorMaI,request:Request){
-    
-        const cantidad = await this.movimientoArea.aggregate([
-          {$match:{flag:flag.nuevo, 
-            tipoDeRegistro:tipoDeRegistroE.INGRESO,
-            ...filtardor
-          }},
-          {
-            $lookup:{
-              from:'Producto',
-              foreignField:'_id',
-              localField:'producto',
-              as:'producto'
-            }
-          },
-          ...(codigo) ? [{$match:{'producto.codigo':codigo}}]:[],
-          {
-            $lookup:{
-              from:'AlmacenArea',
-              foreignField:'_id',
-              localField:'almacenArea',
-              as:'almacenArea'
-            }
-          },
-        
-          ...(request.area) ? [{$match:{'almacenArea.area':request.area}}]:[],
-          {
-            $group:{
-              _id:null,
-              cantidad:{$sum:1}
-            }
-          },
-          {
-            $project:{
-              _id:null,
-              cantidad:1
-            }
-          }
-        ])
-      return cantidad.length > 0 ?cantidad[0].cantidad : 1
-    }
 
   findOne(id: number) {
     return `This action returns a #${id} movimientoArea`;

@@ -8,7 +8,7 @@ import { TipoUsuarioE } from 'src/usuarios/enums/tipoUsuario';
 import { TipoUsuario } from 'src/autenticacion/decorators/tipoUsuario/tipoUsuario';
 import { BuscadorProveedorEmpresaDto } from './dto/BuscadorProveedorEmpresa.dto';
 
-@Modulo(modulosE.PROVEEDOR_EMPRESA)
+@Modulo(modulosE.PROVEEDORES)
 @TipoUsuario(TipoUsuarioE.AREA,TipoUsuarioE.NINGUNO )
 @Controller('proveedor/empresa')
 export class ProveedorEmpresaController {
@@ -21,8 +21,6 @@ export class ProveedorEmpresaController {
 
   @Get()
   findAll(@Query() BuscadorProveedorEmpresaDto:BuscadorProveedorEmpresaDto) {
-
-        
     return this.proveedorEmpresaService.findAll(BuscadorProveedorEmpresaDto);
   }
 

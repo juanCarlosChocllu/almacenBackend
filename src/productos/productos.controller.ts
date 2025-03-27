@@ -9,6 +9,7 @@ import {
   UploadedFile,
   Query,
   Req,
+  Delete,
 
 } from '@nestjs/common';
 import { ProductosService } from './services/productos.service';
@@ -26,6 +27,7 @@ import { modulosE } from 'src/core/enums/modulos.enum';
 import { TipoUsuario } from 'src/autenticacion/decorators/tipoUsuario/tipoUsuario';
 import { TipoUsuarioE } from 'src/usuarios/enums/tipoUsuario';
 import { Types } from 'mongoose';
+import { ValidateIdPipe } from 'src/core/utils/validate-id/validate-id.pipe';
 
 
 
@@ -40,16 +42,12 @@ export class ProductosController {
     @Body() createProductoDto: CreateProductoDto,
     @UploadedFile() file: Express.Multer.File,
     @Req() request :Request
-  ) {    
-
-    console.log(file);
-    
-      
+  ) {        
     if (file) {
       createProductoDto.imagen = file.filename;
     }
      createProductoDto.area = new Types.ObjectId(createProductoDto.area)
-     return this.productosService.create(createProductoDto);
+     return this.productosService.create(createProductoDto, request.area);
   }
 
   @Get()
@@ -59,15 +57,26 @@ export class ProductosController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.productosService.findOne(+id);
+  findOne(@Param('id', ValidateIdPipe) id: Types.ObjectId) {
+    return this.productosService.findOne(id);
   }
 
   @Patch(':id')
-  update(
-    @Param('id') id: string,
+  @UseInterceptors(FileInterceptor('file', { ...configuracionMulter }))
+  actualizar(
+    @Param('id', ValidateIdPipe) id: Types.ObjectId,
     @Body() updateProductoDto: UpdateProductoDto,
+    @UploadedFile() file: Express.Multer.File,
   ) {
-    return this.productosService.update(+id, updateProductoDto);
+    if(file){
+      updateProductoDto.imagen = file.filename;
+    }
+    return this.productosService.actualizar(id, updateProductoDto);
+  }
+
+
+  @Delete(':id')
+  eliminarProducto(@Param('id', ValidateIdPipe) id: Types.ObjectId) {
+    return this.productosService.eliminarProducto(id);
   }
 }

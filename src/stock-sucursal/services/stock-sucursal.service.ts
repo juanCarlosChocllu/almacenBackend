@@ -1,6 +1,6 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import {Injectable } from '@nestjs/common';
 import { CreateStockSucursalDto } from '../dto/create-stock-sucursal.dto';
-import { UpdateStockSucursalDto } from '../dto/update-stock-sucursal.dto';
+
 import { StockSucursal } from '../schemas/stock-sucursal.schema';
 import { Model, Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
@@ -12,7 +12,7 @@ import { FiltradorSucursalService } from './filtrador-sucursal.service';
 import { BuscadorStockSucursal } from '../dto/buscador-stock-sucursal.dto';
 
 import { PaginatedResponseI } from 'src/core/interface/httpRespuesta';
-import { BuscadorStockSucursalI } from '../interfaces/buscador';
+
 @Injectable()
 export class StockSucursalService {
   constructor(
@@ -40,17 +40,8 @@ export class StockSucursalService {
  
       
 
-    const countDocuments = await this.countDocuments(
-      codigo,
-      marca,
-      filtrador,
-      request.sucursal,
-      sucursal
-      
-    );
-    const paginas = Math.ceil(
-      countDocuments / Number(buscadorStockSucursal.limite),
-    );
+    
+  
     const stock = await this.stockSucursal
       .aggregate([
         {
@@ -128,92 +119,34 @@ export class StockSucursalService {
             },
           },
         },
-      ])
-      .sort({ fecha: -1 })
-      .skip(
-        (Number(buscadorStockSucursal.pagina) - 1) *
-          Number(buscadorStockSucursal.limite),
-      )
-      .limit(Number(buscadorStockSucursal.limite));
-
-    return { paginas: paginas, data: stock };
-  }
-
-
-
-
-  private async countDocuments(
-    codigo: RegExp,
-    marca: Types.ObjectId,
-    filtrador: BuscadorStockSucursalI,
-    sucursalRequest: Types.ObjectId,
-    sucursal: Types.ObjectId,
-    
-
-  ) {
-    const cantidad = await this.stockSucursal.aggregate([
-      {
-        $match: {
-          flag: flag.nuevo,
-          ...filtrador,
-        },
-      },
-      {
-        $lookup: {
-          from: 'Producto',
-          foreignField: '_id',
-          localField: 'producto',
-          as: 'producto',
-        },
-      },
-
-      ...(codigo ? [{ $match: { 'producto.codigo': codigo } }] : []),
-      ...(marca ? [{ $match: { 'producto.marca': marca } }] : []),
-      {
-        $lookup: {
-          from: 'Marca',
-          foreignField: '_id',
-          localField: 'producto.marca',
-          as: 'marca',
-        },
-      },
-
-      {
-        $lookup: {
-          from: 'AlmacenSucursal',
-          foreignField: '_id',
-          localField: 'almacenSucursal',
-          as: 'almacenSucursal',
-        },
-      },
-      ...(sucursalRequest
-        ? [{ $match: { 'almacenSucursal.sucursal': sucursalRequest } }]
-        : []),
-
-        ...(sucursal
-          ? [
+        {
+          $facet:{
+            data:[
               {
-                $match: {
-                  'almacenSucursal.sucursal': new Types.ObjectId(sucursal),
-                },
+                $skip:
+                  (Number(buscadorStockSucursal.pagina) - 1) *
+                    Number(buscadorStockSucursal.limite)
               },
-            ]
-          : []),
-      {
-        $group: {
-          _id: null,
-          cantidad: { $sum: 1 },
-        },
-      },
-
-      {
-        $project: {
-          cantidad: 1,
-        },
-      },
-    ]);
-    return cantidad.length > 0 ? cantidad[0].cantidad : 1;
+              {
+                $limit:Number(buscadorStockSucursal.limite)
+              }
+            ],
+            countDocuments:[{$count:'total'}]
+          }
+        }
+      ])
+      
+      const countDocuments=await stock[0].countDocuments ? stock[0].countDocuments[0].total:1
+      const paginas = Math.ceil(
+        countDocuments / Number(buscadorStockSucursal.limite),
+      );
+    return { paginas: paginas, data: stock[0].data };
   }
+
+
+
+
+ 
   public async registrarStockTranferencia(data: StockSucursalI) {
     data.codigo = await this.generarCodigo();
     const stockTransferencia = await this.stockSucursal.findOne({

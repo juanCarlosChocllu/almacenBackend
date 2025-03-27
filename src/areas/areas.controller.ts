@@ -8,6 +8,7 @@ import { TipoUsuario } from 'src/autenticacion/decorators/tipoUsuario/tipoUsuari
 import { TipoUsuarioE } from 'src/usuarios/enums/tipoUsuario';
 import { Types } from 'mongoose';
 import { PublicInterno } from 'src/autenticacion/decorators/publicInterno/publicInterno';
+import { ValidateIdPipe } from 'src/core/utils/validate-id/validate-id.pipe';
 
 
 @Modulo(modulosE.AREAS)
@@ -38,12 +39,12 @@ export class AreasController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAreaDto: UpdateAreaDto) {
-    return this.areasService.update(+id, updateAreaDto);
+  actulizar(@Param('id', ValidateIdPipe) id: Types.ObjectId, @Body() updateAreaDto: UpdateAreaDto) {
+    return this.areasService.actulizar(id, updateAreaDto)
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.areasService.remove(+id);
+  softDelete(@Param('id', ValidateIdPipe) id: Types.ObjectId) {
+    return this.areasService.softDelete(id);
   }
 }

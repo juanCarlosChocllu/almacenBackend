@@ -1,4 +1,4 @@
-import { ConflictException, HttpStatus, Injectable, BadRequestException } from '@nestjs/common';
+import { ConflictException, HttpStatus, Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
@@ -11,6 +11,7 @@ import { CreateAlmacenSucursalDto } from '../dto/create-almacen-sucursal.dto';
 import { UpdateAlmacenSucursalDto } from '../dto/update-almacen-sucursal.dto';
 import { Request } from 'express';
 import { Sucursal } from 'src/sucursal/schemas/sucursal.schema';
+import { UpdateDetalleAreaDto } from 'src/detalle-area/dto/update-detalle-area.dto';
 @Injectable()
 export class AlmacenSucursalService {
     constructor(@InjectModel(AlmacenSucursal.name) private readonly almacenSucursal:Model<AlmacenSucursal>){}
@@ -80,15 +81,67 @@ export class AlmacenSucursalService {
     }    
 
   }
-  findOne(id: number) {
-    return `This action returns a #${id} almacenSucursal`;
+  async findOne(id: Types.ObjectId) {
+    const almacenSucursal = await this.almacenSucursal.aggregate([
+      {
+        $match:{
+          _id: new Types.ObjectId(id),
+        flag: flag.nuevo,
+        }
+      },
+      {
+        $lookup:{
+          from:'Sucursal',
+          foreignField:'_id',
+          localField:'sucursal',
+          as:'sucursal'
+        }
+      },
+      {
+        $unwind:{path:'$sucursal', preserveNullAndEmptyArrays:false}
+      },
+      {
+        $project:{
+          nombre:1,
+          sucursal:'$sucursal._id',
+          empresa:'$sucursal.empresa'
+
+        }
+      }
+    ]);
+    if (almacenSucursal.length < 1 ) {
+      throw new NotFoundException();
+    }
+    console.log(almacenSucursal);
+    
+    return almacenSucursal[0] 
+   }
+
+  async  actulizar(id: Types.ObjectId, updateAlmacenSucursalDto: UpdateAlmacenSucursalDto) {
+    const almacenSucursal = await this.almacenSucursal.findOne({
+      _id: new Types.ObjectId(id),
+      flag: flag.nuevo,
+    });
+    if (!almacenSucursal) {
+      throw new NotFoundException();
+    }
+    updateAlmacenSucursalDto.sucursal = new Types.ObjectId(updateAlmacenSucursalDto.sucursal)
+    await this.almacenSucursal.updateOne({_id:new Types.ObjectId(id)}, updateAlmacenSucursalDto  )
+    return {status:HttpStatus.OK}
   }
 
-  update(id: number, updateAlmacenSucursalDto: UpdateAlmacenSucursalDto) {
-    return `This action updates a #${id} almacenSucursal`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} almacenSucursal`;
-  }
+   async softDelete(id: Types.ObjectId) {
+     const almacenSucursal = await this.almacenSucursal.findOne({
+       _id: new Types.ObjectId(id),
+       flag: flag.nuevo,
+     });
+     if (!almacenSucursal) {
+       throw new NotFoundException();
+     }
+     await this.almacenSucursal.updateOne(
+       { _id: new Types.ObjectId(id) },
+       { flag: flag.eliminado },
+     );
+     return { status: HttpStatus.OK };
+   }
 }

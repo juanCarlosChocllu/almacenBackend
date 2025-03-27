@@ -8,7 +8,9 @@ import { TipoUsuario } from 'src/autenticacion/decorators/tipoUsuario/tipoUsuari
 import { TipoUsuarioE } from 'src/usuarios/enums/tipoUsuario';
 import { PublicInterno } from 'src/autenticacion/decorators/publicInterno/publicInterno';
 import { query } from 'express';
-import { PaginadorDto } from 'src/utils/dtos/paginadorDto';
+import { PaginadorDto } from 'src/core/utils/dtos/paginadorDto';
+import { Types } from 'mongoose';
+import { ValidateIdPipe } from 'src/core/utils/validate-id/validate-id.pipe';
 
 
 @Modulo(modulosE.MARCAS)
@@ -32,18 +34,15 @@ export class MarcaController {
   listarBuscador() {
     return this.marcaService.marcasPublicas();
   }
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.marcaService.findOne(+id);
-  }
+
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateMarcaDto: UpdateMarcaDto) {
-    return this.marcaService.update(+id, updateMarcaDto);
+  actualizar(@Param('id') id: Types.ObjectId, @Body() updateMarcaDto: UpdateMarcaDto) {
+    return this.marcaService.actualizar(id, updateMarcaDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.marcaService.remove(+id);
+  softDelete(@Param('id', ValidateIdPipe) id:  Types.ObjectId) {
+    return this.marcaService.softDelete(id);
   }
 }

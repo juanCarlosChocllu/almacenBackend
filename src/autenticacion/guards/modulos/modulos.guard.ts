@@ -36,7 +36,8 @@ export class ModulosGuard implements CanActivate {
       const request: Request = context.switchToHttp().getRequest();
 
       const modulo = this.reflector.get(MODULOS_KEY, context.getClass());
-
+      console.log(modulo);
+      
       
  
       
