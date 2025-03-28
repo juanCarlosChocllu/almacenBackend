@@ -7,6 +7,8 @@ import { Modulo } from 'src/autenticacion/decorators/modulos/modulo.decorator';
 import { modulosE } from 'src/core/enums/modulos.enum';
 import { TipoUsuarioE } from 'src/usuarios/enums/tipoUsuario';
 import { TipoUsuario } from 'src/autenticacion/decorators/tipoUsuario/tipoUsuario';
+import { Types } from 'mongoose';
+import { ValidateIdPipe } from 'src/core/utils/validate-id/validate-id.pipe';
 
 @Modulo(modulosE.CATEGORIAS)
 @TipoUsuario(TipoUsuarioE.AREA, TipoUsuarioE.NINGUNO)
@@ -30,13 +32,14 @@ export class CategoriasController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCategoriaDto: UpdateCategoriaDto) {
-    return this.categoriasService.update(+id, updateCategoriaDto);
+  actulizar(@Param('id', ValidateIdPipe) id: Types.ObjectId, @Body() updateCategoriaDto: UpdateCategoriaDto, @Req() request:Request) {
+    
+    return this.categoriasService.actulizar(id, updateCategoriaDto, request.area);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.categoriasService.remove(+id);
+  softDelete(@Param('id', ValidateIdPipe) id: Types.ObjectId) {
+    return this.categoriasService.softDelete(id);
   }
 
   

@@ -3,6 +3,7 @@ import {
   ConflictException,
   HttpStatus,
   Injectable,
+  NotFoundException,
 } from '@nestjs/common';
 import { CreateSubCategoriaDto } from './dto/create-sud-categoria.dto';
 import { UpdateSubCategoriaDto } from './dto/update-sud-categoria.dto';
@@ -60,22 +61,13 @@ export class SubCategoriaService {
         $project: {
           nombre: 1,
           categoria: '$categoria.nombre',
+          idCategoria: '$categoria._id',
         },
       },
     ]);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} sudCategoria`;
-  }
 
-  update(id: number, updateSudCategoriaDto: UpdateSubCategoriaDto) {
-    return `This action updates a #${id} sudCategoria`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} sudCategoria`;
-  }
   async listarPorCategoria(id: string) {
     const sudCategorias = await this.sudCategoria.find({
       categoria: new Types.ObjectId(id),
@@ -83,4 +75,27 @@ export class SubCategoriaService {
     });
     return sudCategorias;
   }
+
+    async actualizar(id: Types.ObjectId,updateSubCategoriaDto: UpdateSubCategoriaDto) {
+      const sudCategoria = await this.sudCategoria.findOne({
+        nombre: updateSubCategoriaDto.nombre,
+        flag: flag.nuevo,
+        _id:{$ne :new Types.ObjectId(id)}
+      });
+      if (sudCategoria) {
+        throw new ConflictException('La sud categoria ya existe');
+      }
+        updateSubCategoriaDto.categoria = new Types.ObjectId(updateSubCategoriaDto.categoria)
+        await this.sudCategoria.updateOne({_id:new Types.ObjectId(id)}, updateSubCategoriaDto)
+        return {status:HttpStatus.OK}
+    }
+  
+    async softDelete(id: Types.ObjectId) {
+      const sudCategoria = await this.sudCategoria.findOne({_id:new Types.ObjectId(id), flag:flag.nuevo})
+        if(!sudCategoria) {
+          throw new NotFoundException()
+        }
+        await this.sudCategoria.updateOne({_id:new Types.ObjectId(id)}, {flag:flag.eliminado})
+        return {status:HttpStatus.OK}
+    } 
 }

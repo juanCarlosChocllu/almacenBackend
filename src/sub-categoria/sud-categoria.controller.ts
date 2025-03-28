@@ -8,6 +8,7 @@ import { Modulo } from 'src/autenticacion/decorators/modulos/modulo.decorator';
 import { modulosE } from 'src/core/enums/modulos.enum';
 import { TipoUsuario } from 'src/autenticacion/decorators/tipoUsuario/tipoUsuario';
 import { TipoUsuarioE } from 'src/usuarios/enums/tipoUsuario';
+import { Types } from 'mongoose';
 
 
 
@@ -34,18 +35,14 @@ export class SubCategoriaController {
   }
 
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.sudCategoriaService.findOne(+id);
-  }
-
+ 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateSudCategoriaDto: UpdateSubCategoriaDto) {
-    return this.sudCategoriaService.update(+id, updateSudCategoriaDto);
+  update(@Param('id', ValidateIdPipe) id: Types.ObjectId, @Body() updateSudCategoriaDto: UpdateSubCategoriaDto) {
+    return this.sudCategoriaService.actualizar(id, updateSudCategoriaDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.sudCategoriaService.remove(+id);
+  remove(@Param('id', ValidateIdPipe) id: Types.ObjectId) {
+    return this.sudCategoriaService.softDelete(id);
   }
 }
