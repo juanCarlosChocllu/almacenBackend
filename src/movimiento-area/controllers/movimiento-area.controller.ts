@@ -11,6 +11,9 @@ import { MovimientoAreaService } from '../services/movimiento-area.service';
 import { CreateMovimientoAreaDto } from '../dto/create-movimiento-area.dto';
 import { BuscadorMovimientoArea } from '../dto/buscador-movimiento-area.dto';
 import { UpdateMovimientoAreaDto } from '../dto/update-movimiento-area.dto';
+import { Permiso } from 'src/autenticacion/decorators/permisos/permisos.decorator';
+import { PermisoE } from 'src/core/enums/permisosEnum';
+import { PublicInterno } from 'src/autenticacion/decorators/publicInterno/publicInterno';
 
 
 @Modulo(modulosE.MOVIMIENTO_AREA)
@@ -19,32 +22,17 @@ import { UpdateMovimientoAreaDto } from '../dto/update-movimiento-area.dto';
 export class MovimientoAreaController {
   constructor(private readonly movimientoAreaService: MovimientoAreaService) {}
 
-  @Post()
-  create(@Body() createMovimientoAreaDto: CreateMovimientoAreaDto) {
-    return this.movimientoAreaService.create(createMovimientoAreaDto);
-  }
+
 
   @Get('ingresos')
+  @Permiso(PermisoE.LISTAR)
   ingresos(@Query() buscadorMovimientoArea:BuscadorMovimientoArea, @Req() request:Request) {
     return this.movimientoAreaService.ingresos( buscadorMovimientoArea, request);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.movimientoAreaService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateMovimientoAreaDto: UpdateMovimientoAreaDto) {
-    return this.movimientoAreaService.update(+id, updateMovimientoAreaDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.movimientoAreaService.remove(+id);
-  }
 
   @Get('informacion/stock/:codigo')
+  @PublicInterno()
   listarStockMovimientoPorCodigoStock(@Param('codigo', ValidateIdPipe ) codigo:Types.ObjectId) {
     return this.movimientoAreaService.listarStockMovimientoPorCodigoStock(codigo)
   }

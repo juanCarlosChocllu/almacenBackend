@@ -8,6 +8,8 @@ import { BuscadorCodigoTransferenciaDto } from "../dto/buscadorCodigoTransferenc
 import { Request } from 'express';
 import { ValidateIdPipe } from "src/core/utils/validate-id/validate-id.pipe";
 import { Types } from "mongoose";
+import { Permiso } from "src/autenticacion/decorators/permisos/permisos.decorator";
+import { PermisoE } from "src/core/enums/permisosEnum";
 
 @Modulo(modulosE.TRANSFERENCIAS)
 @TipoUsuario(TipoUsuarioE.AREA,TipoUsuarioE.NINGUNO, TipoUsuarioE.SUCURSAL)  
@@ -17,6 +19,7 @@ export class CodigoTransferenciaController {
 
 
   @Get()
+  @Permiso(PermisoE.RECIBIR_TRANSFERENCIAS)
   listarCodigosTransferencia(@Req() request:Request,@Query() buscadorCodigoTransferenciaDto :BuscadorCodigoTransferenciaDto){
       return  this.codigoTransferenciaService.listarCodigosTransferencia(buscadorCodigoTransferenciaDto, request)
   }

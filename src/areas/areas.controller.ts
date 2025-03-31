@@ -9,6 +9,8 @@ import { TipoUsuarioE } from 'src/usuarios/enums/tipoUsuario';
 import { Types } from 'mongoose';
 import { PublicInterno } from 'src/autenticacion/decorators/publicInterno/publicInterno';
 import { ValidateIdPipe } from 'src/core/utils/validate-id/validate-id.pipe';
+import { Permiso } from 'src/autenticacion/decorators/permisos/permisos.decorator';
+import { PermisoE } from 'src/core/enums/permisosEnum';
 
 
 @Modulo(modulosE.AREAS)
@@ -18,12 +20,14 @@ export class AreasController {
   constructor(private readonly areasService: AreasService) {}
 
   @Post()
+  @Permiso(PermisoE.CREAR)
   create(@Body() createAreaDto: CreateAreaDto) {
     
     return this.areasService.create(createAreaDto);
   }
 
   @Get()
+  @Permiso(PermisoE.LISTAR)
   findAll() {
     return this.areasService.findAll();
   }
@@ -39,11 +43,13 @@ export class AreasController {
   }
 
   @Patch(':id')
+  @Permiso(PermisoE.EDITAR)
   actulizar(@Param('id', ValidateIdPipe) id: Types.ObjectId, @Body() updateAreaDto: UpdateAreaDto) {
     return this.areasService.actulizar(id, updateAreaDto)
   }
 
   @Delete(':id')
+  @Permiso(PermisoE.ELIMINAR)
   softDelete(@Param('id', ValidateIdPipe) id: Types.ObjectId) {
     return this.areasService.softDelete(id);
   }

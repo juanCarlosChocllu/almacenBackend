@@ -20,9 +20,7 @@ export class StockSucursalService {
     private readonly stockSucursal: Model<StockSucursal>,
     private readonly filtradorSucursalService: FiltradorSucursalService,
   ) {}
-  create(createStockSucursalDto: CreateStockSucursalDto) {
-    return 'This action adds a new stockSucursal';
-  }
+  
 
   async findAll(
     request: Request,

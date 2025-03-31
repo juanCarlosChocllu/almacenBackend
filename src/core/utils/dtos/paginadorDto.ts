@@ -1,4 +1,4 @@
-import {IsOptional, IsString, Min } from "class-validator";
+import {IsOptional, IsString } from "class-validator";
 export class PaginadorDto {
     @IsOptional()
     @IsString()

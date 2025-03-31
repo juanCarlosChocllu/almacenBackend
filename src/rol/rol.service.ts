@@ -1,4 +1,4 @@
-import { ConflictException, HttpStatus, Injectable } from '@nestjs/common';
+import { ConflictException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateRolDto } from './dto/create-rol.dto';
 import { UpdateRolDto } from './dto/update-rol.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -57,9 +57,21 @@ export class RolService {
     }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} rol`;
-  }
+  async softDelete(id: Types.ObjectId) {
+      const sucursal = await this.rol.findOne({
+        _id: new Types.ObjectId(id),
+        flag: flag.nuevo,
+      });
+      if (!sucursal) {
+        throw new NotFoundException();
+      }
+      await this.rol.updateOne(
+        { _id: new Types.ObjectId(id) },
+        { flag: flag.eliminado },
+      );
+      return { status: HttpStatus.OK };
+    }
+
 
   public async verificarRol(id:Types.ObjectId):Promise<RolI>{
     const rol = this.rol.findOne({_id:new Types.ObjectId(id)})

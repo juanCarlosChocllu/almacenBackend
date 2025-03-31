@@ -72,9 +72,7 @@ export class SucursalService {
     return sucursal;
   }
 
-  async actualizar(id: Types.ObjectId, UpdateSucursalDto: UpdateSucursalDto) {
-    console.log(UpdateSucursalDto);
-    
+  async actualizar(id: Types.ObjectId, UpdateSucursalDto: UpdateSucursalDto) {    
     const sucursal = await this.sucursal.findOne({
       _id: new Types.ObjectId(id),
       flag: flag.nuevo,
@@ -103,5 +101,16 @@ export class SucursalService {
       { flag: flag.eliminado },
     );
     return { status: HttpStatus.OK };
+  }
+
+  async obtenerSucursal(id:Types.ObjectId) {
+    const sucursal = await this.sucursal.findOne({
+      _id: new Types.ObjectId(id),
+      flag: flag.nuevo,
+    });
+    if (!sucursal) {
+      throw new NotFoundException();
+    }
+    return sucursal
   }
 }

@@ -1,13 +1,12 @@
-import { ConflictException, HttpStatus, Injectable, Param } from '@nestjs/common';
+import { ConflictException, HttpStatus, Injectable, NotFoundException, Param } from '@nestjs/common';
 import { CreateProveedorEmpresaDto } from './dto/create-proveedor-empresa.dto';
 import { UpdateProveedorEmpresaDto } from './dto/update-proveedor-empresa.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { ProveedorEmpresa } from './schemas/proveedor-empresa.schema';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { ApiResponseI, PaginatedResponseI } from 'src/core/interface/httpRespuesta';
 import { flag } from 'src/core/enums/flag.enum';
 import { BuscadorProveedorEmpresaDto } from './dto/BuscadorProveedorEmpresa.dto';
-import { console } from 'inspector';
 import { BuscadorProveedorI } from './interface/BuscadorProveedor';
 
 @Injectable()
@@ -44,15 +43,43 @@ export class ProveedorEmpresaService {
     return {paginas:paginas, data:proveedor};
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} proveedorEmpresa`;
+  async obtenerProveedor(id: Types.ObjectId) {     
+    const proveedor = await this.proveedorEmpresa.findOne({
+      _id: new Types.ObjectId(id),
+      flag: flag.nuevo,
+    });
+    if (!proveedor) {
+      throw new NotFoundException();
+    }
+
+    return proveedor;
   }
 
-  update(id: number, updateProveedorEmpresaDto: UpdateProveedorEmpresaDto) {
-    return `This action updates a #${id} proveedorEmpresa`;
-  }
+   async actualizar(id: Types.ObjectId, updateProveedorEmpresaDto: UpdateProveedorEmpresaDto) {
 
-  remove(id: number) {
-    return `This action removes a #${id} proveedorEmpresa`;
-  }
+    if(updateProveedorEmpresaDto.nit){
+       
+      const nit:ProveedorEmpresa = await this.proveedorEmpresa.findOne({nit:updateProveedorEmpresaDto.nit,_id:{$ne:new Types.ObjectId(id)}})
+      if(nit){
+        throw new ConflictException('El nit ya existe')
+      }
+      }
+    await this.proveedorEmpresa.updateOne({_id:new Types.ObjectId(id)}, updateProveedorEmpresaDto)
+     return { status: HttpStatus.OK };
+   }
+ 
+   async softDelete(id: Types.ObjectId) {
+     const sucursal = await this.proveedorEmpresa.findOne({
+       _id: new Types.ObjectId(id),
+       flag: flag.nuevo,
+     });
+     if (!sucursal) {
+       throw new NotFoundException();
+     }
+     await this.proveedorEmpresa.updateOne(
+       { _id: new Types.ObjectId(id) },
+       { flag: flag.eliminado },
+     );
+     return { status: HttpStatus.OK };
+   }
 }

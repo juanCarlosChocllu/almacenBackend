@@ -22,9 +22,6 @@ export class MovimientoAreaService {
 ){
 
   }
-  create(createMovimientoAreaDto: CreateMovimientoAreaDto) {
-    return 'This action adds a new movimientoArea';
-  }
 
 
   async ingresos(buscadorMovimientoArea:BuscadorMovimientoArea,request:Request):Promise<PaginatedResponseI<MovimientoArea>> {
@@ -163,17 +160,7 @@ export class MovimientoAreaService {
 
 
 
-  findOne(id: number) {
-    return `This action returns a #${id} movimientoArea`;
-  }
-
-  update(id: number, updateMovimientoAreaDto: UpdateMovimientoAreaDto) {
-    return `This action updates a #${id} movimientoArea`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} movimientoArea`;
-  }
+ 
 
   public async registrarMovimientoArea(data:DataStockDto, 
      tipoDeRegistro:tipoDeRegistroE, stock:Types.ObjectId,

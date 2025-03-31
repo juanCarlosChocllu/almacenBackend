@@ -11,8 +11,10 @@ import { Permiso } from 'src/autenticacion/decorators/permisos/permisos.decorato
 import { TipoUsuario } from 'src/autenticacion/decorators/tipoUsuario/tipoUsuario';
 import { TipoUsuarioE } from './enums/tipoUsuario';
  import {Request } from 'express'
-import { get } from 'mongoose';
+import { get, Types } from 'mongoose';
 import { PublicInterno } from 'src/autenticacion/decorators/publicInterno/publicInterno';
+import { ValidateIdPipe } from 'src/core/utils/validate-id/validate-id.pipe';
+import { PermisoE } from 'src/core/enums/permisosEnum';
 
 @Controller('usuarios')
 @Modulo(modulosE.USUARIOS)
@@ -21,32 +23,39 @@ export class UsuariosController {
   constructor(private readonly usuariosService: UsuariosService) {}
 
   @Post()
-  //@Permiso(permisosE.CREAR)
+  @Permiso(PermisoE.CREAR)
   create(@Body() createUsuarioDto: CreateUsuarioDto) {    
     return this.usuariosService.create(createUsuarioDto);
   }
 
   @Get()
-  //@Permiso(permisosE.LISTAR)
+  @Permiso(PermisoE.LISTAR)
   findAll() {
     return this.usuariosService.findAll();
   }
 
   @Get('informacion')
   @PublicInterno()
-  findOne(@Req() request:Request) {
-    return this.usuariosService.findOne(request);
+  obtenerUsuarioPorTipo(@Req() request:Request) {
+    return this.usuariosService.obtenerUsuarioPorTipo(request);
   }
-
+  @Permiso(PermisoE.EDITAR)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUsuarioDto: UpdateUsuarioDto) {
-    return this.usuariosService.update(+id, updateUsuarioDto);
+  actualizar(@Param('id', ValidateIdPipe) id: Types.ObjectId, @Body() updateUsuarioDto: UpdateUsuarioDto) {
+    return this.usuariosService.actualizar(id, updateUsuarioDto);
   }
-
+  @Permiso(PermisoE.ELIMINAR)
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usuariosService.remove(+id);
+  softDelete(@Param('id', ValidateIdPipe) id: Types.ObjectId) {
+    return this.usuariosService.softDelete(id);
   }
 
+
+  
+  @Get(':id')
+  @Permiso(PermisoE.LISTAR)
+  obtenerUsuario(@Param('id', ValidateIdPipe) id:Types.ObjectId) {
+    return this.usuariosService.obtenerUsuario(id);
+  }
   
 }

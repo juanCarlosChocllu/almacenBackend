@@ -39,11 +39,6 @@ export class CreateUsuarioDto {
     @IsArray()
     area: Types.ObjectId[];
 
-    @IsBoolean({ message: 'El campo sin relacion debe ser un boolean valido.' })
-    @IsOptional()
-    @ValidateIf((a:CreateUsuarioDto)=> !a.sucursal && !a.area)
-    sinRelacion:boolean
-
     @IsMongoId({ message: 'El campo Rol debe ser un ID válido de Mongo.' })
     @ValidateIf((a:CreateUsuarioDto) => !a.area)
     @IsOptional()

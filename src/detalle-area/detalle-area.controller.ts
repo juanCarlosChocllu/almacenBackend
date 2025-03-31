@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Req, Type } from '@nestjs/common';
 import { DetalleAreaService } from './detalle-area.service';
 import { UpdateDetalleAreaDto } from './dto/update-detalle-area.dto';
 import { Request } from 'express';
@@ -7,6 +7,8 @@ import { ActualizarIngresoArea } from './dto/actualizar-ingreso.area.dto';
 import { TipoUsuario } from 'src/autenticacion/decorators/tipoUsuario/tipoUsuario';
 import { TipoUsuarioE } from 'src/usuarios/enums/tipoUsuario';
 import { PublicInterno } from 'src/autenticacion/decorators/publicInterno/publicInterno';
+import { get, Types } from 'mongoose';
+import { ValidateIdPipe } from 'src/core/utils/validate-id/validate-id.pipe';
 
 @TipoUsuario(TipoUsuarioE.AREA, TipoUsuarioE.NINGUNO)
 @Controller('detalle/area')
@@ -21,16 +23,12 @@ export class DetalleAreaController {
 
 
 
-  
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateDetalleAreaDto: UpdateDetalleAreaDto) {
-    return this.detalleAreaService.update(+id, updateDetalleAreaDto);
-  }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.detalleAreaService.remove(+id);
+  @Get(':id')
+  @PublicInterno()
+  listarAreasUser(@Param('id', ValidateIdPipe) id: Types.ObjectId) {
+    return this.detalleAreaService.obtenerDetalleArea(id);
   }
 
  

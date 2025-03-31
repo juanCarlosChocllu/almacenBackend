@@ -12,6 +12,8 @@ import { tipoRegistro } from 'src/core/enums/tipo.registro.enum';
 import { TipoUsuarioE } from 'src/usuarios/enums/tipoUsuario';
 import { PublicInterno } from 'src/autenticacion/decorators/publicInterno/publicInterno';
 import { Types } from 'mongoose';
+import { Permiso } from 'src/autenticacion/decorators/permisos/permisos.decorator';
+import { PermisoE } from 'src/core/enums/permisosEnum';
 
 
 @Modulo(modulosE.ALMACEN_SUCURSAL)
@@ -21,11 +23,13 @@ export class AlmacenSucursalController {
   constructor(private readonly almacenSucursalService: AlmacenSucursalService) {}
 
   @Post()
+    @Permiso(PermisoE.CREAR)
   create(@Body() createAlmacenSucursalDto: CreateAlmacenSucursalDto) {
     return this.almacenSucursalService.create(createAlmacenSucursalDto);
   }
 
   @Get()
+  @Permiso(PermisoE.LISTAR)
   findAll(@Req() request :Request ) {
     return this.almacenSucursalService.findAll(request);
   }
@@ -45,16 +49,19 @@ export class AlmacenSucursalController {
   }
 
   @Get(':id')
+  @Permiso(PermisoE.LISTAR)
   findOne(@Param('id',ValidateIdPipe) id: Types.ObjectId) {
     return this.almacenSucursalService.findOne(id);
   }
 
   @Patch(':id')
+  @Permiso(PermisoE.EDITAR)
   actulizar(@Param('id', ValidateIdPipe) id: Types.ObjectId, @Body() updateAlmacenSucursalDto: UpdateAlmacenSucursalDto) {
     return this.almacenSucursalService.actulizar(id, updateAlmacenSucursalDto);
   }
 
   @Delete(':id')
+  @Permiso(PermisoE.ELIMINAR)
   softDelete(@Param('id', ValidateIdPipe) id: Types.ObjectId) {
     return this.almacenSucursalService.softDelete(id);
   }

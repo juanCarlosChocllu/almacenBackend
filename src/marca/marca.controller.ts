@@ -11,6 +11,8 @@ import { query } from 'express';
 import { PaginadorDto } from 'src/core/utils/dtos/paginadorDto';
 import { Types } from 'mongoose';
 import { ValidateIdPipe } from 'src/core/utils/validate-id/validate-id.pipe';
+import { Permiso } from 'src/autenticacion/decorators/permisos/permisos.decorator';
+import { PermisoE } from 'src/core/enums/permisosEnum';
 
 
 @Modulo(modulosE.MARCAS)
@@ -20,11 +22,13 @@ export class MarcaController {
   constructor(private readonly marcaService: MarcaService) {}
 
   @Post()
+  @Permiso(PermisoE.CREAR)
   create(@Body() createMarcaDto: CreateMarcaDto) {
     return this.marcaService.create(createMarcaDto);
   }
 
   @Get()
+  @Permiso(PermisoE.LISTAR)
   findAll(@Query() paginadorDto:PaginadorDto) {
     return this.marcaService.findAll(paginadorDto);
   }
@@ -37,11 +41,13 @@ export class MarcaController {
 
 
   @Patch(':id')
+  @Permiso(PermisoE.EDITAR)
   actualizar(@Param('id') id: Types.ObjectId, @Body() updateMarcaDto: UpdateMarcaDto) {
     return this.marcaService.actualizar(id, updateMarcaDto);
   }
 
   @Delete(':id')
+  @Permiso(PermisoE.ELIMINAR)
   softDelete(@Param('id', ValidateIdPipe) id:  Types.ObjectId) {
     return this.marcaService.softDelete(id);
   }

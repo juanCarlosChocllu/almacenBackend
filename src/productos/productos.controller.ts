@@ -28,6 +28,8 @@ import { TipoUsuario } from 'src/autenticacion/decorators/tipoUsuario/tipoUsuari
 import { TipoUsuarioE } from 'src/usuarios/enums/tipoUsuario';
 import { Types } from 'mongoose';
 import { ValidateIdPipe } from 'src/core/utils/validate-id/validate-id.pipe';
+import { Permiso } from 'src/autenticacion/decorators/permisos/permisos.decorator';
+import { PermisoE } from 'src/core/enums/permisosEnum';
 
 
 
@@ -36,7 +38,9 @@ import { ValidateIdPipe } from 'src/core/utils/validate-id/validate-id.pipe';
 @Controller('productos')
 export class ProductosController {
   constructor(private readonly productosService: ProductosService) {}
+  
   @Post()
+  @Permiso(PermisoE.CREAR)
   @UseInterceptors(FileInterceptor('file', { ...configuracionMulter }))
    async create(
     @Body() createProductoDto: CreateProductoDto,
@@ -51,17 +55,20 @@ export class ProductosController {
   }
 
   @Get()
+  @Permiso(PermisoE.LISTAR)
   findAll(@Req()request :Request , @Query() buscadorProductoDto:BuscadorProductoDto ) {
 
     return this.productosService.findAll(buscadorProductoDto,request);
   }
 
   @Get(':id')
+  @Permiso(PermisoE.LISTAR)
   findOne(@Param('id', ValidateIdPipe) id: Types.ObjectId) {
     return this.productosService.findOne(id);
   }
 
   @Patch(':id')
+  @Permiso(PermisoE.EDITAR)
   @UseInterceptors(FileInterceptor('file', { ...configuracionMulter }))
   actualizar(
     @Param('id', ValidateIdPipe) id: Types.ObjectId,
@@ -76,6 +83,7 @@ export class ProductosController {
 
 
   @Delete(':id')
+  @Permiso(PermisoE.ELIMINAR)
   eliminarProducto(@Param('id', ValidateIdPipe) id: Types.ObjectId) {
     return this.productosService.eliminarProducto(id);
   }

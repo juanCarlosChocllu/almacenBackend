@@ -12,6 +12,8 @@ import { modulosE } from 'src/core/enums/modulos.enum';
 import { TipoUsuario } from 'src/autenticacion/decorators/tipoUsuario/tipoUsuario';
 import { TipoUsuarioE } from 'src/usuarios/enums/tipoUsuario';
 import { PublicInterno } from 'src/autenticacion/decorators/publicInterno/publicInterno';
+import { Permiso } from 'src/autenticacion/decorators/permisos/permisos.decorator';
+import { PermisoE } from 'src/core/enums/permisosEnum';
 
 
 @Modulo(modulosE.STOCK_SUCURSAL)
@@ -20,12 +22,10 @@ import { PublicInterno } from 'src/autenticacion/decorators/publicInterno/public
 export class StockSucursalController {
   constructor(private readonly stockSucursalService: StockSucursalService) {}
 
-  @Post()
-  create(@Body() createStockSucursalDto: CreateStockSucursalDto) {
-    return this.stockSucursalService.create(createStockSucursalDto);
-  }
+
 
   @Get()
+  @Permiso(PermisoE.LISTAR)
   findAll(@Req() request: Request, @Query () buscadorStockSucursal:BuscadorStockSucursal) {    
     return this.stockSucursalService.findAll(request,buscadorStockSucursal);
   }

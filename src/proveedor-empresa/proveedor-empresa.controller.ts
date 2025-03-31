@@ -7,6 +7,10 @@ import { modulosE } from 'src/core/enums/modulos.enum';
 import { TipoUsuarioE } from 'src/usuarios/enums/tipoUsuario';
 import { TipoUsuario } from 'src/autenticacion/decorators/tipoUsuario/tipoUsuario';
 import { BuscadorProveedorEmpresaDto } from './dto/BuscadorProveedorEmpresa.dto';
+import { Types } from 'mongoose';
+import { ValidateIdPipe } from 'src/core/utils/validate-id/validate-id.pipe';
+import { Permiso } from 'src/autenticacion/decorators/permisos/permisos.decorator';
+import { PermisoE } from 'src/core/enums/permisosEnum';
 
 @Modulo(modulosE.PROVEEDORES)
 @TipoUsuario(TipoUsuarioE.AREA,TipoUsuarioE.NINGUNO )
@@ -15,27 +19,32 @@ export class ProveedorEmpresaController {
   constructor(private readonly proveedorEmpresaService: ProveedorEmpresaService) {}
 
   @Post()
+  @Permiso(PermisoE.CREAR)
   create(@Body() createProveedorEmpresaDto: CreateProveedorEmpresaDto) {
     return this.proveedorEmpresaService.create(createProveedorEmpresaDto);
   }
 
   @Get()
+  @Permiso(PermisoE.LISTAR)
   findAll(@Query() BuscadorProveedorEmpresaDto:BuscadorProveedorEmpresaDto) {
     return this.proveedorEmpresaService.findAll(BuscadorProveedorEmpresaDto);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.proveedorEmpresaService.findOne(+id);
+  @Permiso(PermisoE.LISTAR)
+  obtenerProveedor(@Param('id', ValidateIdPipe) id: Types.ObjectId) {
+    return this.proveedorEmpresaService.obtenerProveedor(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateProveedorEmpresaDto: UpdateProveedorEmpresaDto) {
-    return this.proveedorEmpresaService.update(+id, updateProveedorEmpresaDto);
+  @Permiso(PermisoE.EDITAR)
+  actualizar(@Param('id') id: Types.ObjectId, @Body() updateProveedorEmpresaDto: UpdateProveedorEmpresaDto) {
+    return this.proveedorEmpresaService.actualizar(id, updateProveedorEmpresaDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.proveedorEmpresaService.remove(+id);
+  @Permiso(PermisoE.ELIMINAR)
+  softDelete(@Param('id', ValidateIdPipe) id: Types.ObjectId) {
+    return this.proveedorEmpresaService.softDelete(id);
   }
 }

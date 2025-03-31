@@ -15,16 +15,7 @@ export class MovimientoSucursalController {
     return this.movimientoSucursalService.create(createMovimientoSucursalDto);
   }
 
-  @Get()
-  findAll() {
-    return this.movimientoSucursalService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.movimientoSucursalService.findOne(+id);
-  }
-
+ 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateMovimientoSucursalDto: UpdateMovimientoSucursalDto) {
     return this.movimientoSucursalService.update(+id, updateMovimientoSucursalDto);

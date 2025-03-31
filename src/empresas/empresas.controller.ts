@@ -9,6 +9,8 @@ import { TipoUsuarioE } from 'src/usuarios/enums/tipoUsuario';
 import { PublicInterno } from 'src/autenticacion/decorators/publicInterno/publicInterno';
 import { ValidateIdPipe } from 'src/core/utils/validate-id/validate-id.pipe';
 import { Types } from 'mongoose';
+import { Permiso } from 'src/autenticacion/decorators/permisos/permisos.decorator';
+import { PermisoE } from 'src/core/enums/permisosEnum';
 
 
 
@@ -20,17 +22,19 @@ export class EmpresasController {
   constructor(private readonly empresasService: EmpresasService) {}
 
   @Post()
+  @Permiso(PermisoE.CREAR)
   create(@Body() createEmpresaDto: CreateEmpresaDto) {
     return this.empresasService.create(createEmpresaDto);
   }
 
   @Get()
+  @Permiso(PermisoE.LISTAR)
   findAll() {
     return this.empresasService.findAll();
   }
 
 
-  @Get('buscador')
+  @Get('publico')
  @PublicInterno()
   bsucadorEmpresas() {
     return this.empresasService.findAll();
@@ -38,11 +42,13 @@ export class EmpresasController {
   
 
   @Patch(':id')
+  @Permiso(PermisoE.EDITAR)
   actulizaEmpresa(@Param('id', ValidateIdPipe) id: Types.ObjectId, @Body() updateEmpresaDto: UpdateEmpresaDto) {
     return this.empresasService.actualizar(id, updateEmpresaDto);
   }
 
   @Delete(':id')
+  @Permiso(PermisoE.ELIMINAR)
   softDelete(@Param('id', ValidateIdPipe) id: Types.ObjectId) {
     return this.empresasService.softDelete(id);
   }

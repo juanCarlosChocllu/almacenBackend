@@ -15,39 +15,35 @@ import {
   ApiResponseI,
   PaginatedResponseI,
 } from 'src/core/interface/httpRespuesta';
-import { MovimientoAreaService } from 'src/movimiento-area/services/movimiento-area.service';
+
 import { tipoDeRegistroE } from 'src/movimiento-area/enums/tipoRegistro.enum';
 
 import {
   transferenciaEntradaSucursalI,
-  transferenciaSalidaI,
+
 } from '../interfaces/transferencias';
 import { dataTransferenciaDto } from '../dto/data-transferencia.dto';
 import { MovimientoSucursalService } from 'src/movimiento-sucursal/movimiento-sucursal.service';
 import { flag } from 'src/core/enums/flag.enum';
-import { PaginadorDto } from 'src/core/utils/dtos/paginadorDto';
-import { Console, log } from 'console';
+
 import { StocksService } from 'src/stocks/services/stocks.service';
 import { BuscadorTransferenciaDto } from '../dto/buscador-transferencia.dto';
 import { FiltardoresService } from './filtradores.service';
 import { StockSucursalService } from 'src/stock-sucursal/services/stock-sucursal.service';
 import { StockSucursalI } from 'src/stock-sucursal/interfaces/stock.sucursal';
-import { ProductosService } from 'src/productos/services/productos.service';
+
 import { Request } from 'express';
-import { TipoUsuarioE } from 'src/usuarios/enums/tipoUsuario';
+
 import { BuscadorTransferenciaI } from '../interfaces/buscadorTransferencia';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { NotificacionI } from 'src/notificacion/interface/notificacion';
-import { CodigoTransferencia } from '../schemas/codigoTransferencia';
-import { CodigoTransferenciaI } from '../interfaces/codigoTranferencia';
+
 import { CodigoTransferenciaService } from './codigoTransferencia.service';
-import { fail } from 'assert';
-import { Area } from 'src/areas/schemas/area.schema';
-import { codigoProducto } from 'src/productos/utils/codigoProducto.utils';
+
 import { estadoE } from '../enums/estado.enum';
 import { TransferenciaData } from '../interfaces/transferenciaData';
 import { EditarTransferenciaRechazadaDto } from '../dto/editarTransferenciaRechazada.dto';
-import { skip } from 'rxjs';
+
 
 
 @Injectable()
@@ -539,83 +535,7 @@ export class TransferenciasService {
     return tranferencias;
   }
 
-  async listarTransferenciasSucursal() {
-    const transferencias = await this.transferencia.aggregate([
-      {
-        $match: {
-          flag: flag.nuevo,
-        },
-      },
-      {
-        $lookup: {
-          from: 'Stock',
-          foreignField: '_id',
-          localField: 'stock',
-          as: 'stock',
-        },
-      },
-      {
-        $unwind: { path: '$stock', preserveNullAndEmptyArrays: false },
-      },
-      {
-        $lookup: {
-          from: 'Producto',
-          foreignField: '_id',
-          localField: 'stock.producto',
-          as: 'producto',
-        },
-      },
-      {
-        $unwind: { path: '$producto', preserveNullAndEmptyArrays: false },
-      },
-      {
-        $lookup: {
-          from: 'Area',
-          foreignField: '_id',
-          localField: 'area',
-          as: 'area',
-        },
-      },
-      {
-        $unwind: { path: '$area', preserveNullAndEmptyArrays: false },
-      },
-
-      {
-        $lookup: {
-          from: 'AlmacenSucursal',
-          foreignField: '_id',
-          localField: 'almacenSucursal',
-          as: 'almacenSucursal',
-        },
-      },
-      {
-        $unwind: {
-          path: '$almacenSucursal',
-          preserveNullAndEmptyArrays: false,
-        },
-      },
-
-      {
-        $project: {
-          codigoProducto: '$producto.codigo',
-          producto: '$producto.nombre',
-          area: '$area.nombre',
-          almacen: '$almacenSucursal.nombre',
-          idAlmacen: '$almacenSucursal._id',
-          cantidad: 1,
-          fecha: {
-            $dateToString: {
-              format: '%Y-%m-%d',
-              date: '$fecha',
-            },
-          },
-        },
-      },
-    ]);
-
-    return transferencias;
-  }
-
+ 
   async aprobarTransferenciaSucursal(transferencia: Types.ObjectId) {
     const transferenciaEncontrada: TransferenciaData[] =
       await this.transferencia.aggregate([

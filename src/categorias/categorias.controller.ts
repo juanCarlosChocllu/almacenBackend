@@ -10,6 +10,9 @@ import { TipoUsuario } from 'src/autenticacion/decorators/tipoUsuario/tipoUsuari
 import { Types } from 'mongoose';
 import { ValidateIdPipe } from 'src/core/utils/validate-id/validate-id.pipe';
 
+import { PermisoE } from 'src/core/enums/permisosEnum';
+import { Permiso } from 'src/autenticacion/decorators/permisos/permisos.decorator';
+
 @Modulo(modulosE.CATEGORIAS)
 @TipoUsuario(TipoUsuarioE.AREA, TipoUsuarioE.NINGUNO)
 @Controller('categorias')
@@ -17,27 +20,27 @@ export class CategoriasController {
   constructor(private readonly categoriasService: CategoriasService) {}
 
   @Post()
+  @Permiso(PermisoE.CREAR)
   create(@Body() createCategoriaDto: CreateCategoriaDto, @Req() request:Request) {
     return this.categoriasService.create(createCategoriaDto, request);
   }
 
   @Get()
+  @Permiso(PermisoE.LISTAR)
   findAll(@Req() request:Request) {
     return this.categoriasService.findAll(request);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.categoriasService.findOne(+id);
-  }
 
   @Patch(':id')
+  @Permiso(PermisoE.EDITAR)
   actulizar(@Param('id', ValidateIdPipe) id: Types.ObjectId, @Body() updateCategoriaDto: UpdateCategoriaDto, @Req() request:Request) {
     
     return this.categoriasService.actulizar(id, updateCategoriaDto, request.area);
   }
 
   @Delete(':id')
+  @Permiso(PermisoE.ELIMINAR)
   softDelete(@Param('id', ValidateIdPipe) id: Types.ObjectId) {
     return this.categoriasService.softDelete(id);
   }

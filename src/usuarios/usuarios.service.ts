@@ -1,4 +1,12 @@
-import { ConflictException, forwardRef, HttpStatus, Inject, Injectable, Type } from '@nestjs/common';
+import {
+  ConflictException,
+  forwardRef,
+  HttpStatus,
+  Inject,
+  Injectable,
+  NotFoundException,
+  Type,
+} from '@nestjs/common';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
 import * as argon2 from 'argon2';
@@ -13,6 +21,7 @@ import { tipoE } from 'src/stocks/enums/tipo.enum';
 import { TipoUsuarioE } from './enums/tipoUsuario';
 
 import { Request } from 'express';
+import { UpdateDetalleAreaDto } from 'src/detalle-area/dto/update-detalle-area.dto';
 
 @Injectable()
 export class UsuariosService {
@@ -26,14 +35,13 @@ export class UsuariosService {
   constructor(
     @InjectModel(Usuario.name) private readonly usuario: Model<Usuario>,
 
-     @Inject(forwardRef(() => DetalleAreaService))   private  readonly detalleArea :DetalleAreaService
+    @Inject(forwardRef(() => DetalleAreaService))
+    private readonly detalleArea: DetalleAreaService,
   ) {}
 
-
-  
-  async create(createUsuarioDto: CreateUsuarioDto): Promise<ApiResponseI> {    
+  async create(createUsuarioDto: CreateUsuarioDto): Promise<ApiResponseI> {
     createUsuarioDto.rol = new Types.ObjectId(createUsuarioDto.rol);
-    if(createUsuarioDto.sucursal){
+    if (createUsuarioDto.sucursal) {
       createUsuarioDto.sucursal = new Types.ObjectId(createUsuarioDto.sucursal);
     }
     const username = await this.usuario.findOne({
@@ -60,13 +68,11 @@ export class UsuariosService {
       createUsuarioDto.password,
       this.opcionesArgon2,
     );
-    const usuario= await this.usuario.create(createUsuarioDto);
-    if(createUsuarioDto.tipo == TipoUsuarioE.AREA){
-    
-      
-      if(createUsuarioDto.area.length > 0){
-        this.detalleArea.crearDetalleArea(createUsuarioDto.area, usuario.id)
-     }
+    const usuario = await this.usuario.create(createUsuarioDto);
+    if (createUsuarioDto.tipo == TipoUsuarioE.AREA) {
+      if (createUsuarioDto.area.length > 0) {
+        this.detalleArea.crearDetalleArea(createUsuarioDto.area, usuario.id);
+      }
     }
     return { status: HttpStatus.CREATED, message: 'Usuario registrado' };
   }
@@ -103,12 +109,12 @@ export class UsuariosService {
     ]);
   }
 
-  private   async  userInfoTipoNinguno  (id:Types.ObjectId){
-    const user=await this.usuario.aggregate([
+  private async userInfoTipoNinguno(id: Types.ObjectId) {
+    const user = await this.usuario.aggregate([
       {
         $match: {
           flag: flag.nuevo,
-          _id:new Types.ObjectId(id)
+          _id: new Types.ObjectId(id),
         },
       },
       {
@@ -129,19 +135,19 @@ export class UsuariosService {
           apellidos: 1,
           username: 1,
           celular: 1,
-          rol: '$rol.nombre'
+          rol: '$rol.nombre',
         },
       },
-    ]);    
-    return user[0]
+    ]);
+    return user[0];
   }
 
-  private  async  userInfoTipoSucursal (id:Types.ObjectId){
-    const user=  await this.usuario.aggregate([
+  private async userInfoTipoSucursal(id: Types.ObjectId) {
+    const user = await this.usuario.aggregate([
       {
         $match: {
           flag: flag.nuevo,
-          _id:new Types.ObjectId(id)
+          _id: new Types.ObjectId(id),
         },
       },
       {
@@ -164,7 +170,7 @@ export class UsuariosService {
           as: 'sucursal',
         },
       },
-    {  $unwind: { path: '$sucursal', preserveNullAndEmptyArrays: false } },
+      { $unwind: { path: '$sucursal', preserveNullAndEmptyArrays: false } },
       {
         $project: {
           ci: 1,
@@ -172,22 +178,21 @@ export class UsuariosService {
           apellidos: 1,
           username: 1,
           celular: 1,
-          rol:  '$rol.nombre',
-         
-          sucursal:'$sucursal.nombre'
+          rol: '$rol.nombre',
+
+          sucursal: '$sucursal.nombre',
         },
       },
-    ]);    
-    return  user[0]
+    ]);
+    return user[0];
   }
 
-
-  private   async  userInfoTipoArea (id:Types.ObjectId){
-    const user=await this.usuario.aggregate([
+  private async userInfoTipoArea(id: Types.ObjectId) {
+    const user = await this.usuario.aggregate([
       {
         $match: {
           flag: flag.nuevo,
-          _id:new Types.ObjectId(id)
+          _id: new Types.ObjectId(id),
         },
       },
       {
@@ -202,34 +207,33 @@ export class UsuariosService {
         $unwind: { path: '$rol', preserveNullAndEmptyArrays: false },
       },
       {
-        $lookup:{
-          from :'DetalleArea',
-          foreignField:'usuario',
-          localField:'_id',
-          as:'detalleArea'
-        }
+        $lookup: {
+          from: 'DetalleArea',
+          foreignField: 'usuario',
+          localField: '_id',
+          as: 'detalleArea',
+        },
       },
       {
-        $unwind:'$detalleArea'
+        $unwind: '$detalleArea',
       },
       {
-        $match:{
-          'detalleArea.ingreso':true
-        }
+        $match: {
+          'detalleArea.ingreso': true,
+        },
       },
       {
-        $lookup:{
-          from :'Area',
-          foreignField:'_id',
-          localField:'detalleArea.area',
-          as:'area'
-        }
+        $lookup: {
+          from: 'Area',
+          foreignField: '_id',
+          localField: 'detalleArea.area',
+          as: 'area',
+        },
       },
       {
-        $unwind:'$area'
+        $unwind: '$area',
       },
 
-    
       {
         $project: {
           ci: 1,
@@ -238,35 +242,87 @@ export class UsuariosService {
           username: 1,
           celular: 1,
           rol: '$rol.nombre',
-         
+
           area: '$area.nombre',
         },
       },
-    ]);    
-    return user[0]
+    ]);
+    return user[0];
   }
 
+  async obtenerUsuarioPorTipo(request: Request) {
+    if (request.tipo == TipoUsuarioE.NINGUNO) {
+      return this.userInfoTipoNinguno(request.usuario);
+    }
+    if (request.tipo == TipoUsuarioE.SUCURSAL) {
+      return this.userInfoTipoSucursal(request.usuario);
+    }
+    if (request.tipo == TipoUsuarioE.AREA) {
+      return this.userInfoTipoArea(request.usuario);
+    }
+  }
 
-
-  async findOne(request: Request) {
+  async actualizar(id: Types.ObjectId, updateUsuarioDto: UpdateUsuarioDto) {
     
-      if(request.tipo == TipoUsuarioE.NINGUNO) {
-        return this.userInfoTipoNinguno(request.usuario)
+      
+    updateUsuarioDto.rol = new Types.ObjectId(updateUsuarioDto.rol);
+    if (updateUsuarioDto.sucursal) {
+      await this.detalleArea.eliminarDetalleAreaUsuario(id)
+      updateUsuarioDto.sucursal = new Types.ObjectId(updateUsuarioDto.sucursal);
+    }    
+    if(updateUsuarioDto.tipo == TipoUsuarioE.NINGUNO){
+      await this.detalleArea.eliminarDetalleAreaUsuario(id)
+      await this.usuario.updateOne({_id:new Types.ObjectId(id)},{$unset:{sucursal:''}})
+    }
+
+    try {
+      const ci = await this.usuario.findOne({
+        _id:{$ne: new Types.ObjectId(id)},
+        ci: updateUsuarioDto.ci,
+        flag: flag.nuevo,
+    
+      });
+     
+      if (ci) {
+        throw new ConflictException({
+          propiedad: 'ci',
+          message: 'El ci ya existe'
+        });
       }
-      if(request.tipo == TipoUsuarioE.SUCURSAL) {
-        return this.userInfoTipoSucursal(request.usuario)
+      
+       await this.usuario.updateOne({_id:new Types.ObjectId(id)},updateUsuarioDto);
+  
+      
+      if (updateUsuarioDto.tipo == TipoUsuarioE.AREA) {
+        await this.detalleArea.eliminarDetalleAreaUsuario(id)
+        await this.usuario.updateOne({_id:new Types.ObjectId(id)},{$unset:{sucursal:''}})
+        if (updateUsuarioDto.area.length > 0) {
+        
+           await this.detalleArea.crearDetalleArea(updateUsuarioDto.area,id);
+        }
       }
-      if(request.tipo == TipoUsuarioE.AREA) {
-        return this.userInfoTipoArea(request.usuario)
-      }
+      return { status: HttpStatus.OK };
+    } catch (error) {
+      console.log(error);
+      throw error
+      
+    }
+
   }
 
-  update(id: number, updateUsuarioDto: UpdateUsuarioDto) {
-    return `This action updates a #${id} usuario`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} usuario`;
+  async softDelete(id: Types.ObjectId) {
+    const user = await this.usuario.findOne({
+      _id: new Types.ObjectId(id),
+      flag: flag.nuevo,
+    });
+    if (!user) {
+      throw new NotFoundException();
+    }
+    await this.usuario.updateOne(
+      { _id: new Types.ObjectId(id) },
+      { flag: flag.eliminado },
+    );
+    return { status: HttpStatus.OK };
   }
 
   public async verificarUsername(username: string): Promise<UsuarioI> {
@@ -277,12 +333,20 @@ export class UsuariosService {
   }
 
   public async verificarUsuario(usuario: Types.ObjectId) {
-
-    
     return this.usuario.findOne({ _id: new Types.ObjectId(usuario) });
   }
 
-  
 
-  
+  async obtenerUsuario(id: Types.ObjectId) {
+    const user = await this.usuario.findOne({
+      _id: new Types.ObjectId(id),
+      flag: flag.nuevo,
+    });
+    if (!user) {
+      throw new NotFoundException();
+    }
+   
+    return user;
+  }
+
 }

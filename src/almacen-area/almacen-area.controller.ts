@@ -9,6 +9,8 @@ import { TipoUsuario } from 'src/autenticacion/decorators/tipoUsuario/tipoUsuari
 import { TipoUsuarioE } from 'src/usuarios/enums/tipoUsuario';
 import { Types } from 'mongoose';
 import { ValidateIdPipe } from 'src/core/utils/validate-id/validate-id.pipe';
+import { Permiso } from 'src/autenticacion/decorators/permisos/permisos.decorator';
+import { PermisoE } from 'src/core/enums/permisosEnum';
 
 @Modulo(modulosE.ALMACEN_AREA)
 @TipoUsuario(TipoUsuarioE.AREA, TipoUsuarioE.NINGUNO)
@@ -20,32 +22,34 @@ export class AlmacenAreaController {
   ) {}
 
   @Post()
+  @Permiso(PermisoE.CREAR)
   create(@Body() createAlmacenAreaDto: CreateAlmacenAreaDto, @Req() request :Request ) {
 
     return this.almacenAreaService.create(createAlmacenAreaDto, request);
   }
 
   @Get()
+  @Permiso(PermisoE.LISTAR)
   findAll(@Req() request:Request) {    
     return this.almacenAreaService.findAll(request);
   }
 
   @Get('listar')
+  @Permiso(PermisoE.LISTAR)
   listarAlmacenPorArea(@Req() request:Request) {
     return this.almacenAreaService.listarAlmacenPorArea(request);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.almacenAreaService.findOne(+id);
-  }
+
 
   @Patch(':id')
+  @Permiso(PermisoE.EDITAR)
   actulizar(@Param('id', ValidateIdPipe) id: Types.ObjectId, @Body() updateAlmacenAreaDto: UpdateAlmacenAreaDto) {
     return this.almacenAreaService.actulizar(id, updateAlmacenAreaDto);
   }
 
   @Delete(':id')
+  @Permiso(PermisoE.ELIMINAR)
   softDelete(@Param('id', ValidateIdPipe) id: Types.ObjectId) {
     return this.almacenAreaService.softDelete(id);
   }

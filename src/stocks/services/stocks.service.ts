@@ -15,7 +15,6 @@ import { tipoE } from "../enums/tipo.enum";
 import { FiltardorStockService } from "./filtardor.stock.service";
 
 import { Request } from "express";
-import { BuscadorStockI } from "../interfaces/buscadorStock";
 import { CodigoStockService } from "../../movimiento-area/services/codigoStock.service";
 
 
@@ -27,6 +26,7 @@ export class StocksService {
     private readonly filtardorStockService: FiltardorStockService,
     private readonly codigoStockService:CodigoStockService
   ) {}
+  
   async create(createStockDto: CreateStockDto, request :Request) {
    
     try {
@@ -251,10 +251,6 @@ export class StocksService {
 
   
 
-  findOne(id: number) {
-    return `This action returns a #${id} stock`;
-  }
-
   async vericarStockProducto(producto:Types.ObjectId, request :Request){      
     const stock=await this.stock.aggregate([
       {
@@ -298,13 +294,7 @@ export class StocksService {
     return stock
 
   }
-  update(id: number, updateStockDto: UpdateStockDto) {
-    return `This action updates a #${id} stock`;
-  }
 
-  remove(id: number) {
-    return `This action removes a #${id} stock`;
-  }
 
   public async asignarStock(producto: Types.ObjectId, cantidad: number, tipo:tipoE) {
   

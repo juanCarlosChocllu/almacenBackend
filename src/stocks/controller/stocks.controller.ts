@@ -22,7 +22,8 @@ import { modulosE } from 'src/core/enums/modulos.enum';
 import { TipoUsuario } from 'src/autenticacion/decorators/tipoUsuario/tipoUsuario';
 import { TipoUsuarioE } from 'src/usuarios/enums/tipoUsuario';
 import { PublicInterno } from 'src/autenticacion/decorators/publicInterno/publicInterno';
-
+import { PermisoE } from 'src/core/enums/permisosEnum';
+import { Permiso } from 'src/autenticacion/decorators/permisos/permisos.decorator';
 
 @Modulo(modulosE.STOCK)
 @TipoUsuario(TipoUsuarioE.AREA, TipoUsuarioE.NINGUNO)
@@ -31,15 +32,16 @@ export class StocksController {
   constructor(private readonly stocksService: StocksService) {}
 
   @Post()
-
-  async create(  @Req() request :Request, @Body() createStockDto: CreateStockDto) {
-    return this.stocksService.create(createStockDto , request);
+  @Permiso(PermisoE.ASIGNAR_STOCK)
+  async asignarStock(
+    @Req() request: Request,
+    @Body() createStockDto: CreateStockDto,
+  ) {
+    return this.stocksService.create(createStockDto, request);
   }
 
-
-
   @Get('verficar/stock/:stock/:tipo')
-
+  @PublicInterno()
   verficarStock(
     @Param('stock', ValidateIdPipe) stock: string,
     @Param('tipo') tipo: string,
@@ -48,33 +50,24 @@ export class StocksController {
   }
 
   @Get()
+  @Permiso(PermisoE.LISTAR)
   findAll(
-    @Req() request :Request, @Query() parametrosStockDto:ParametrosStockDto, 
-) {      
+    @Req() request: Request,
+    @Query() parametrosStockDto: ParametrosStockDto,
+  ) {
     return this.stocksService.findAll(parametrosStockDto, request);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.stocksService.findOne(+id);
-  }
+ 
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateStockDto: UpdateStockDto) {
-    return this.stocksService.update(+id, updateStockDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.stocksService.remove(+id);
-  }
-
-
+  
 
   @Get('verificar/stock/:producto')
-    vericarStockProducto(@Param('producto', ValidateIdPipe ) producto:Types.ObjectId, @Req() request :Request){   
-      return this.stocksService.vericarStockProducto(producto, request)
-    }
-
-   
+  @PublicInterno()
+  vericarStockProducto(
+    @Param('producto', ValidateIdPipe) producto: Types.ObjectId,
+    @Req() request: Request,
+  ) {
+    return this.stocksService.vericarStockProducto(producto, request);
+  }
 }

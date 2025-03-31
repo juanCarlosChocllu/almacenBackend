@@ -26,9 +26,6 @@ export class CategoriasService {
     return this.categoria.find({flag:flag.nuevo, ...request.area ? {area:request.area} :{}});
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} categoria`;
-  }
 
 
 

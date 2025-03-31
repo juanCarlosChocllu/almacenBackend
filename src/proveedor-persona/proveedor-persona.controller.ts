@@ -7,6 +7,10 @@ import { modulosE } from 'src/core/enums/modulos.enum';
 import { TipoUsuario } from 'src/autenticacion/decorators/tipoUsuario/tipoUsuario';
 import { TipoUsuarioE } from 'src/usuarios/enums/tipoUsuario';
 import { BuscadorProveedorPersonaDto } from './dto/bsucadorProveedorPersona.dto';
+import { Types } from 'mongoose';
+import { ValidateIdPipe } from 'src/core/utils/validate-id/validate-id.pipe';
+import { Permiso } from 'src/autenticacion/decorators/permisos/permisos.decorator';
+import { PermisoE } from 'src/core/enums/permisosEnum';
 
 
 @Modulo(modulosE.PROVEEDORES)
@@ -16,27 +20,32 @@ export class ProveedorPersonaController {
   constructor(private readonly proveedorPersonaService: ProveedorPersonaService) {}
 
   @Post()
+  @Permiso(PermisoE.CREAR)
   create(@Body() createProveedorPersonaDto: CreateProveedorPersonaDto) {
     return this.proveedorPersonaService.create(createProveedorPersonaDto);
   }
 
   @Get()
+  @Permiso(PermisoE.LISTAR)
   findAll(@Query () buscadorProveedorPersonaDto:BuscadorProveedorPersonaDto) {
     return this.proveedorPersonaService.findAll(buscadorProveedorPersonaDto);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.proveedorPersonaService.findOne(+id);
+  @Permiso(PermisoE.LISTAR)
+  obtenerProveedor(@Param('id', ValidateIdPipe) id: Types.ObjectId) {
+    return this.proveedorPersonaService.obtenerProveedor(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateProveedorPersonaDto: UpdateProveedorPersonaDto) {
-    return this.proveedorPersonaService.update(+id, updateProveedorPersonaDto);
+  @Permiso(PermisoE.EDITAR)
+    actualizar(@Param('id', ValidateIdPipe) id: Types.ObjectId, @Body() updateProveedorPersonaDto: UpdateProveedorPersonaDto) {
+    return this.proveedorPersonaService.actualizar(id, updateProveedorPersonaDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.proveedorPersonaService.remove(+id);
+  @Permiso(PermisoE.ELIMINAR)
+  softDelete(@Param('id',ValidateIdPipe) id: Types.ObjectId) {
+    return this.proveedorPersonaService.softDelete(id);
   }
 }
