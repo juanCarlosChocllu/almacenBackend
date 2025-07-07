@@ -2,32 +2,30 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, HttpCode
 import { TipoProductoService } from './tipo-producto.service';
 import { CreateTipoProductoDto } from './dto/create-tipo-producto.dto';
 import { UpdateTipoProductoDto } from './dto/update-tipo-producto.dto';
-import { Modulo } from 'src/autenticacion/decorators/modulos/modulo.decorator';
-import { modulosE } from 'src/core/enums/modulos.enum';
+
 import { Permiso } from 'src/autenticacion/decorators/permisos/permisos.decorator';
 import { PermisoE } from 'src/core/enums/permisosEnum';
 import { PublicInterno } from 'src/autenticacion/decorators/publicInterno/publicInterno';
+import { MODULO_PUBLICO } from 'src/autenticacion/decorators/modulos/modulo.decorator';
 
-@Modulo(modulosE.TIPO_PRODUCTO)
+
+@MODULO_PUBLICO()
 @Controller('tipoProducto')
 export class TipoProductoController {
   constructor(private readonly tipoProductoService: TipoProductoService) {}
-  @Permiso(PermisoE.CREAR)
-  @HttpCode(HttpStatus.CREATED)
+
   @Post()
   create(@Body() createTipoProductoDto: CreateTipoProductoDto) {
     return this.tipoProductoService.create(createTipoProductoDto);
   }
 
   @Get()
-  @Permiso(PermisoE.LISTAR)
+
   listar() {
     return this.tipoProductoService.listar();
   }
 
   @Get('publica')
-  @PublicInterno()
-  @Permiso(PermisoE.LISTAR)
   listarTipoPublico() {
     return this.tipoProductoService.listar();
   }

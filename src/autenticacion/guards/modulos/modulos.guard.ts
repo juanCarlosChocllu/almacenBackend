@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Observable } from 'rxjs';
-import { MODULOS_KEY, PUBLIC_INTERNO_KEY, Public_KEY } from 'src/autenticacion/constants/contantes';
+import { MODULO_PUBLICO_KEY, MODULOS_KEY, PUBLIC_INTERNO_KEY, Public_KEY } from 'src/autenticacion/constants/contantes';
 import { PermisosService } from 'src/permisos/permisos.service';
 
 import { Request } from 'express';
@@ -27,6 +27,15 @@ export class ModulosGuard implements CanActivate {
         PUBLIC_INTERNO_KEY,
         context.getHandler(),
       );
+
+      const moduloPublico = this.reflector.get<boolean>(
+        MODULO_PUBLICO_KEY,
+        context.getClass(),
+      );
+       if (moduloPublico) {
+        return true;
+      }
+      
       if (publicInterno) {
         return true;
       }
