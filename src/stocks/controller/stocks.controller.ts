@@ -48,7 +48,6 @@ export class StocksController {
   ) {
     return this.verficarStock(stock, tipo);
   }
-
   @Get()
   @Permiso(PermisoE.LISTAR)
   findAll(
@@ -57,8 +56,6 @@ export class StocksController {
   ) {
     return this.stocksService.findAll(parametrosStockDto, request);
   }
-
- 
 
   
 

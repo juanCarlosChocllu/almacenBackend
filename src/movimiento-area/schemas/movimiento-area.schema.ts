@@ -33,7 +33,7 @@ export class MovimientoArea {
     @Prop()
     factura:string
 
-    @Prop({type:String , enum:tipoE} )
+    @Prop({type:Types.ObjectId, ref:'TipoProducto'} )
     tipo:string
 
     @Prop()

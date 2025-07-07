@@ -13,12 +13,10 @@ import { MODULO_PUBLICO } from 'src/autenticacion/decorators/modulos/modulo.deco
 @Controller('tipoProducto')
 export class TipoProductoController {
   constructor(private readonly tipoProductoService: TipoProductoService) {}
-
   @Post()
   create(@Body() createTipoProductoDto: CreateTipoProductoDto) {
     return this.tipoProductoService.create(createTipoProductoDto);
   }
-
   @Get()
 
   listar() {

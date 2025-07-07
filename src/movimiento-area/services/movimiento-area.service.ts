@@ -180,7 +180,7 @@ export class MovimientoAreaService {
         precio:data.precio,
         producto:data.producto,
         tipoDeRegistro:tipoDeRegistro,
-        tipo:data.tipo,
+        tipo:new Types.ObjectId(data.tipo),
         total:data.total,
         codigoStock:new Types.ObjectId(codigoStock),
         usuario:new Types.ObjectId(usuario),
