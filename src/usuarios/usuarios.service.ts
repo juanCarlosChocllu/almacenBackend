@@ -303,7 +303,7 @@ export class UsuariosService {
       }
       return { status: HttpStatus.OK };
     } catch (error) {
-      console.log(error);
+
       throw error
       
     }

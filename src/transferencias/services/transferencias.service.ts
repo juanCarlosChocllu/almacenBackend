@@ -43,6 +43,7 @@ import { CodigoTransferenciaService } from './codigoTransferencia.service';
 import { estadoE } from '../enums/estado.enum';
 import { TransferenciaData } from '../interfaces/transferenciaData';
 import { EditarTransferenciaRechazadaDto } from '../dto/editarTransferenciaRechazada.dto';
+import { AreasService } from 'src/areas/areas.service';
 
 
 
@@ -58,10 +59,12 @@ export class TransferenciasService {
     private readonly stockSucursalService: StockSucursalService,
     private readonly filtardoresService: FiltardoresService,
 
+    private readonly areService: AreasService,
+
     private readonly codigoTransferenciaService: CodigoTransferenciaService,
     private emiter: EventEmitter2,
   ) {}
-  async create(
+  async realizarTransferencias(
     createTransferenciaDto: CreateTransferenciaDto,
     request: Request,
   ): Promise<ApiResponseI> {
@@ -74,7 +77,7 @@ export class TransferenciasService {
         throw errorStock;
       } else {
         if (!request.usuario && !request.area) {
-          throw new BadRequestException('Selecciona una area');
+          throw new NotFoundException('Selecciona una area');
         }
         let cantidad: number = 0;
         const codigoTransferencia =
@@ -101,8 +104,9 @@ export class TransferenciasService {
             cantidad += data.cantidad;
           }
         }
+        const area= await this.areService.findOne(request.area)
         const dataNotificacion: NotificacionI = {
-          area: '',
+          area: area.nombre,
           cantidad: cantidad,
           codigoProducto: codigoTransferencia.codigo,
           producto: '',
@@ -113,7 +117,7 @@ export class TransferenciasService {
 
       return { message: 'Transferencia realizada', status: HttpStatus.OK };
     } catch (error) {
-      console.log(error);
+     
       
       throw new BadRequestException(error);
     }
@@ -630,11 +634,11 @@ export class TransferenciasService {
   }
 
   rechazarTransferenciaSucursal(transferencia: Types.ObjectId) {
-    console.log(transferencia);
+ 
   }
 
   async aprobarTodasTransferenciaCodigo(codigo: Types.ObjectId) {
-    const date = new Date();
+  
     const transferencias = await this.transferencia.find({
       codigoTransferencia: new Types.ObjectId(codigo),
       estado: estadoE.PENDIENTE,
@@ -646,7 +650,7 @@ export class TransferenciasService {
       if (aprobado.status == HttpStatus.OK) {
         await this.transferencia.updateOne(
           { _id: new Types.ObjectId(data._id) },
-          { estado: estadoE.APROBADO, fechaAprobacion: date },
+          { estado: estadoE.APROBADO, fechaAprobacion: Date.now() },
         );
       }
     }
@@ -665,7 +669,7 @@ export class TransferenciasService {
         flag: flag.nuevo,
         estado: estadoE.PENDIENTE,
       },
-      { estado: estadoE.RECHAZADO },
+      { estado: estadoE.RECHAZADO , fechaRechazo:Date.now() },
     );
     const codigoTransferencia =
       await this.codigoTransferenciaService.rechazarTransferenciaCodigo(codigo);
@@ -693,7 +697,7 @@ export class TransferenciasService {
         if (stkActualiza.acknowledged == true) {
           await this.transferencia.updateMany(
             { _id: data._id, flag: flag.nuevo, estado: estadoE.PENDIENTE },
-            { estado: estadoE.CANCELADO },
+            { estado: estadoE.CANCELADO , fechaCancelacion:Date.now()},
           );
         }
       }

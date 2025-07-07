@@ -1,4 +1,4 @@
-import { IsDateString, IsEnum, IsMongoId, IsOptional, IsString } from "class-validator";
+import { IsDateString, IsEnum, IsMongoId, IsNotEmpty, IsOptional, IsString } from "class-validator";
 import { tipoE } from "src/stocks/enums/tipo.enum";
 import { PaginadorDto } from "src/core/utils/dtos/paginadorDto";
 
@@ -26,7 +26,7 @@ export class BuscadorTransferenciaDto extends PaginadorDto{
     tipo:string
 
     @IsDateString()
-    @IsOptional()
+    @IsNotEmpty()
     fechaInicio:string
 
     @IsDateString()

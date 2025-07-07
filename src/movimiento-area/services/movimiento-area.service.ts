@@ -307,7 +307,7 @@ export class MovimientoAreaService {
       },
     ])
 
-    console.log(stocks);
+
     
     return stocks
   }

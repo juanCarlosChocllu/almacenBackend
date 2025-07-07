@@ -11,8 +11,8 @@ import { CoreService } from 'src/core/core.service';
 import { AreasService } from 'src/areas/areas.service';
 import { DetalleAreaService } from 'src/detalle-area/detalle-area.service';
 import { estadoE } from '../enums/estado.enum';
-import { log } from 'console';
-import { TransferenciasService } from './transferencias.service';
+import { FiltardoresService } from './filtradores.service';
+
 @Injectable()
 export class CodigoTransferenciaService {
   constructor(
@@ -20,7 +20,7 @@ export class CodigoTransferenciaService {
     private readonly codigoTransferencia: Model<CodigoTransferencia>,
     private readonly coreService: CoreService,
     private readonly areaService: AreasService,
-    private readonly detalleAreaService: DetalleAreaService,
+    private readonly filtradorService: FiltardoresService,
    
   ) {}
 
@@ -46,9 +46,10 @@ export class CodigoTransferenciaService {
      
       
       const [fechaInicio, fechaFin ] = this.coreService.formateoFechasUTC(buscadorCodigoTransferenciaDto.fechaInicio, buscadorCodigoTransferenciaDto.fechaFin)
-      const areas = await this.detalleAreaService.listarAreasPorUsuario(request.usuario)
-   
-  
+     const fechas= this.filtradorService.fechasPorEstado(buscadorCodigoTransferenciaDto)
+      
+
+      
       const codigoTranferencias = await this.codigoTransferencia
         .aggregate([
           {
@@ -56,7 +57,7 @@ export class CodigoTransferenciaService {
               flag:flag.nuevo,
               ...(request.area) ?{ area:request.area} :{},
               ...(buscadorCodigoTransferenciaDto.codigo) ?{ codigo: new RegExp(buscadorCodigoTransferenciaDto.codigo,'i')} :{},
-              ...(fechaInicio && fechaFin) ?{ fecha:{ $gte : fechaInicio , $lte: fechaFin}} :{},
+              ...(fechaInicio && fechaFin) ?{ ...fechas } :{},
               ...(buscadorCodigoTransferenciaDto.estado) ?{ estado:buscadorCodigoTransferenciaDto.estado} :{estado:estadoE.PENDIENTE}
             }
           },
@@ -128,7 +129,6 @@ export class CodigoTransferenciaService {
       return { data: codigoTranferencias[0].data||[], paginas: totalPages };
     } catch (error) {
     
-      console.log(error);
       
       throw new BadRequestException();
     }
@@ -154,21 +154,22 @@ export class CodigoTransferenciaService {
 
     
      async  aprobarTransferenciaCodigo(codigo:Types.ObjectId){   
-   
-        const actulizado = await this.codigoTransferencia.updateOne({_id:new Types.ObjectId(codigo), estado:estadoE.PENDIENTE, flag:flag.nuevo} , {estado:estadoE.APROBADO})
+        
+        const actulizado = await this.codigoTransferencia.updateOne({_id:new Types.ObjectId(codigo), 
+          estado:estadoE.PENDIENTE, flag:flag.nuevo} , {estado:estadoE.APROBADO, fechaAprobacion:Date.now()}
+        
+        )
       return actulizado
       }
 
       
      async  rechazarTransferenciaCodigo(codigo:Types.ObjectId){   
-   
-      const actulizado = await this.codigoTransferencia.updateOne({_id:new Types.ObjectId(codigo), estado:estadoE.PENDIENTE, flag:flag.nuevo} , {estado:estadoE.RECHAZADO})
+      const actulizado = await this.codigoTransferencia.updateOne({_id:new Types.ObjectId(codigo), estado:estadoE.PENDIENTE, flag:flag.nuevo} , {estado:estadoE.RECHAZADO, fechaRechazo:Date.now()})
     return actulizado
     }
 
     async  cancelarTransferenciaCodigo(codigo:Types.ObjectId){   
-   
-      const actulizado = await this.codigoTransferencia.updateOne({_id:new Types.ObjectId(codigo), estado:estadoE.PENDIENTE, flag:flag.nuevo} , {estado:estadoE.CANCELADO})
+      const actulizado = await this.codigoTransferencia.updateOne({_id:new Types.ObjectId(codigo), estado:estadoE.PENDIENTE, flag:flag.nuevo} , {estado:estadoE.CANCELADO, fechaCancelacion: Date.now()})
     return actulizado
     }
 

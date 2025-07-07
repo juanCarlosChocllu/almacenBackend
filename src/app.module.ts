@@ -33,6 +33,9 @@ import { TipoUsuarioGuard } from './autenticacion/guards/tipo-usuario/tipo-usuar
 import { NotificacionModule } from './notificacion/notificacion.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { CoreModule } from './core/core.module';
+import { LogModule } from './log/log.module';
+import { TipoProductoModule } from './tipo-producto/tipo-producto.module';
+import { databaseConeccion } from './core/config/variableEntorno';
 
 
 
@@ -42,7 +45,7 @@ import { CoreModule } from './core/core.module';
     ServeStaticModule.forRoot({
       rootPath:join(__dirname,'..','upload')
     }),
-    MongooseModule.forRoot('mongodb://kanna:kanna@localhost:27017/almacen?authSource=admin'),
+    MongooseModule.forRoot(databaseConeccion),
     ProductosModule,
      CategoriasModule,
       StocksModule,
@@ -68,6 +71,8 @@ import { CoreModule } from './core/core.module';
        DetalleAreaModule,
        NotificacionModule,
        CoreModule,
+       LogModule,
+       TipoProductoModule,
 
 
       ],
@@ -85,10 +90,10 @@ import { CoreModule } from './core/core.module';
       provide:APP_GUARD,
       useClass:TipoDetalleGuard
     },
-    {
+   /* {
       provide:APP_GUARD,
       useClass:TipoUsuarioGuard
-    },
+    },*/
      {
       provide:APP_GUARD,
       useClass:PermisosGuard

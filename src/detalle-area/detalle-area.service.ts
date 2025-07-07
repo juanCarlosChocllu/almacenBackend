@@ -4,10 +4,7 @@ import {
   HttpStatus,
   Inject,
   Injectable,
-  Type,
 } from '@nestjs/common';
-import { CreateDetalleAreaDto } from './dto/create-detalle-area.dto';
-import { UpdateDetalleAreaDto } from './dto/update-detalle-area.dto';
 import { Model, Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { DetalleArea } from './schemas/detalle-area.schema';
@@ -17,7 +14,6 @@ import { TipoUsuarioE } from 'src/usuarios/enums/tipoUsuario';
 import { ActualizarIngresoArea } from './dto/actualizar-ingreso.area.dto';
 import { AreasService } from 'src/areas/areas.service';
 import { UsuariosService } from 'src/usuarios/usuarios.service';
-import { log } from 'node:console';
 @Injectable()
 export class DetalleAreaService {
   constructor(
@@ -26,8 +22,8 @@ export class DetalleAreaService {
     private readonly areaService: AreasService,
     @Inject(forwardRef(() => UsuariosService))
     private readonly UsuariosService: UsuariosService,
-  ) {}
-  
+  ) { }
+
 
   async actualizarIngreso(
     actualizarIngresoArea: ActualizarIngresoArea,
@@ -41,21 +37,25 @@ export class DetalleAreaService {
       const actualizado = await this.detalleArea.updateOne(
         { _id: new Types.ObjectId(actualizarIngresoArea.detalleArea) },
         { ingreso: true },
-      );
+      );            
+      if (detalles && actualizado.modifiedCount > 0) {
+        if (actualizado && detalles) {
+          await this.detalleArea.updateOne(
+            { _id: detalles.id },
+            { ingreso: false },
+          );
 
-      if (actualizado && detalles) {
-        await this.detalleArea.updateOne(
-          { _id: detalles.id },
-          { ingreso: false },
-        );
+        }
+        return { status: HttpStatus.OK };
       }
-      return { status: HttpStatus.OK };
-    } catch (error) {
+
       throw new BadRequestException();
+    } catch (error) {
+      throw error;
     }
   }
 
-  async crearDetalleArea(areas: Types.ObjectId[], usuario: Types.ObjectId) {    
+  async crearDetalleArea(areas: Types.ObjectId[], usuario: Types.ObjectId) {
     let contador: number = 0;
     for (const area of areas) {
       contador = contador + 1;
@@ -170,12 +170,12 @@ export class DetalleAreaService {
   }
 
 
-  async obtenerDetalleArea (usuario:Types.ObjectId) {
-    const detalle = await this.listarAreasUser(usuario)    
+  async obtenerDetalleArea(usuario: Types.ObjectId) {
+    const detalle = await this.listarAreasUser(usuario)
     return detalle
   }
 
-  async eliminarDetalleAreaUsuario(usuario:Types.ObjectId){
-      return this.detalleArea.deleteMany({usuario:new Types.ObjectId(usuario)})
+  async eliminarDetalleAreaUsuario(usuario: Types.ObjectId) {
+    return this.detalleArea.deleteMany({ usuario: new Types.ObjectId(usuario) })
   }
 }

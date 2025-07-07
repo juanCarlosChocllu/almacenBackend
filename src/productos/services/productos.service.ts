@@ -20,9 +20,8 @@ import {PaginatedResponseI } from 'src/core/interface/httpRespuesta';
 import { ProductoFiltradorService } from './producto.filtardor.service';
 import * as path from 'node:path';
 import * as fs from 'fs';
-
 import {Request} from 'express'
-import { UpdateDetalleAreaDto } from 'src/detalle-area/dto/update-detalle-area.dto';
+
 @Injectable()
 export class ProductosService {
   constructor(
@@ -30,9 +29,7 @@ export class ProductosService {
     private readonly categoriasService: CategoriasService,
     private readonly productoFiltradorService: ProductoFiltradorService,
   ) {}
-  async create(createProductoDto: CreateProductoDto, area:Types.ObjectId) {    
-   
-
+  async create(createProductoDto: CreateProductoDto, area:Types.ObjectId) {        
     try {
       if(createProductoDto.codigoBarra){
         const codigoBarra: Producto = await this.producto.findOne({
@@ -66,7 +63,7 @@ export class ProductosService {
       createProductoDto.area= new Types.ObjectId(area) 
       await this.producto.create(createProductoDto);
       return { status: HttpStatus.CREATED };
-    } catch (error) {
+    } catch (error) {     
     if( error instanceof HttpException)   { 
         const status= error.getStatus() 
       if (status === HttpStatus.NOT_FOUND) {
@@ -85,10 +82,8 @@ export class ProductosService {
 
 
 
-  async findAll(buscadorProductoDto:BuscadorProductoDto,request :Request):Promise<PaginatedResponseI<Producto>> {    
+  async listarProductos(buscadorProductoDto:BuscadorProductoDto,request :Request):Promise<PaginatedResponseI<Producto>> {    
     const filtrador =  this.productoFiltradorService.filtradorProducto(buscadorProductoDto)
-    console.log(buscadorProductoDto.pagina);
-    
 
     const pepiline:PipelineStage[] =[
       {
@@ -165,7 +160,7 @@ export class ProductosService {
     return{data:productos[0].data,paginas:paginas};
   }
 
-  async  findOne(id: Types.ObjectId) {
+  async  obtenerProducto(id: Types.ObjectId) {
     const producto = await this.producto.findOne({_id:new Types.ObjectId(id), flag:flag.nuevo})
     if(!producto) {
       throw new NotFoundException('No existe el producto')

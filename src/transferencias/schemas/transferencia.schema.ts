@@ -33,17 +33,30 @@ export class Transferencia {
     @Prop({type:Types.ObjectId , ref:'CodigoTransferencia'})
     codigoTransferencia:Types.ObjectId
 
-    @Prop({type:Date, default:Date.now()})
-    fecha:Date
-    
-    @Prop()
-    fechaAprobacion:Date
-
-    
+   
 
     @Prop({type:String, enum:flag, default:flag.nuevo })
     flag:string
-    
+
+
+    @Prop({type:Date, default:Date.now()})
+    fecha:Date
+
+    @Prop()
+    fechaAprobacion:Date
+
+    @Prop()
+    fechaRechazo:Date
+
+
+    @Prop()
+    fechaCancelacion:Date
+
+    @Prop()
+    fechaReenvio:Date
+
+    @Prop()
+    fechaRechazoAceptado:Date
 }
 
 export const transferenciaSchema=SchemaFactory.createForClass(Transferencia)

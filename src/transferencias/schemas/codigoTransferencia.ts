@@ -8,8 +8,7 @@ export class CodigoTransferencia {
     @Prop()
     codigo:string
 
-    @Prop({type:Date, default:Date.now()})
-    fecha:Date
+  
         
     @Prop({type:String, enum:flag, default:flag.nuevo })
     flag:string
@@ -23,12 +22,32 @@ export class CodigoTransferencia {
     @Prop({type:String, enum:estadoE , default:estadoE.PENDIENTE})
     estado:Types.ObjectId
 
+
+    
     @Prop({type:Types.ObjectId , ref:'Sucursal'})
     sucursal:Types.ObjectId
+
+    
+
+    @Prop({type:Date, default:Date.now()})
+    fecha:Date
+
 
     @Prop()
     fechaAprobacion:Date
 
+    @Prop()
+    fechaRechazo:Date
+
+
+    @Prop()
+    fechaCancelacion:Date
+
+    @Prop()
+    fechaReenvio:Date
+
+    @Prop()
+    fechaRechazoAceptado:Date
 }
 
 

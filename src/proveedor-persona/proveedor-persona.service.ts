@@ -33,7 +33,7 @@ export class ProveedorPersonaService {
        buscadorProveedorPersonaDto.nit ? filter.nit =  new RegExp ( buscadorProveedorPersonaDto.nit, 'i'): filter
        buscadorProveedorPersonaDto.apellidos ? filter.apellidos =  new RegExp ( buscadorProveedorPersonaDto.apellidos, 'i'): filter
        buscadorProveedorPersonaDto.ci ? filter.ci =  new RegExp ( buscadorProveedorPersonaDto.ci, 'i'): filter
-    console.log(filter);
+
     
     const countDocuments =await this.proveedorPersona.countDocuments({flag:flag.nuevo, ...filter})
     const paginas = Math.ceil((countDocuments/Number( buscadorProveedorPersonaDto.limite)))

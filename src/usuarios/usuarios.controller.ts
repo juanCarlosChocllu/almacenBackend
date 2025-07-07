@@ -18,7 +18,7 @@ import { PermisoE } from 'src/core/enums/permisosEnum';
 
 @Controller('usuarios')
 @Modulo(modulosE.USUARIOS)
-@TipoUsuario(TipoUsuarioE.AREA,TipoUsuarioE.NINGUNO )
+@TipoUsuario(TipoUsuarioE.AREA,TipoUsuarioE.NINGUNO ,TipoUsuarioE.SUCURSAL )
 export class UsuariosController {
   constructor(private readonly usuariosService: UsuariosService) {}
 

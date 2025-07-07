@@ -57,9 +57,7 @@ export class TokenGuard implements CanActivate {
       } else {
         throw new UnauthorizedException('token invalido');
       }
-    } catch (error) {  
-      console.log(error);
-          
+    } catch (error) {           
       throw new UnauthorizedException('token invalido');
     }
   }

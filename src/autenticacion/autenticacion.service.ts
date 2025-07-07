@@ -6,14 +6,10 @@ import { JwtService } from '@nestjs/jwt';
 import { RolService } from 'src/rol/rol.service';
 import { PermisosService } from 'src/permisos/permisos.service';
 import { payloadI } from './interface/payload.interface';
-import { permiso } from 'src/permisos/interface/permisos';
-import { PermisoPayloadI } from './interface/permisos.interface';
-import { log } from 'node:console';
+
 import { jwtConstants } from './constants/jwtSecret';
 import { UsuarioI } from 'src/usuarios/interface/usuario.interface';
-import { tipoE } from 'src/stocks/enums/tipo.enum';
-import { TipoDetalleGuard } from './guards/tipo-detalle/tipo-detalle.guard';
-import { TipoUsuario } from './decorators/tipoUsuario/tipoUsuario';
+
 import { TipoUsuarioE } from 'src/usuarios/enums/tipoUsuario';
 
 @Injectable()

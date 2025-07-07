@@ -5,9 +5,7 @@ import { permiso } from './interface/permisos';
 import { Permiso } from './schema/permiso.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
-import { log } from 'node:console';
 import { flag } from 'src/core/enums/flag.enum';
-import { Type } from 'class-transformer';
 
 @Injectable()
 export class PermisosService {

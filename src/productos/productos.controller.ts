@@ -56,15 +56,15 @@ export class ProductosController {
 
   @Get()
   @Permiso(PermisoE.LISTAR)
-  findAll(@Req()request :Request , @Query() buscadorProductoDto:BuscadorProductoDto ) {
+  listarProductos(@Req()request :Request , @Query() buscadorProductoDto:BuscadorProductoDto ) {
 
-    return this.productosService.findAll(buscadorProductoDto,request);
+    return this.productosService.listarProductos(buscadorProductoDto,request);
   }
 
   @Get(':id')
   @Permiso(PermisoE.LISTAR)
-  findOne(@Param('id', ValidateIdPipe) id: Types.ObjectId) {
-    return this.productosService.findOne(id);
+  obtenerProducto(@Param('id', ValidateIdPipe) id: Types.ObjectId) {
+    return this.productosService.obtenerProducto(id);
   }
 
   @Patch(':id')
@@ -80,8 +80,6 @@ export class ProductosController {
     }
     return this.productosService.actualizar(id, updateProductoDto);
   }
-
-
   @Delete(':id')
   @Permiso(PermisoE.ELIMINAR)
   eliminarProducto(@Param('id', ValidateIdPipe) id: Types.ObjectId) {

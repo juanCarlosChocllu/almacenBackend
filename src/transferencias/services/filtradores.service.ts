@@ -3,6 +3,8 @@ import { Injectable } from "@nestjs/common";
 import { BuscadorTransferenciaI } from "../interfaces/buscadorTransferencia";
 import { Types } from "mongoose";
 import { BuscadorTransferenciaDto } from "../dto/buscador-transferencia.dto";
+import { BuscadorCodigoTransferenciaDto } from "../dto/buscadorCodigoTransferencia.dto";
+import { estadoE } from "../enums/estado.enum";
 
 @Injectable()
 export class FiltardoresService {
@@ -37,6 +39,29 @@ export class FiltardoresService {
 
      }
 
+    fechasPorEstado(buscadorCodigoTransferenciaDto: BuscadorCodigoTransferenciaDto) {
+      const fechas:FechasPorEstadoI = {}
+      const {fechaInicio,fechaFin} = this.formatearFecha(buscadorCodigoTransferenciaDto.fechaInicio, buscadorCodigoTransferenciaDto.fechaFin)
+      
+      if(buscadorCodigoTransferenciaDto.estado && !buscadorCodigoTransferenciaDto.fechaFin && !buscadorCodigoTransferenciaDto.fechaFin) {
+         return fechaFin
+      }
+      if(buscadorCodigoTransferenciaDto.estado == estadoE.PENDIENTE) {
+         fechas.fecha={$gte: fechaInicio, $lte:fechaFin}
+      }else if(buscadorCodigoTransferenciaDto.estado == estadoE.APROBADO) {
+         fechas.fechaAprobacion={$gte: fechaInicio, $lte:fechaFin}
+      }else if(buscadorCodigoTransferenciaDto.estado == estadoE.CANCELADO) {
+         fechas.fechaCancelacion={$gte: fechaInicio, $lte:fechaFin}
+      }else if(buscadorCodigoTransferenciaDto.estado == estadoE.RECHAZADO) {
+         fechas.fechaRechazo={$gte: fechaInicio, $lte:fechaFin}
+      }else if(buscadorCodigoTransferenciaDto.estado == estadoE.RECHAZO_ACEPTADO) {
+         fechas.rechazoAceptado={$gte: fechaInicio, $lte:fechaFin}
+      }
+      else if(buscadorCodigoTransferenciaDto.estado == estadoE.REENVIADO) {
+         fechas.fechaRechazoAceptado={$gte: fechaInicio, $lte:fechaFin}
+      }
+      return fechas
+    }
      
 
 } 

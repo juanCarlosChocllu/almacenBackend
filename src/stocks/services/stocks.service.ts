@@ -88,8 +88,6 @@ export class StocksService {
       }
       return { status: HttpStatus.CREATED, data:codigo._id};
     } catch (error) {
-      console.log(error);
-
       throw new BadGatewayException();
     }
   }

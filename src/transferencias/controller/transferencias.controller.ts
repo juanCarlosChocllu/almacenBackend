@@ -27,8 +27,8 @@ export class TransferenciasController {
 
   @Post()
     @Permiso(PermisoE.REALIZAR_TRANSFERENCIAS)
-  create(@Body() createTransferenciaDto: CreateTransferenciaDto, @Req() request:Request) {
-    return this.transferenciasService.create(createTransferenciaDto, request);
+    realizarTransferencias(@Body() createTransferenciaDto: CreateTransferenciaDto, @Req() request:Request) {
+    return this.transferenciasService.realizarTransferencias(createTransferenciaDto, request);
   }
 
 

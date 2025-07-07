@@ -51,8 +51,6 @@ export class CodigoStockService {
 
 
         async listarCodigoStock( buscadorCodigoStockDto:BuscadorCodigoStockDto , request:Request){
-            console.log(buscadorCodigoStockDto);
-            
             const [fechaInicio, fechaFin ] = this.coreService.formateoFechasUTC(buscadorCodigoStockDto.fechaInicio, buscadorCodigoStockDto.fechaFin)
             try {
             

@@ -5,13 +5,12 @@ import { Model, Types } from 'mongoose';
 import { ApiResponseI } from 'src/core/interface/httpRespuesta';
 import { flag } from 'src/core/enums/flag.enum';
 import { sucursalEmpresaI } from 'src/sucursal/interfaces/sucursalesEmpresa.Interface';
-import { log } from 'node:console';
+
 import { AlmacenSucursal } from '../schemas/almacen-sucursal.schema';
 import { CreateAlmacenSucursalDto } from '../dto/create-almacen-sucursal.dto';
 import { UpdateAlmacenSucursalDto } from '../dto/update-almacen-sucursal.dto';
 import { Request } from 'express';
-import { Sucursal } from 'src/sucursal/schemas/sucursal.schema';
-import { UpdateDetalleAreaDto } from 'src/detalle-area/dto/update-detalle-area.dto';
+
 @Injectable()
 export class AlmacenSucursalService {
     constructor(@InjectModel(AlmacenSucursal.name) private readonly almacenSucursal:Model<AlmacenSucursal>){}
@@ -112,8 +111,7 @@ export class AlmacenSucursalService {
     if (almacenSucursal.length < 1 ) {
       throw new NotFoundException();
     }
-    console.log(almacenSucursal);
-    
+
     return almacenSucursal[0] 
    }
 
