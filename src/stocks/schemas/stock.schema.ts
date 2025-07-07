@@ -11,8 +11,8 @@ export class Stock {
     @Prop()
     cantidad:number
 
-    @Prop({type:String , enum:tipoE} )
-    tipo:string
+    @Prop({type:Types.ObjectId, ref:'TipoProducto'})
+    tipo:Types.ObjectId
 
     @Prop({type:Types.ObjectId, ref:'AlmacenArea'})
     almacenArea:Types.ObjectId

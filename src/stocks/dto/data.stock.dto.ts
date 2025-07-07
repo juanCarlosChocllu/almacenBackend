@@ -11,7 +11,7 @@ export class DataStockDto{
  
     total:number
 
-    tipo:tipoE
+    tipo:Types.ObjectId
 
 
     fechaCompra:string

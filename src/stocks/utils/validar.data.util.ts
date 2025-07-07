@@ -93,13 +93,10 @@ import {
                 }
   
 
-                if (
-                  atributo.tipo !== tipoE.REGALO &&
-                  atributo.tipo !== tipoE.VENTA
-                ) {
+                if (!isMongoId(atributo.tipo)) {
                   errores.push({
                     status: HttpStatus.BAD_REQUEST,
-                    message: 'El tipo debe ser "REGALO" o "VENTA"',
+                    message: 'Debe seleccionar un tipo de producto',
                     propiedad: 'tipo',
                   });
                 }
