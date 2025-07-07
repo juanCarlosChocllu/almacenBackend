@@ -90,6 +90,15 @@ export class MovimientoAreaService {
           path:'$proveedorEmpresa', preserveNullAndEmptyArrays:true
         }
       },
+
+        {
+        $lookup:{
+          from:'TipoProducto',
+          foreignField:'_id',
+          localField:'tipo',
+          as:'tipoProducto'
+        }
+      },
        {
         $project:{
           _id: 1,
@@ -101,7 +110,7 @@ export class MovimientoAreaService {
           precio: 1,
           total: 1,
           factura: 1,
-          tipo: 1,
+          tipo: { $arrayElemAt: [ '$tipoProducto.nombre', 0 ] },
           fechaCompra: {
             $dateToString: {
               format: '%Y-%m-%d',
@@ -155,6 +164,7 @@ export class MovimientoAreaService {
     const paginas = Math.ceil(countDocuments / Number(buscadorMovimientoArea.limite))
     
 
+    
     return {data:movimiento[0].data, paginas:paginas}  }
 
 
@@ -245,7 +255,14 @@ export class MovimientoAreaService {
         $unwind: { path: '$marca', preserveNullAndEmptyArrays: false },
       },
         
-
+         {
+        $lookup:{
+          from:'TipoProducto',
+          foreignField:'_id',
+          localField:'tipo',
+          as:'tipoProducto'
+        }
+      },
       
       {
         $lookup: {
@@ -279,7 +296,8 @@ export class MovimientoAreaService {
           cantidad: 1,
           precio: 1,
           total: 1,
-          tipo: 1,
+          tipo: { $arrayElemAt: [ '$tipoProducto.nombre', 0 ] }
+,
           fechaCompra: {
             $dateToString: {
               format: '%Y-%m-%d',

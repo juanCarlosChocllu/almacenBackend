@@ -180,6 +180,15 @@ export class StocksService {
           as: 'categoria',
         },
       },
+
+       {
+        $lookup: {
+          from: 'TipoProducto',
+          localField: 'tipo',
+          foreignField: '_id',
+          as: 'tipoProducto',
+        },
+      },
       {
         $unwind: { path: '$categoria', preserveNullAndEmptyArrays: false },
       },
@@ -192,7 +201,8 @@ export class StocksService {
           cantidad: 1,
           precio: 1,
           total: 1,
-          tipo: 1,
+          tipo: { $arrayElemAt: [ '$tipoProducto.nombre', 0  ] }
+,
           fechaCompra: {
             $dateToString: {
               format: '%Y-%m-%d',
