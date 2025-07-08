@@ -266,6 +266,8 @@ export class StocksService {
   }
 
   async vericarStockProducto(producto: Types.ObjectId, request: Request) {
+    console.log(request.ubicacion);
+    
     const stock = await this.stock.aggregate([
       {
         $match: {

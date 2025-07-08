@@ -22,6 +22,7 @@ import * as path from 'node:path';
 import * as fs from 'fs';
 import {Request} from 'express'
 import { filtroUbicacion } from 'src/core/utils/fitroUbicacion/filtrosUbicacion';
+import { calcularPaginas } from 'src/core/utils/mongo/mongo';
 
 @Injectable()
 export class ProductosService {
@@ -154,12 +155,9 @@ export class ProductosService {
     ]
  
     const productos = await this.producto.aggregate(pepiline)    
-    
-    const countDocuments = await productos[0].length > 0 ?  productos[0].total[0].total :1
-
-    const paginas = Math.ceil(countDocuments / Number(buscadorProductoDto.limite))
+    const countDocuments =  productos[0].total.length > 0 ?  productos[0].total[0].total :1
+    const paginas = calcularPaginas(countDocuments , buscadorProductoDto.limite)
      
-
     return{data:productos[0].data,paginas:paginas};
   }
 

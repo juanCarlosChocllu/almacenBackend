@@ -27,14 +27,8 @@ export class UbicacionGuard implements CanActivate {
         context.getHandler(),
       );
 
-      const publicInterno = this.reflector.get<boolean>(
-        PUBLIC_INTERNO_KEY,
-        context.getHandler(),
-      );
-
-      if (publicInterno) {
-        return true;
-      }
+    
+      
       if (publico) {
         return true;
       }
@@ -50,8 +44,7 @@ export class UbicacionGuard implements CanActivate {
 
           if (detalle) {
             request.tipoUbicacion = detalle.tipoUbicacion;
-            request.ubicacion = new Types.ObjectId(detalle.area);
-
+            request.ubicacion = new Types.ObjectId(detalle.area); 
             return true;
           }
         }

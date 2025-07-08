@@ -47,6 +47,8 @@ export class StocksController {
     @Param('stock', ValidateIdPipe) stock: string,
     @Param('tipo') tipo: string,
   ) {
+    console.log('hola');
+    
     return this.verficarStock(stock, tipo);
   }
   @Get()
@@ -65,7 +67,7 @@ export class StocksController {
   vericarStockProducto(
     @Param('producto', ValidateIdPipe) producto: Types.ObjectId,
     @Req() request: Request,
-  ) {
+  ) { 
     return this.stocksService.vericarStockProducto(producto, request);
   }
 }
