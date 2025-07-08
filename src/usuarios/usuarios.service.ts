@@ -72,7 +72,7 @@ export class UsuariosService {
     const usuario = await this.usuario.create(createUsuarioDto);
     if (createUsuarioDto.tipoUbicacion == TipoUsuarioE.AREA || createUsuarioDto.tipoUbicacion == TipoUsuarioE.TODOS  ) {
       if (createUsuarioDto.area.length > 0) {
-        this.UbicacionService.crearDetalleArea(createUsuarioDto.area, usuario.id);
+        this.UbicacionService.crearDetalleArea(createUsuarioDto.area, usuario.id, createUsuarioDto.tipoUbicacion);
       }
     }
     return { status: HttpStatus.CREATED, message: 'Usuario registrado' };
@@ -209,25 +209,25 @@ export class UsuariosService {
       },
       {
         $lookup: {
-          from: 'DetalleArea',
+          from: 'Ubicacion',
           foreignField: 'usuario',
           localField: '_id',
-          as: 'detalleArea',
+          as: 'Ubicacion',
         },
       },
       {
-        $unwind: '$detalleArea',
+        $unwind: '$Ubicacion',
       },
       {
         $match: {
-          'detalleArea.ingreso': true,
+          'Ubicacion.ingreso': true,
         },
       },
       {
         $lookup: {
           from: 'Area',
           foreignField: '_id',
-          localField: 'detalleArea.area',
+          localField: 'Ubicacion.area',
           as: 'area',
         },
       },
@@ -248,10 +248,13 @@ export class UsuariosService {
         },
       },
     ]);
+    
     return user[0];
   }
 
   async obtenerUsuarioPorTipo(request: Request) {
+
+    
     if (request.tipoUbicacion == TipoUsuarioE.TODOS) {
       return this.userInfoTipoNinguno(request.usuario);
     }
@@ -299,7 +302,7 @@ export class UsuariosService {
         await this.usuario.updateOne({_id:new Types.ObjectId(id)},{$unset:{sucursal:''}})
         if (updateUsuarioDto.area.length > 0) {
         
-           await this.UbicacionService.crearDetalleArea(updateUsuarioDto.area,id);
+           await this.UbicacionService.crearDetalleArea(updateUsuarioDto.area,id, updateUsuarioDto.tipoUbicacion);
         }
       }
       return { status: HttpStatus.OK };

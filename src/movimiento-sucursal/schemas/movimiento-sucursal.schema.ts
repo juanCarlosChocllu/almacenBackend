@@ -29,8 +29,8 @@ export class MovimientoSucursal {
         cantidad:number
     
     
-        @Prop({type:String , enum:tipoE} )
-        tipo:string
+        @Prop( {type:Types.ObjectId,ref:'TipoProducto'})
+        tipoProducto:Types.ObjectId
     
         @Prop()
         fechaCompra:Date

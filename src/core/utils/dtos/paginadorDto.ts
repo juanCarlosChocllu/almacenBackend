@@ -1,10 +1,13 @@
-import {IsOptional, IsString } from "class-validator";
+import { Transform } from 'class-transformer';
+import { IsNumber, IsOptional, IsString } from 'class-validator';
 export class PaginadorDto {
-    @IsOptional()
-    @IsString()
-    pagina: string ='1';
-  
-    @IsOptional()
-    @IsString()
-    limite: string = '20';
-  }
+  @IsOptional()
+  @IsNumber()
+  @Transform(({ value }: { value: string }) => Number(value))
+  pagina: number = 1;
+
+  @IsOptional()
+  @IsNumber()
+  @Transform(({ value }: { value: string }) => Number(value))
+  limite: number = 20;
+}

@@ -44,6 +44,7 @@ import { estadoE } from '../enums/estado.enum';
 import { TransferenciaData } from '../interfaces/transferenciaData';
 import { EditarTransferenciaRechazadaDto } from '../dto/editarTransferenciaRechazada.dto';
 import { AreasService } from 'src/areas/areas.service';
+import { filtroUbicacion } from 'src/core/utils/fitroUbicacion/filtrosUbicacion';
 
 
 
@@ -126,6 +127,8 @@ export class TransferenciasService {
   private async verificarStock(
     createTransferenciaDto: CreateTransferenciaDto,
   ): Promise<httErrorI[]> {
+    console.log(createTransferenciaDto);
+    
     const errorStock: httErrorI[] = [];
     for (const data of createTransferenciaDto.data) {
       const stock = await this.stockService.verificarStock(
@@ -206,7 +209,8 @@ export class TransferenciasService {
       buscadorTransferenciaDto,
     );
     const { sucursal, marca, tipo, ...nuevoFiltardor } = filtardor;
-
+ 
+    
     const tranferencias = await this.transferencia
       .aggregate([
         {
@@ -343,12 +347,13 @@ export class TransferenciasService {
   async countDocuments(filtardor: BuscadorTransferenciaI, request: Request) {
     // cuenta la cantidad de coumetos por busqueda
     const { sucursal, marca, tipo, ...nuevoFiltardor } = filtardor;
+    const filtroProUbicacion =filtroUbicacion(request)
     const cantidad = await this.transferencia.aggregate([
       {
         $match: {
           flag: flag.nuevo,
           ...nuevoFiltardor,
-          ... (request.ubicacion ? { area: request.ubicacion } : {}),
+          ...filtroProUbicacion,
         },
       },
       {
@@ -434,6 +439,7 @@ export class TransferenciasService {
   }
 
   async listarTransferenciaPorCodigo(id: Types.ObjectId) {
+  
     const tranferencias = await this.transferencia.aggregate([
       {
         $match: {
@@ -455,6 +461,16 @@ export class TransferenciasService {
           preserveNullAndEmptyArrays: false,
         },
       },
+
+      {
+        $lookup: {
+          from: 'TipoProducto',
+          foreignField: '_id',
+          localField: 'stock.tipoProducto',
+          as: 'tipoProducto',
+        },
+      },
+      
 
       {
         $lookup: {
@@ -525,7 +541,7 @@ export class TransferenciasService {
           sucursal: '$sucursal.nombre',
           idSucursal: '$sucursal._id',
           idAlmacenSucursal: '$almacenSucursal._id',
-          tipo: '$stock.tipo',
+          tipo: { $arrayElemAt: [ '$tipoProducto.nombre', 0 ] },
           estado: 1,
           fecha: {
             $dateToString: {
@@ -541,7 +557,8 @@ export class TransferenciasService {
 
  
   async aprobarTransferenciaSucursal(transferencia: Types.ObjectId) {
-    const transferenciaEncontrada: TransferenciaData[] =
+   try {
+     const transferenciaEncontrada: TransferenciaData[] =
       await this.transferencia.aggregate([
         {
           $match: {
@@ -567,7 +584,7 @@ export class TransferenciasService {
             cantidad: 1,
             stock: '$stock._id',
             producto: '$stock.producto',
-            tipo: '$stock.tipo',
+            tipoProducto: '$stock.tipoProducto',
             area: 1,
             fechaVencimiento: '$stock.fechaVencimiento',
             fechaCompra: '$stock.fechaCompra',
@@ -589,6 +606,12 @@ export class TransferenciasService {
       { estado: estadoE.APROBADO },
     );
     return { status: HttpStatus.OK };
+   } catch (error) {
+    console.log(error);
+    
+      throw new BadRequestException()
+   }
+   
   }
 
   private async registrarStockTransferencia(
@@ -599,7 +622,7 @@ export class TransferenciasService {
       almacenSucursal: new Types.ObjectId(data.almacenSucursal),
       cantidad: data.cantidad,
       producto: data.producto,
-      tipo: data.tipo,
+      tipoProducto: data.tipoProducto,
       transferencia: new Types.ObjectId(tranferencia),
       area: data.area,
       stock: data.stock,
@@ -623,7 +646,7 @@ export class TransferenciasService {
       fechaVencimiento: data.fechaVencimiento,
       producto: data.producto,
       tipoDeRegistro: tipoDeRegistroE.INGRESO,
-      tipo: data.tipo,
+      tipoProducto: data.tipoProducto,
       stock: data.stock,
       usuario: new Types.ObjectId(data.usuario),
       transferencia: new Types.ObjectId(tranferencia),
@@ -638,7 +661,9 @@ export class TransferenciasService {
   }
 
   async aprobarTodasTransferenciaCodigo(codigo: Types.ObjectId) {
-  
+
+   try {
+     
     const transferencias = await this.transferencia.find({
       codigoTransferencia: new Types.ObjectId(codigo),
       estado: estadoE.PENDIENTE,
@@ -646,6 +671,8 @@ export class TransferenciasService {
     });
 
     for (const data of transferencias) {
+
+      
       const aprobado = await this.aprobarTransferenciaSucursal(data._id);
       if (aprobado.status == HttpStatus.OK) {
         await this.transferencia.updateOne(
@@ -660,6 +687,11 @@ export class TransferenciasService {
     if (aprobado.acknowledged == true) {
       return { status: HttpStatus.OK };
     }
+   } catch (error) {
+    console.log(error);
+    
+     throw new BadRequestException()
+   }
   }
 
   async rechazarCodigoTransferencia(codigo: Types.ObjectId) {

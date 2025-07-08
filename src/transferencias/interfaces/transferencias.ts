@@ -22,7 +22,7 @@ export interface transferenciaSalidaI {
     precio?: number;
     producto: Types.ObjectId;
     tipoDeRegistro: string;
-    tipo: string;
+    tipoProducto: Types.ObjectId;
     total?: number;
     usuario: Types.ObjectId;
     stock:Types.ObjectId

@@ -16,6 +16,7 @@ import { FiltardorStockService } from './filtardor.stock.service';
 
 import { Request } from 'express';
 import { CodigoStockService } from '../../movimiento-area/services/codigoStock.service';
+import { filtroUbicacion, filtroUbicacionProducto } from 'src/core/utils/fitroUbicacion/filtrosUbicacion';
 
 @Injectable()
 export class StocksService {
@@ -34,20 +35,24 @@ export class StocksService {
       );
 
       for (const data of createStockDto.data) {
+        console.log(data);
+        
         const producto = new Types.ObjectId(data.producto);
         const stockExistente = await this.stock.findOne({
           producto: producto,
-          tipo: data.tipo,
+          tipoProducto: new Types.ObjectId(data.tipo),
           ...(data.fechaVencimiento
             ? { fechaVencimiento: data.fechaVencimiento }
             : {}),
           almacenArea: new Types.ObjectId(data.almacenArea),
         });
-
+        console.log(stockExistente);
+        
         if (stockExistente) {
           const nuevaCantidad: number = stockExistente.cantidad + data.cantidad;
           data.almacenArea = new Types.ObjectId(data.almacenArea);
           data.producto = new Types.ObjectId(data.producto);
+          data.tipo = new Types.ObjectId(data.tipo);
           await this.stock.updateOne(
             { _id: stockExistente._id },
             {
@@ -55,7 +60,7 @@ export class StocksService {
                 cantidad: nuevaCantidad,
                 fechaCompra: new Date(data.fechaCompra),
                 factura: data.factura,
-                tipo: data.tipo,
+                tipoProducto: data.tipo,
                 codigo: stockExistente.codigo
                   ? stockExistente.codigo
                   : await this.generarCodigo(),
@@ -105,7 +110,7 @@ export class StocksService {
       cantidad: data.cantidad,
       producto: data.producto,
       fechaVencimiento: data.fechaVencimiento,
-      tipo: data.tipo,
+      tipoProducto: data.tipo,
       codigo: await this.generarCodigo(),
     });
     await this.movimientoAreaService.registrarMovimientoArea(
@@ -126,7 +131,9 @@ export class StocksService {
     const filtrador =
       this.filtardorStockService.filtroBusquedaStock(parametrosStockDto);
     const { marca, codigo, ...filtradorSinMarca } = filtrador;
-
+    const filtroPorUbicacion = filtroUbicacionProducto(request)
+   
+    
     const stocks = await this.stock.aggregate([
       {
         $match: {
@@ -145,7 +152,9 @@ export class StocksService {
       {
         $unwind: { path: '$producto', preserveNullAndEmptyArrays: false },
       },
-
+      {
+        $match:filtroPorUbicacion
+      },
       ...(codigo ? [{ $match: { 'producto.codigo': codigo } }] : []),
 
       {
@@ -186,7 +195,7 @@ export class StocksService {
        {
         $lookup: {
           from: 'TipoProducto',
-          localField: 'tipo',
+          localField: 'tipoProducto',
           foreignField: '_id',
           as: 'tipoProducto',
         },
@@ -194,7 +203,7 @@ export class StocksService {
       {
         $unwind: { path: '$categoria', preserveNullAndEmptyArrays: false },
       },
-      ...(request.ubicacion ? [{ $match: { 'categoria.area': request.ubicacion } }] : []),
+     
       {
         $project: {
           _id: 0,
@@ -203,8 +212,9 @@ export class StocksService {
           cantidad: 1,
           precio: 1,
           total: 1,
-          tipo: { $arrayElemAt: [ '$tipoProducto.nombre', 0  ] }
-,
+          tipo: { $arrayElemAt: [ '$tipoProducto.nombre', 0  ] },
+          idTipoProducto: { $arrayElemAt: [ '$tipoProducto._id', 0  ] },
+
           fechaCompra: {
             $dateToString: {
               format: '%Y-%m-%d',
@@ -315,12 +325,12 @@ export class StocksService {
 
   public async verificarStock(
     stock: Types.ObjectId,
-    tipo: tipoE,
+    tipo: Types.ObjectId,
     almacenArea: Types.ObjectId,
   ) {
     const stockExistente = await this.stock.findOne({
       _id: new Types.ObjectId(stock),
-      tipo: tipo,
+      tipoProducto: new Types.ObjectId(tipo),
       almacenArea: new Types.ObjectId(almacenArea),
     });
     return stockExistente;
@@ -328,11 +338,11 @@ export class StocksService {
 
   public async descontarCantidad(
     stock: Types.ObjectId,
-    tipo: tipoE,
+    tipo: Types.ObjectId,
     cantidad: number,
   ) {
     await this.stock.updateOne(
-      { _id: new Types.ObjectId(stock), flag: flag.nuevo, tipo: tipo },
+      { _id: new Types.ObjectId(stock), flag: flag.nuevo, tipoProducto: new Types.ObjectId(tipo) },
       { $set: { cantidad: cantidad } },
     );
   }

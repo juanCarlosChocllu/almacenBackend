@@ -6,7 +6,7 @@ export interface TransferenciaData {
     cantidad:number,
     stock:Types.ObjectId,
     producto:Types.ObjectId,
-    tipo:tipoE,
+    tipoProducto:Types.ObjectId,
     area:Types.ObjectId,
     fechaVencimiento:string
     fechaCompra:string,

@@ -51,6 +51,7 @@ export class TransferenciasController {
   @Get('aprobar/sucursal/:transferencia')
   @Permiso(PermisoE.APROBAR)
   aprobarTransferenciaSucursal(@Param('transferencia', ValidateIdPipe) trasferencia:Types.ObjectId){
+
     return this.transferenciasService.aprobarTransferenciaSucursal(trasferencia)
   }
 

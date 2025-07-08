@@ -25,7 +25,7 @@ export class dataTransferenciaDto {
   nombreProducto:string
 
 
-  tipo: tipoE;
+  tipo: Types.ObjectId;
 
   almacenSucursal: Types.ObjectId;
 

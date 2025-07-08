@@ -41,12 +41,16 @@ export class PermisosGuard implements CanActivate {
         return true;
       }
       const request: Request = context.switchToHttp().getRequest();
-
+    
+      
       if (request.rol) {
         const permisoDecorador = this.reflector.get(
           PERMISOS_KEY,
           context.getHandler(),
         );
+
+        console.log(request.acciones.some((accion) => accion === permisoDecorador));
+        
         return request.acciones.some((accion) => accion === permisoDecorador);
       }
     } catch (error) {

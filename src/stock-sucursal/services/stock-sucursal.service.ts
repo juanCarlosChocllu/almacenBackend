@@ -12,6 +12,7 @@ import { FiltradorSucursalService } from './filtrador-sucursal.service';
 import { BuscadorStockSucursal } from '../dto/buscador-stock-sucursal.dto';
 
 import { PaginatedResponseI } from 'src/core/interface/httpRespuesta';
+import { calcularPaginas } from 'src/core/utils/mongo/mongo';
 
 @Injectable()
 export class StockSucursalService {
@@ -56,6 +57,7 @@ export class StockSucursalService {
             as: 'producto',
           },
         },
+
        
         ...(codigo ? [{ $match: { 'producto.codigo': codigo } }] : []),
         ...(marca ? [{ $match: { 'producto.marca': marca } }] : []),
@@ -74,6 +76,16 @@ export class StockSucursalService {
             foreignField: '_id',
             localField: 'almacenSucursal',
             as: 'almacenSucursal',
+          },
+        },
+
+          
+        {
+          $lookup: {
+            from: 'TipoProducto',
+            foreignField: '_id',
+            localField: 'tipoProducto',
+            as: 'tipoProducto',
           },
         },
         ...(request.ubicacion
@@ -105,7 +117,7 @@ export class StockSucursalService {
             marca: '$marca.nombre',
             descripcion: '$producto.descripcion',
             cantidad: 1,
-            tipo: 1,
+            tipo:{ $arrayElemAt: [ '$tipoProducto.nombre', 0] } ,
             color: '$producto.color',
             imagen: '$producto.imagen',
             almacen: '$almacenSucursal.nombre',
@@ -134,10 +146,8 @@ export class StockSucursalService {
         }
       ])
       
-      const countDocuments=await stock[0].countDocuments ? stock[0].countDocuments[0].total:1
-      const paginas = Math.ceil(
-        countDocuments / Number(buscadorStockSucursal.limite),
-      );
+      const countDocuments= stock[0].countDocuments ? stock[0].countDocuments[0].total:1
+      const paginas = calcularPaginas(countDocuments, buscadorStockSucursal.limite)
     return { paginas: paginas, data: stock[0].data };
   }
 
@@ -149,7 +159,7 @@ export class StockSucursalService {
     data.codigo = await this.generarCodigo();
     const stockTransferencia = await this.stockSucursal.findOne({
       producto: new Types.ObjectId(data.producto),
-      tipo: data.tipo,
+      tipoProducto: data.tipoProducto,
       almacenSucursal: new Types.ObjectId(data.almacenSucursal),
       ...(data.fechaVencimiento)? {fechaVencimiento:data.fechaVencimiento} : {}
     });

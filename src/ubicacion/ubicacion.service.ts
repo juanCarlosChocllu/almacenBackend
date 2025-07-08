@@ -29,10 +29,14 @@ export class UbicacionService {
           usuario: request.usuario,
           ingreso: true,
         });
+
+        
         const actualizado = await this.ubicacion.updateOne(
           { _id: new Types.ObjectId(actualizarIngresoArea.detalleArea) },
           { ingreso: true },
-        );            
+        );        
+       
+            
         if (detalles && actualizado.modifiedCount > 0) {
           if (actualizado && detalles) {
             await this.ubicacion.updateOne(
@@ -46,11 +50,13 @@ export class UbicacionService {
   
         throw new BadRequestException();
       } catch (error) {
+        console.log(error);
+        
         throw error;
       }
     }
   
-    async crearDetalleArea(areas: Types.ObjectId[], usuario: Types.ObjectId) {
+    async crearDetalleArea(areas: Types.ObjectId[], usuario: Types.ObjectId, tipoUbicacion:string) {
       let contador: number = 0;
       for (const area of areas) {
         contador = contador + 1;
@@ -59,11 +65,13 @@ export class UbicacionService {
             usuario: new Types.ObjectId(usuario),
             area: new Types.ObjectId(area),
             ingreso: true,
+            tipoUbicacion:tipoUbicacion
           });
         } else {
           await this.ubicacion.create({
             usuario: new Types.ObjectId(usuario),
             area: new Types.ObjectId(area),
+            tipoUbicacion:tipoUbicacion
           });
         }
       }
@@ -80,7 +88,8 @@ export class UbicacionService {
   
     async listarDedalleAreasPorUsuario(request: Request) {
       const areas = await this.listarAreasUser(request.usuario);
-  
+       console.log(areas);
+       
       return areas;
     }
   

@@ -49,7 +49,7 @@ export class UbicacionGuard implements CanActivate {
           const detalle = areaDetalle.find((item) => item.ingreso == true);
 
           if (detalle) {
-            request.tipoUbicacion = TipoUsuarioE.AREA;
+            request.tipoUbicacion = detalle.tipoUbicacion;
             request.ubicacion = new Types.ObjectId(detalle.area);
 
             return true;
@@ -57,7 +57,9 @@ export class UbicacionGuard implements CanActivate {
         }
 
         if (request.tipoUbicacion === TipoUsuarioE.SUCURSAL) {
-          //request.ubicacion = new Types.ObjectId(usuario.sucursal);
+          //request.ubicacion =  new Types.ObjectId(usuario.sucursal);
+      
+          
           request.tipoUbicacion = TipoUsuarioE.SUCURSAL;
           return true;
         }

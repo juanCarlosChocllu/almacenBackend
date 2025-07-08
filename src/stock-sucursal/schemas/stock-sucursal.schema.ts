@@ -9,8 +9,8 @@ export class StockSucursal {
   @Prop()
   cantidad: number;
 
-  @Prop({ type: String, enum: tipoE })
-  tipo: string;
+  @Prop({type:Types.ObjectId,ref:'TipoProducto'})
+  tipoProducto: Types.ObjectId;
 
   @Prop({ type: Types.ObjectId, ref: 'AlmacenArea' })
   almacenSucursal: Types.ObjectId;

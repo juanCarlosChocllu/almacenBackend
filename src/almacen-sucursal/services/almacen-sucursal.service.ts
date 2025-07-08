@@ -10,6 +10,8 @@ import { AlmacenSucursal } from '../schemas/almacen-sucursal.schema';
 import { CreateAlmacenSucursalDto } from '../dto/create-almacen-sucursal.dto';
 import { UpdateAlmacenSucursalDto } from '../dto/update-almacen-sucursal.dto';
 import { Request } from 'express';
+import { TipoUsuarioE } from 'src/usuarios/enums/tipoUsuario';
+import { filtroUbicacion } from 'src/core/utils/fitroUbicacion/filtrosUbicacion';
 
 @Injectable()
 export class AlmacenSucursalService {
@@ -25,11 +27,13 @@ export class AlmacenSucursalService {
   }
 
   findAll( request :Request):Promise<sucursalEmpresaI[]> {
+    const filtroPorUbicacion = filtroUbicacion(request)
+  
     
     return  this.almacenSucursal.aggregate([{
       $match:{
         flag:flag.nuevo,
-        ...(request.ubicacion) ? {sucursal: request.ubicacion} : {}
+        ...filtroPorUbicacion
       },
   
     },

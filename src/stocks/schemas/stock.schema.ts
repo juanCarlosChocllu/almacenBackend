@@ -12,7 +12,7 @@ export class Stock {
     cantidad:number
 
     @Prop({type:Types.ObjectId, ref:'TipoProducto'})
-    tipo:Types.ObjectId
+    tipoProducto:Types.ObjectId
 
     @Prop({type:Types.ObjectId, ref:'AlmacenArea'})
     almacenArea:Types.ObjectId

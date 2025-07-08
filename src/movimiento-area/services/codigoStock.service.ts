@@ -7,6 +7,7 @@ import { flag } from 'src/core/enums/flag.enum';
 import { BuscadorCodigoStockDto } from '../../stocks/dto/buscadorCodigoStock.dto';
 import { Request } from 'express';
 import { CoreService } from 'src/core/core.service';
+import { filtroUbicacion } from 'src/core/utils/fitroUbicacion/filtrosUbicacion';
 
 @Injectable()
 export class CodigoStockService {
@@ -55,11 +56,11 @@ export class CodigoStockService {
         async listarCodigoStock( buscadorCodigoStockDto:BuscadorCodigoStockDto , request:Request){
             const [fechaInicio, fechaFin ] = this.coreService.formateoFechasUTC(buscadorCodigoStockDto.fechaInicio, buscadorCodigoStockDto.fechaFin)
             try {
-            
+            const filtroPorUbicacion=filtroUbicacion(request)
             const countDocuments: number =
             await this.codigoStock.countDocuments({   
                 flag:flag.nuevo,
-              ...(request.ubicacion) ?{ area:request.ubicacion} :{},
+              ...filtroPorUbicacion,
               ...(buscadorCodigoStockDto.codigo) ? { codigo: new RegExp(buscadorCodigoStockDto.codigo,'i')} :{},
               ...(fechaInicio && fechaFin) ?{ fecha:{ $gte : fechaInicio , $lte: fechaFin}} :{} });
             const paginas = Math.ceil(
@@ -72,7 +73,7 @@ export class CodigoStockService {
               {
                 $match:{
                   flag:flag.nuevo,
-                  ... (request.ubicacion) ?{ area:request.ubicacion} :{},
+                  ...filtroPorUbicacion,
                   ...(buscadorCodigoStockDto.codigo) ?{ codigo: new RegExp(buscadorCodigoStockDto.codigo,'i')} :{},
                   ...(buscadorCodigoStockDto && fechaFin) ?{ fecha:{ $gte : fechaInicio , $lte: fechaFin}} :{}
                   

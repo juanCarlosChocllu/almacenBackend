@@ -13,6 +13,7 @@ import { BuscadorMovimientoArea } from '../dto/buscador-movimiento-area.dto';
 import { PaginatedResponseI } from 'src/core/interface/httpRespuesta';
 import { FiltradoresAreaService } from './filtradores-area.service';
 import { Request } from 'express';
+import { filtroUbicacionProducto } from 'src/core/utils/fitroUbicacion/filtrosUbicacion';
 
 
 @Injectable()
@@ -27,8 +28,9 @@ export class MovimientoAreaService {
   async ingresos(buscadorMovimientoArea:BuscadorMovimientoArea,request:Request):Promise<PaginatedResponseI<MovimientoArea>> {
 
     const {codigo, ...nuevoFiltardor}= this.filtradoresAreaService.filtradorMovimientoArea(buscadorMovimientoArea)    
-
-   
+    const filtroPorUbicacion = filtroUbicacionProducto(request)
+    console.log(filtroPorUbicacion);
+    
     const movimiento= await this.movimientoArea.aggregate([
       {$match:{flag:flag.nuevo, 
         tipoDeRegistro:tipoDeRegistroE.INGRESO,
@@ -47,6 +49,9 @@ export class MovimientoAreaService {
           path:'$producto', preserveNullAndEmptyArrays:false
         }
       },
+      {
+        $match:filtroPorUbicacion
+      },
       ...(codigo) ? [{$match:{'producto.codigo':codigo}}]:[],
       {
         $lookup:{
@@ -61,7 +66,7 @@ export class MovimientoAreaService {
           path:'$almacenArea', preserveNullAndEmptyArrays:false
         }
       },
-      ... (request.ubicacion) ? [{$match:{'almacenArea.area':request.ubicacion}}]:[],
+     
       {
         $lookup:{
           from:'ProveedorPersona',
@@ -160,7 +165,9 @@ export class MovimientoAreaService {
        }
       
     ])
-    const countDocuments = await movimiento[0].countDocuments ?movimiento[0].countDocuments[0].total : 1
+    console.log(movimiento);
+    
+    const countDocuments =  movimiento[0].countDocuments[0] ?movimiento[0].countDocuments[0].total : 1
     const paginas = Math.ceil(countDocuments / Number(buscadorMovimientoArea.limite))
     
 

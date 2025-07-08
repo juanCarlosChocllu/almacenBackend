@@ -14,6 +14,8 @@ export class UbicacionController {
     @Get('usuario')
     @PublicInterno()
     listarDedalleAreasPorUsuario(@Req() request : Request){
+  
+      
       return this.ubicacionService.listarDedalleAreasPorUsuario(request);
     }
   
@@ -40,6 +42,8 @@ export class UbicacionController {
     @Post()
     @PublicInterno()
     actualizarIngreso(@Body() ActualizarUbicacion:ActualizarUbicacion ,@Req() request:Request ){
+      console.log(ActualizarUbicacion);
+      
       return this.ubicacionService.actualizarIngreso(ActualizarUbicacion, request)
   
     }

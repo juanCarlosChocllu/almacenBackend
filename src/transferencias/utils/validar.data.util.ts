@@ -53,10 +53,10 @@ export function IsvalidarDataTranferencia(validationOptions?:ValidationOptions){
                     });
                   }
 
-                  if(atributo.tipo != tipoE.REGALO && atributo.tipo != tipoE.VENTA ){
+                  if(!isMongoId(atributo.tipo) ){
                       errores.push({
                           status: HttpStatus.BAD_REQUEST,
-                          message: 'El tipo solo puede ser REGALO || VENTA ',
+                          message: 'Seleccione un tipo de producto ',
                           propiedad: 'tipo',
                         });
                       }       

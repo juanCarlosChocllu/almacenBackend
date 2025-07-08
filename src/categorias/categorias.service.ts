@@ -6,6 +6,7 @@ import { Categoria } from './schema/categoria.schema';
 import { Model, Types } from 'mongoose';
 import { flag } from 'src/core/enums/flag.enum';
 import {Request} from 'express'
+import { filtroUbicacion } from 'src/core/utils/fitroUbicacion/filtrosUbicacion';
 @Injectable()
 export class CategoriasService {
   constructor(@InjectModel(Categoria.name) private readonly categoria:Model<Categoria>){}
@@ -23,7 +24,8 @@ export class CategoriasService {
   }
 
   findAll(request:Request) {
-    return this.categoria.find({flag:flag.nuevo, ...request.ubicacion ? {area:request.ubicacion} :{}});
+     const filtroPorUbicacion = filtroUbicacion(request)
+    return this.categoria.find({flag:flag.nuevo, ...filtroPorUbicacion});
   }
 
 

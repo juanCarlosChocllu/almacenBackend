@@ -11,6 +11,7 @@ import { CoreService } from 'src/core/core.service';
 import { AreasService } from 'src/areas/areas.service';
 import { estadoE } from '../enums/estado.enum';
 import { FiltardoresService } from './filtradores.service';
+import { filtroUbicacion } from 'src/core/utils/fitroUbicacion/filtrosUbicacion';
 
 @Injectable()
 export class CodigoTransferenciaService {
@@ -46,15 +47,13 @@ export class CodigoTransferenciaService {
       
       const [fechaInicio, fechaFin ] = this.coreService.formateoFechasUTC(buscadorCodigoTransferenciaDto.fechaInicio, buscadorCodigoTransferenciaDto.fechaFin)
      const fechas= this.filtradorService.fechasPorEstado(buscadorCodigoTransferenciaDto)
-      
-
-      
+      const filtroPorUbicacion=filtroUbicacion(request)
       const codigoTranferencias = await this.codigoTransferencia
         .aggregate([
           {
             $match:{
               flag:flag.nuevo,
-              ... (request.ubicacion) ?{ area:request.ubicacion} :{},
+              ...filtroPorUbicacion,
               ...(buscadorCodigoTransferenciaDto.codigo) ?{ codigo: new RegExp(buscadorCodigoTransferenciaDto.codigo,'i')} :{},
               ...(fechaInicio && fechaFin) ?{ ...fechas } :{},
               ...(buscadorCodigoTransferenciaDto.estado) ?{ estado:buscadorCodigoTransferenciaDto.estado} :{estado:estadoE.PENDIENTE}

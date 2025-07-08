@@ -21,6 +21,7 @@ import { ProductoFiltradorService } from './producto.filtardor.service';
 import * as path from 'node:path';
 import * as fs from 'fs';
 import {Request} from 'express'
+import { filtroUbicacion } from 'src/core/utils/fitroUbicacion/filtrosUbicacion';
 
 @Injectable()
 export class ProductosService {
@@ -84,13 +85,13 @@ export class ProductosService {
 
   async listarProductos(buscadorProductoDto:BuscadorProductoDto,request :Request):Promise<PaginatedResponseI<Producto>> {    
     const filtrador =  this.productoFiltradorService.filtradorProducto(buscadorProductoDto)
-   
+   const filtroPorUbicacion = filtroUbicacion(request)
     
     const pepiline:PipelineStage[] =[
       {
         $match: { flag: flag.nuevo,
           ...filtrador,
-          area:request.ubicacion
+          ...filtroPorUbicacion
          },
       },
       {
