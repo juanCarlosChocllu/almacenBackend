@@ -34,7 +34,6 @@ import { PermisoE } from 'src/core/enums/permisosEnum';
 
 
 @Modulo(modulosE.PRODUCTOS)
-@TipoUsuario(TipoUsuarioE.AREA,TipoUsuarioE.NINGUNO )
 @Controller('productos')
 export class ProductosController {
   constructor(private readonly productosService: ProductosService) {}
@@ -51,7 +50,7 @@ export class ProductosController {
       createProductoDto.imagen = file.filename;
     }
      createProductoDto.area = new Types.ObjectId(createProductoDto.area)
-     return this.productosService.create(createProductoDto, request.area);
+     return this.productosService.create(createProductoDto, request);
   }
 
   @Get()

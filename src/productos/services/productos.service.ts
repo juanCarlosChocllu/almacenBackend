@@ -29,7 +29,7 @@ export class ProductosService {
     private readonly categoriasService: CategoriasService,
     private readonly productoFiltradorService: ProductoFiltradorService,
   ) {}
-  async create(createProductoDto: CreateProductoDto, area:Types.ObjectId) {        
+  async create(createProductoDto: CreateProductoDto, request:Request) {        
     try {
       if(createProductoDto.codigoBarra){
         const codigoBarra: Producto = await this.producto.findOne({
@@ -60,7 +60,7 @@ export class ProductosService {
           createProductoDto.subCategoria,
         );
       }     
-      createProductoDto.area= new Types.ObjectId(area) 
+      createProductoDto.area= new Types.ObjectId(request.ubicacion) 
       await this.producto.create(createProductoDto);
       return { status: HttpStatus.CREATED };
     } catch (error) {     
@@ -84,11 +84,13 @@ export class ProductosService {
 
   async listarProductos(buscadorProductoDto:BuscadorProductoDto,request :Request):Promise<PaginatedResponseI<Producto>> {    
     const filtrador =  this.productoFiltradorService.filtradorProducto(buscadorProductoDto)
-
+   
+    
     const pepiline:PipelineStage[] =[
       {
         $match: { flag: flag.nuevo,
-          ...filtrador
+          ...filtrador,
+          area:request.ubicacion
          },
       },
       {
@@ -111,7 +113,7 @@ export class ProductosService {
         $unwind: { path: '$categoria', preserveNullAndEmptyArrays: false },
       },
 
-      ...(request.area) ?[{$match:{'categoria.area':request.area}}]:[],
+   
       {
         $unwind: { path: '$marca', preserveNullAndEmptyArrays: false },
       },

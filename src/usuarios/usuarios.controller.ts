@@ -8,8 +8,6 @@ import { modulosE } from 'src/core/enums/modulos.enum';
 import { PermisosGuard } from 'src/autenticacion/guards/permisos/permisos.guard';
 import { Permiso } from 'src/autenticacion/decorators/permisos/permisos.decorator';
 
-import { TipoUsuario } from 'src/autenticacion/decorators/tipoUsuario/tipoUsuario';
-import { TipoUsuarioE } from './enums/tipoUsuario';
  import {Request } from 'express'
 import { get, Types } from 'mongoose';
 import { PublicInterno } from 'src/autenticacion/decorators/publicInterno/publicInterno';
@@ -18,7 +16,6 @@ import { PermisoE } from 'src/core/enums/permisosEnum';
 
 @Controller('usuarios')
 @Modulo(modulosE.USUARIOS)
-@TipoUsuario(TipoUsuarioE.AREA,TipoUsuarioE.NINGUNO ,TipoUsuarioE.SUCURSAL )
 export class UsuariosController {
   constructor(private readonly usuariosService: UsuariosService) {}
 

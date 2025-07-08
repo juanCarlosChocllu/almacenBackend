@@ -18,7 +18,6 @@ import { Permiso } from 'src/autenticacion/decorators/permisos/permisos.decorato
 import { PermisoE } from 'src/core/enums/permisosEnum';
 
 @Modulo(modulosE.TRANSFERENCIAS)
-@TipoUsuario(TipoUsuarioE.AREA,TipoUsuarioE.NINGUNO , TipoUsuarioE.SUCURSAL)  
 @Controller('transferencias')
 export class TransferenciasController {
   constructor(private readonly transferenciasService: TransferenciasService) {}

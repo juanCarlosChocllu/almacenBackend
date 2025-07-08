@@ -13,7 +13,6 @@ import { Permiso } from 'src/autenticacion/decorators/permisos/permisos.decorato
 import { PermisoE } from 'src/core/enums/permisosEnum';
 
 @Modulo(modulosE.PROVEEDORES)
-@TipoUsuario(TipoUsuarioE.AREA,TipoUsuarioE.NINGUNO )
 @Controller('proveedor/empresa')
 export class ProveedorEmpresaController {
   constructor(private readonly proveedorEmpresaService: ProveedorEmpresaService) {}

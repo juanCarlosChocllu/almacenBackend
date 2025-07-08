@@ -32,6 +32,8 @@ export class CodigoStockService {
 
 
      private async codigoArea(area:Types.ObjectId){
+       
+        
          const data= await this.areaService.findOne(area)
           const letras = data.nombre.split('')
           let consonastes:String=''
@@ -57,7 +59,7 @@ export class CodigoStockService {
             const countDocuments: number =
             await this.codigoStock.countDocuments({   
                 flag:flag.nuevo,
-              ...(request.area) ?{ area:request.area} :{},
+              ...(request.ubicacion) ?{ area:request.ubicacion} :{},
               ...(buscadorCodigoStockDto.codigo) ? { codigo: new RegExp(buscadorCodigoStockDto.codigo,'i')} :{},
               ...(fechaInicio && fechaFin) ?{ fecha:{ $gte : fechaInicio , $lte: fechaFin}} :{} });
             const paginas = Math.ceil(
@@ -70,7 +72,7 @@ export class CodigoStockService {
               {
                 $match:{
                   flag:flag.nuevo,
-                  ...(request.area) ?{ area:request.area} :{},
+                  ... (request.ubicacion) ?{ area:request.ubicacion} :{},
                   ...(buscadorCodigoStockDto.codigo) ?{ codigo: new RegExp(buscadorCodigoStockDto.codigo,'i')} :{},
                   ...(buscadorCodigoStockDto && fechaFin) ?{ fecha:{ $gte : fechaInicio , $lte: fechaFin}} :{}
                   

@@ -14,7 +14,8 @@ async function bootstrap() {
       whitelist: true,
       exceptionFactory: (errors) => {
 
-      
+        console.log(errors);
+        
         const formattedErrors = errors.map((error) => {          
           const constraints = error.constraints ? Object.values(error.constraints) : [];
           

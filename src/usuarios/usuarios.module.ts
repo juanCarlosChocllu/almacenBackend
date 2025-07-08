@@ -3,11 +3,12 @@ import { UsuariosService } from './usuarios.service';
 import { UsuariosController } from './usuarios.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Usuario,usuarioSchema } from './schemas/usuario.schema';
-import { DetalleAreaModule } from 'src/detalle-area/detalle-area.module';
+import { UbicacionModule } from 'src/ubicacion/ubicacion.module';
+
 
 @Module({
     imports:[
-    forwardRef(()=> DetalleAreaModule)
+    forwardRef(()=> UbicacionModule)
       ,MongooseModule.forFeature([{name:Usuario.name, schema:usuarioSchema}])],
   controllers: [UsuariosController],
   providers: [UsuariosService],

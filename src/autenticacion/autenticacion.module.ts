@@ -6,10 +6,11 @@ import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './constants/jwtSecret';
 import { RolModule } from 'src/rol/rol.module';
 import { PermisosModule } from 'src/permisos/permisos.module';
-import { DetalleAreaModule } from 'src/detalle-area/detalle-area.module';
+import { UbicacionModule } from 'src/ubicacion/ubicacion.module';
+
 
 @Module({
-  imports:[DetalleAreaModule,UsuariosModule,JwtModule,RolModule,PermisosModule, JwtModule.register({
+  imports:[UbicacionModule,UsuariosModule,JwtModule,RolModule,PermisosModule, JwtModule.register({
     global: true,
     secret: jwtConstants.secret,
     signOptions: { expiresIn: '4h' },

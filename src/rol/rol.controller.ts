@@ -16,7 +16,6 @@ import { PermisoE } from 'src/core/enums/permisosEnum';
 
 
 @Modulo(modulosE.ROL)
-@TipoUsuario(TipoUsuarioE.AREA,TipoUsuarioE.NINGUNO )
 @Controller('rol')
 export class RolController {
   constructor(private readonly rolService: RolService) {}

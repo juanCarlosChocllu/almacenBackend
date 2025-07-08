@@ -4,7 +4,6 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { DetalleAreaService } from 'src/detalle-area/detalle-area.service';
 import { Request } from 'express';
 import { TipoUsuarioE } from 'src/usuarios/enums/tipoUsuario';
 import { Types } from 'mongoose';
@@ -13,29 +12,27 @@ import {
   Public_KEY,
 } from 'src/autenticacion/constants/contantes';
 import { Reflector } from '@nestjs/core';
+import { UbicacionService } from 'src/ubicacion/ubicacion.service';
 
 @Injectable()
-export class TipoDetalleGuard implements CanActivate {
+export class UbicacionGuard implements CanActivate {
   constructor(
-    private readonly detalleAreaService: DetalleAreaService,
+    private readonly UbicacionService: UbicacionService,
     private readonly reflector: Reflector,
   ) {}
   async canActivate(context: ExecutionContext): Promise<boolean> {
-     try {
+    try {
       const publico = this.reflector.get<boolean>(
         Public_KEY,
         context.getHandler(),
       );
-  
+
       const publicInterno = this.reflector.get<boolean>(
         PUBLIC_INTERNO_KEY,
         context.getHandler(),
       );
 
-      
       if (publicInterno) {
-
-
         return true;
       }
       if (publico) {
@@ -43,39 +40,34 @@ export class TipoDetalleGuard implements CanActivate {
       }
       const request: Request = context.switchToHttp().getRequest();
 
-      
-      
-      if (request.usuario && request.tipo) {
-        if (request.tipo === TipoUsuarioE.AREA) {
-          const areaDetalle = await this.detalleAreaService.verifcarDetalleArea(
-            request.usuario,
-            
-          );        
+      if (request.usuario && request.tipoUbicacion) {
+        const areaDetalle = await this.UbicacionService.verifcarDetalleArea(
+          request.usuario,
+        );
+
+        if (areaDetalle.length > 0) {
           const detalle = areaDetalle.find((item) => item.ingreso == true);
-      
-          
+
           if (detalle) {
-            request.area = new Types.ObjectId(detalle.area);
-    
-            
+            request.tipoUbicacion = TipoUsuarioE.AREA;
+            request.ubicacion = new Types.ObjectId(detalle.area);
+
             return true;
           }
-          throw new UnauthorizedException('Seleccione una area');
         }
-        if (request.tipo === TipoUsuarioE.SUCURSAL) {
-          //request.sucursal = new Types.ObjectId(usuario.sucursal);
-          return true;
-        }
-        if (request.tipo === TipoUsuarioE.NINGUNO) {
+
+        if (request.tipoUbicacion === TipoUsuarioE.SUCURSAL) {
+          //request.ubicacion = new Types.ObjectId(usuario.sucursal);
+          request.tipoUbicacion = TipoUsuarioE.SUCURSAL;
           return true;
         }
       } else {
-       
         throw new UnauthorizedException('tipo detalle invalido');
       }
-     } catch (error) {
-      
+    } catch (error) {
+      console.log(error);
+
       throw new UnauthorizedException('tipo detalle invalido');
-     }
+    }
   }
 }

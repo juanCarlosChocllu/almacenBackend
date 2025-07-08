@@ -76,19 +76,19 @@ export class TransferenciasService {
       if (errorStock.length > 0) {
         throw errorStock;
       } else {
-        if (!request.usuario && !request.area) {
+        if (!request.usuario && !request.ubicacion) {
           throw new NotFoundException('Selecciona una area');
         }
         let cantidad: number = 0;
         const codigoTransferencia =
           await this.codigoTransferenciaService.codigoTransferencias(
             request.usuario,
-            request.area,
+            request.ubicacion,
             createTransferenciaDto.sucursal,
           );
         for (const data of createTransferenciaDto.data) {
           data.usuario = request.usuario;
-          data.area = request.area;
+          data.area = request.ubicacion;
           const stock = await this.stockService.verificarStock(
             data.stock,
             data.tipo,
@@ -104,7 +104,7 @@ export class TransferenciasService {
             cantidad += data.cantidad;
           }
         }
-        const area= await this.areService.findOne(request.area)
+        const area= await this.areService.findOne (request.ubicacion)
         const dataNotificacion: NotificacionI = {
           area: area.nombre,
           cantidad: cantidad,
@@ -213,7 +213,7 @@ export class TransferenciasService {
           $match: {
             flag: flag.nuevo,
             ...nuevoFiltardor,
-            ...(request.area ? { area: request.area } : {}),
+            ... (request.ubicacion ? { area: request.ubicacion } : {}),
           },
         },
         {
@@ -348,7 +348,7 @@ export class TransferenciasService {
         $match: {
           flag: flag.nuevo,
           ...nuevoFiltardor,
-          ...(request.area ? { area: request.area } : {}),
+          ... (request.ubicacion ? { area: request.ubicacion } : {}),
         },
       },
       {

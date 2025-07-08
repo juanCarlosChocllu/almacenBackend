@@ -14,7 +14,6 @@ import { PermisoE } from 'src/core/enums/permisosEnum';
 
 
 @Modulo(modulosE.PROVEEDORES)
-@TipoUsuario(TipoUsuarioE.AREA,TipoUsuarioE.NINGUNO )
 @Controller('proveedor/persona')
 export class ProveedorPersonaController {
   constructor(private readonly proveedorPersonaService: ProveedorPersonaService) {}

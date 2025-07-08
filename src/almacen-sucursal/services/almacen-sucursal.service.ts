@@ -29,7 +29,7 @@ export class AlmacenSucursalService {
     return  this.almacenSucursal.aggregate([{
       $match:{
         flag:flag.nuevo,
-        ...(request.sucursal) ? {sucursal: request.sucursal} : {}
+        ...(request.ubicacion) ? {sucursal: request.ubicacion} : {}
       },
   
     },
@@ -70,7 +70,7 @@ export class AlmacenSucursalService {
 
   listarAlmacenSucursalBuscador(sucursal:string,request:Request){
     try {
-      return this.almacenSucursal.find({sucursal: request.sucursal ?new Types.ObjectId( request.sucursal ): new Types.ObjectId(sucursal)  , flag:flag.nuevo})
+      return this.almacenSucursal.find({sucursal: request.ubicacion ?new Types.ObjectId( request.ubicacion ): new Types.ObjectId(sucursal)  , flag:flag.nuevo})
 
     } catch (error) {
       

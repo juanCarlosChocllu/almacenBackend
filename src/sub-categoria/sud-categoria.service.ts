@@ -56,7 +56,7 @@ export class SubCategoriaService {
       {
         $unwind: { path: '$categoria' },
       },
-      ...(request.area) ? [ {$match:{'categoria.area': request.area}}] : [],
+      ... (request.ubicacion) ? [ {$match:{'categoria.area': request.ubicacion}}] : [],
       {
         $project: {
           nombre: 1,

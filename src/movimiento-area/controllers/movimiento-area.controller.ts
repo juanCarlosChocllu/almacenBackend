@@ -17,7 +17,6 @@ import { PublicInterno } from 'src/autenticacion/decorators/publicInterno/public
 
 
 @Modulo(modulosE.MOVIMIENTO_AREA)
-@TipoUsuario(TipoUsuarioE.AREA,TipoUsuarioE.NINGUNO )
 @Controller('movimiento/area')
 export class MovimientoAreaController {
   constructor(private readonly movimientoAreaService: MovimientoAreaService) {}

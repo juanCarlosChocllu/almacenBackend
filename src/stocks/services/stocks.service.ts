@@ -29,7 +29,7 @@ export class StocksService {
   async create(createStockDto: CreateStockDto, request: Request) {
     try {
       const codigo = await this.codigoStockService.registrarCodigo(
-        request.area,
+        request.ubicacion,
         request.usuario,
       );
 
@@ -84,6 +84,8 @@ export class StocksService {
       }
       return { status: HttpStatus.CREATED, data: codigo._id };
     } catch (error) {
+      console.log(error);
+      
       throw new BadGatewayException();
     }
   }
@@ -192,7 +194,7 @@ export class StocksService {
       {
         $unwind: { path: '$categoria', preserveNullAndEmptyArrays: false },
       },
-      ...(request.area ? [{ $match: { 'categoria.area': request.area } }] : []),
+      ...(request.ubicacion ? [{ $match: { 'categoria.area': request.ubicacion } }] : []),
       {
         $project: {
           _id: 0,
@@ -274,7 +276,7 @@ export class StocksService {
       },
       {
         $match: {
-          'almacenArea.area': new Types.ObjectId(request.area),
+          'almacenArea.area': new Types.ObjectId(request.ubicacion),
         },
       },
       {

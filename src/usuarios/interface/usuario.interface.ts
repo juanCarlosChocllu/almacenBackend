@@ -31,6 +31,6 @@ export interface UsuarioI{
       fecha: Date;
 
 
-      tipo:string
+      tipoUbicacion:string
 
 }

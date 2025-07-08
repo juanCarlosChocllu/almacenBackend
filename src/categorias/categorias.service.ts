@@ -12,9 +12,9 @@ export class CategoriasService {
 
   async create(createCategoriaDto: CreateCategoriaDto,request:Request) {
     createCategoriaDto.nombre = createCategoriaDto.nombre.toUpperCase()
-    createCategoriaDto.area = request.area
+    createCategoriaDto.area = request.ubicacion
 
-    const categoria = await this.categoria.exists({nombre:createCategoriaDto.nombre,area:request.area})    
+    const categoria = await this.categoria.exists({nombre:createCategoriaDto.nombre,area:request.ubicacion})    
     if(categoria){
       throw new ConflictException('La categoria ya existe')
     }
@@ -23,7 +23,7 @@ export class CategoriasService {
   }
 
   findAll(request:Request) {
-    return this.categoria.find({flag:flag.nuevo, ...request.area ? {area:request.area} :{}});
+    return this.categoria.find({flag:flag.nuevo, ...request.ubicacion ? {area:request.ubicacion} :{}});
   }
 
 

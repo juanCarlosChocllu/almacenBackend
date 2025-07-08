@@ -39,6 +39,10 @@ export class Producto {
     @Prop({type:Types.ObjectId, ref:'Area'})
     area:Types.ObjectId
 
+    @Prop({type:Types.ObjectId, ref:'Sucursal'})
+    sucursal:Types.ObjectId
+
+
     @Prop()
     color:Types.ObjectId
 

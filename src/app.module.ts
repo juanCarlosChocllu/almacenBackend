@@ -27,8 +27,6 @@ import { ModulosGuard } from './autenticacion/guards/modulos/modulos.guard';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { StockSucursalModule } from './stock-sucursal/stock-sucursal.module';
-import { DetalleAreaModule } from './detalle-area/detalle-area.module';
-import { TipoDetalleGuard } from './autenticacion/guards/tipo-detalle/tipo-detalle.guard';
 import { TipoUsuarioGuard } from './autenticacion/guards/tipo-usuario/tipo-usuario.guard';
 import { NotificacionModule } from './notificacion/notificacion.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
@@ -36,69 +34,62 @@ import { CoreModule } from './core/core.module';
 import { LogModule } from './log/log.module';
 import { TipoProductoModule } from './tipo-producto/tipo-producto.module';
 import { databaseConeccion } from './core/config/variableEntorno';
-
-
+import { UbicacionModule } from './ubicacion/ubicacion.module';
+import { UbicacionGuard } from './autenticacion/guards/ubicacion/UbicacionGuard';
 
 @Module({
   imports: [
     EventEmitterModule.forRoot(),
     ServeStaticModule.forRoot({
-      rootPath:join(__dirname,'..','upload')
+      rootPath: join(__dirname, '..', 'upload'),
     }),
     MongooseModule.forRoot(databaseConeccion),
     ProductosModule,
-     CategoriasModule,
-      StocksModule,
-      AreasModule,
-       AlmacenAreaModule,
-       ProveedorPersonaModule,
-       ProveedorEmpresaModule,
-       MovimientoAreaModule,
-       MarcaModule,
-       ColorModule,
-       SudCategoriaModule,
-       EmpresasModule,
-       AlmacenSucursalModule,
-       TransferenciasModule,
-       MovimientoSucursalModule,
-       UsuariosModule,
-       AutenticacionModule,
-       SucursalModule,
+    CategoriasModule,
+    StocksModule,
+    AreasModule,
+    AlmacenAreaModule,
+    ProveedorPersonaModule,
+    ProveedorEmpresaModule,
+    MovimientoAreaModule,
+    MarcaModule,
+    ColorModule,
+    SudCategoriaModule,
+    EmpresasModule,
+    AlmacenSucursalModule,
+    TransferenciasModule,
+    MovimientoSucursalModule,
+    UsuariosModule,
+    AutenticacionModule,
+    SucursalModule,
 
-       RolModule,
-       PermisosModule,
-       StockSucursalModule,
-       DetalleAreaModule,
-       NotificacionModule,
-       CoreModule,
-       LogModule,
-       TipoProductoModule,
-
-
-      ],
+    RolModule,
+    PermisosModule,
+    StockSucursalModule,
+    NotificacionModule,
+    CoreModule,
+    LogModule,
+    TipoProductoModule,
+    UbicacionModule,
+  ],
   controllers: [],
   providers: [
     {
-      provide:APP_GUARD,
-      useClass:TokenGuard
-    },
-   {
-      provide:APP_GUARD,
-      useClass:ModulosGuard
+      provide: APP_GUARD,
+      useClass: TokenGuard,
     },
     {
-      provide:APP_GUARD,
-      useClass:TipoDetalleGuard
+      provide: APP_GUARD,
+      useClass: ModulosGuard,
     },
-   /* {
-      provide:APP_GUARD,
-      useClass:TipoUsuarioGuard
-    },*/
-     {
-      provide:APP_GUARD,
-      useClass:PermisosGuard
-    }
+    {
+      provide: APP_GUARD,
+      useClass: UbicacionGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: PermisosGuard,
+    },
   ],
-  
 })
 export class AppModule {}

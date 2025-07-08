@@ -9,7 +9,6 @@ import { PaginatedResponseI } from 'src/core/interface/httpRespuesta';
 import {Request} from 'express'
 import { CoreService } from 'src/core/core.service';
 import { AreasService } from 'src/areas/areas.service';
-import { DetalleAreaService } from 'src/detalle-area/detalle-area.service';
 import { estadoE } from '../enums/estado.enum';
 import { FiltardoresService } from './filtradores.service';
 
@@ -55,7 +54,7 @@ export class CodigoTransferenciaService {
           {
             $match:{
               flag:flag.nuevo,
-              ...(request.area) ?{ area:request.area} :{},
+              ... (request.ubicacion) ?{ area:request.ubicacion} :{},
               ...(buscadorCodigoTransferenciaDto.codigo) ?{ codigo: new RegExp(buscadorCodigoTransferenciaDto.codigo,'i')} :{},
               ...(fechaInicio && fechaFin) ?{ ...fechas } :{},
               ...(buscadorCodigoTransferenciaDto.estado) ?{ estado:buscadorCodigoTransferenciaDto.estado} :{estado:estadoE.PENDIENTE}

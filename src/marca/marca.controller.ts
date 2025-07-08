@@ -16,7 +16,6 @@ import { PermisoE } from 'src/core/enums/permisosEnum';
 
 
 @Modulo(modulosE.MARCAS)
-@TipoUsuario(TipoUsuarioE.AREA,TipoUsuarioE.NINGUNO )
 @Controller('marca')
 export class MarcaController {
   constructor(private readonly marcaService: MarcaService) {}

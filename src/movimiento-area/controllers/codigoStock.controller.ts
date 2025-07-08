@@ -10,7 +10,6 @@ import { Permiso } from 'src/autenticacion/decorators/permisos/permisos.decorato
 import { PermisoE } from 'src/core/enums/permisosEnum';
 
 @Modulo(modulosE.MOVIMIENTO_AREA)
-@TipoUsuario(TipoUsuarioE.AREA, TipoUsuarioE.NINGUNO)
 @Controller('codigo/stock')
 export class CodigoStockController {
     constructor( private readonly codigoStockService:CodigoStockService){}

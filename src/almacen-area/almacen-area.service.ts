@@ -20,8 +20,8 @@ export class AlmacenAreaService {
   
    
 
-    if(request.area && ! createAlmacenAreaDto.area){
-      createAlmacenAreaDto.area= new Types.ObjectId(request.area) 
+    if(request.ubicacion && ! createAlmacenAreaDto.area){
+      createAlmacenAreaDto.area= new Types.ObjectId(request.ubicacion) 
     }else{
       createAlmacenAreaDto.area= new Types.ObjectId(createAlmacenAreaDto.area) 
     }    
@@ -40,7 +40,7 @@ export class AlmacenAreaService {
   async findAll(request:Request) {
      const areas = await this.almacenArea.aggregate([
       {$match:{flag:flag.nuevo,
-        ...(request.area)? {area: request.area}:{}
+        ...(request.ubicacion)? {area: request.ubicacion}:{}
       }},
       {
         $lookup:{
@@ -68,7 +68,7 @@ export class AlmacenAreaService {
   }
 
   listarAlmacenPorArea(request:Request){
-    return  this.almacenArea.find({flag:flag.nuevo,...(request.area)? {area:request.area }:{}});
+    return  this.almacenArea.find({flag:flag.nuevo,...(request.ubicacion)? {area:request.ubicacion }:{}});
   }
 
   findOne(id: number) {

@@ -6,9 +6,8 @@ declare global {
             usuario:Types.ObjectId,
             rol:Types.ObjectId,
             acciones:string[],
-            area?:Types.ObjectId,
-            sucursal?:Types.ObjectId,
-            tipo:string
+            ubicacion?:Types.ObjectId,
+            tipoUbicacion:string
       
 
          }

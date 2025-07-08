@@ -47,5 +47,5 @@ export class CreateUsuarioDto {
 
     @IsEnum(TipoUsuarioE)
     @IsNotEmpty()
-    tipo:string
+    tipoUbicacion:string
 }

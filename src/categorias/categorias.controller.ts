@@ -14,7 +14,6 @@ import { PermisoE } from 'src/core/enums/permisosEnum';
 import { Permiso } from 'src/autenticacion/decorators/permisos/permisos.decorator';
 
 @Modulo(modulosE.CATEGORIAS)
-@TipoUsuario(TipoUsuarioE.AREA, TipoUsuarioE.NINGUNO)
 @Controller('categorias')
 export class CategoriasController {
   constructor(private readonly categoriasService: CategoriasService) {}
@@ -36,7 +35,7 @@ export class CategoriasController {
   @Permiso(PermisoE.EDITAR)
   actulizar(@Param('id', ValidateIdPipe) id: Types.ObjectId, @Body() updateCategoriaDto: UpdateCategoriaDto, @Req() request:Request) {
     
-    return this.categoriasService.actulizar(id, updateCategoriaDto, request.area);
+    return this.categoriasService.actulizar(id, updateCategoriaDto, request.ubicacion);
   }
 
   @Delete(':id')

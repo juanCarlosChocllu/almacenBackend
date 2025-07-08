@@ -13,7 +13,6 @@ import { Permiso } from 'src/autenticacion/decorators/permisos/permisos.decorato
 import { PermisoE } from 'src/core/enums/permisosEnum';
 
 @Modulo(modulosE.SUCURSALES)
-@TipoUsuario(TipoUsuarioE.AREA, TipoUsuarioE.NINGUNO)
 @Controller('sucursal')
 export class SucursalController {
   constructor(private readonly sucursalService: SucursalService) {}

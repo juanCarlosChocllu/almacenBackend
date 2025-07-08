@@ -50,11 +50,11 @@ export class AutenticacionService {
     const payload: payloadI = {
       rol: rol._id,
       id: usuario._id,
-      tipo:usuario.tipo
+      tipo:usuario.tipoUbicacion
       
     };
   
-    if(usuario.tipo == TipoUsuarioE.SUCURSAL ){
+    if(usuario.tipoUbicacion == TipoUsuarioE.SUCURSAL ){
         payload.sucursal = usuario.sucursal
     }
     const token = await this.jwtService.signAsync(payload, {

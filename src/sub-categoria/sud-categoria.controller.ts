@@ -16,7 +16,6 @@ import { PermisoE } from 'src/core/enums/permisosEnum';
 
 
 @Modulo(modulosE.SUB_CATEGORIAS)
-@TipoUsuario(TipoUsuarioE.AREA, TipoUsuarioE.NINGUNO)
 @Controller('sub/categoria')
 export class SubCategoriaController {
   constructor(private readonly sudCategoriaService: SubCategoriaService) {}

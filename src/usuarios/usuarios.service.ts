@@ -16,12 +16,13 @@ import { Model, Types } from 'mongoose';
 import { flag } from 'src/core/enums/flag.enum';
 import { ApiResponseI } from 'src/core/interface/httpRespuesta';
 import { UsuarioI } from './interface/usuario.interface';
-import { DetalleAreaService } from 'src/detalle-area/detalle-area.service';
+
 import { tipoE } from 'src/stocks/enums/tipo.enum';
 import { TipoUsuarioE } from './enums/tipoUsuario';
 
 import { Request } from 'express';
-import { UpdateDetalleAreaDto } from 'src/detalle-area/dto/update-detalle-area.dto';
+import { UbicacionService } from 'src/ubicacion/ubicacion.service';
+
 
 @Injectable()
 export class UsuariosService {
@@ -35,8 +36,8 @@ export class UsuariosService {
   constructor(
     @InjectModel(Usuario.name) private readonly usuario: Model<Usuario>,
 
-    @Inject(forwardRef(() => DetalleAreaService))
-    private readonly detalleArea: DetalleAreaService,
+    @Inject(forwardRef(() => UbicacionService))
+    private readonly UbicacionService: UbicacionService,
   ) {}
 
   async create(createUsuarioDto: CreateUsuarioDto): Promise<ApiResponseI> {
@@ -69,9 +70,9 @@ export class UsuariosService {
       this.opcionesArgon2,
     );
     const usuario = await this.usuario.create(createUsuarioDto);
-    if (createUsuarioDto.tipo == TipoUsuarioE.AREA) {
+    if (createUsuarioDto.tipoUbicacion == TipoUsuarioE.AREA || createUsuarioDto.tipoUbicacion == TipoUsuarioE.TODOS  ) {
       if (createUsuarioDto.area.length > 0) {
-        this.detalleArea.crearDetalleArea(createUsuarioDto.area, usuario.id);
+        this.UbicacionService.crearDetalleArea(createUsuarioDto.area, usuario.id);
       }
     }
     return { status: HttpStatus.CREATED, message: 'Usuario registrado' };
@@ -251,13 +252,13 @@ export class UsuariosService {
   }
 
   async obtenerUsuarioPorTipo(request: Request) {
-    if (request.tipo == TipoUsuarioE.NINGUNO) {
+    if (request.tipoUbicacion == TipoUsuarioE.TODOS) {
       return this.userInfoTipoNinguno(request.usuario);
     }
-    if (request.tipo == TipoUsuarioE.SUCURSAL) {
+    if (request.tipoUbicacion == TipoUsuarioE.SUCURSAL) {
       return this.userInfoTipoSucursal(request.usuario);
     }
-    if (request.tipo == TipoUsuarioE.AREA) {
+    if (request.tipoUbicacion == TipoUsuarioE.AREA) {
       return this.userInfoTipoArea(request.usuario);
     }
   }
@@ -267,11 +268,11 @@ export class UsuariosService {
       
     updateUsuarioDto.rol = new Types.ObjectId(updateUsuarioDto.rol);
     if (updateUsuarioDto.sucursal) {
-      await this.detalleArea.eliminarDetalleAreaUsuario(id)
+      await this.UbicacionService.eliminarDetalleAreaUsuario(id)
       updateUsuarioDto.sucursal = new Types.ObjectId(updateUsuarioDto.sucursal);
     }    
-    if(updateUsuarioDto.tipo == TipoUsuarioE.NINGUNO){
-      await this.detalleArea.eliminarDetalleAreaUsuario(id)
+    if(updateUsuarioDto.tipoUbicacion == TipoUsuarioE.TODOS){
+      await this.UbicacionService.eliminarDetalleAreaUsuario(id)
       await this.usuario.updateOne({_id:new Types.ObjectId(id)},{$unset:{sucursal:''}})
     }
 
@@ -293,12 +294,12 @@ export class UsuariosService {
        await this.usuario.updateOne({_id:new Types.ObjectId(id)},updateUsuarioDto);
   
       
-      if (updateUsuarioDto.tipo == TipoUsuarioE.AREA) {
-        await this.detalleArea.eliminarDetalleAreaUsuario(id)
+      if (updateUsuarioDto.tipoUbicacion == TipoUsuarioE.AREA) {
+        await this.UbicacionService.eliminarDetalleAreaUsuario(id)
         await this.usuario.updateOne({_id:new Types.ObjectId(id)},{$unset:{sucursal:''}})
         if (updateUsuarioDto.area.length > 0) {
         
-           await this.detalleArea.crearDetalleArea(updateUsuarioDto.area,id);
+           await this.UbicacionService.crearDetalleArea(updateUsuarioDto.area,id);
         }
       }
       return { status: HttpStatus.OK };

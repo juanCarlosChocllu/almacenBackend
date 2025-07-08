@@ -61,7 +61,7 @@ export class MovimientoAreaService {
           path:'$almacenArea', preserveNullAndEmptyArrays:false
         }
       },
-      ...(request.area) ? [{$match:{'almacenArea.area':request.area}}]:[],
+      ... (request.ubicacion) ? [{$match:{'almacenArea.area':request.ubicacion}}]:[],
       {
         $lookup:{
           from:'ProveedorPersona',

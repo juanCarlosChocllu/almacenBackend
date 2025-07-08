@@ -31,10 +31,7 @@ export class Usuario {
   sucursal: Types.ObjectId;
 
   @Prop()
-  sinRelacion: boolean;
-
-  @Prop()
-  tipo:string
+  tipoUbicacion:string
 
   @Prop({ type: String, enum: flag, default: flag.nuevo })
   flag: flag;

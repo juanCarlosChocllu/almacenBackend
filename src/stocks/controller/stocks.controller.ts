@@ -26,7 +26,6 @@ import { PermisoE } from 'src/core/enums/permisosEnum';
 import { Permiso } from 'src/autenticacion/decorators/permisos/permisos.decorator';
 
 @Modulo(modulosE.STOCK)
-@TipoUsuario(TipoUsuarioE.AREA, TipoUsuarioE.NINGUNO)
 @Controller('stocks')
 export class StocksController {
   constructor(private readonly stocksService: StocksService) {}
@@ -37,6 +36,8 @@ export class StocksController {
     @Req() request: Request,
     @Body() createStockDto: CreateStockDto,
   ) {
+    console.log(createStockDto);
+    
     return this.stocksService.create(createStockDto, request);
   }
 

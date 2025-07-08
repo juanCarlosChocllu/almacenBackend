@@ -61,6 +61,7 @@ export class ModulosGuard implements CanActivate {
         throw new UnauthorizedException('Modulos invalidos');
       }
     } catch (error) {
+      
       throw new UnauthorizedException('Modulos invalidos');
     }
   }

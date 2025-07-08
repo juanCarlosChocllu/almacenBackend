@@ -8,7 +8,7 @@ export class FiltradorSucursalService{
 
     filtroTipoSucursal (request:Request){
         const filtrador:FiltroTipoI={}
-        request.sucursal ? filtrador.sucursal = request.sucursal  : filtrador
+        request.ubicacion ? filtrador.sucursal = request.ubicacion  : filtrador
         return filtrador
     }
 

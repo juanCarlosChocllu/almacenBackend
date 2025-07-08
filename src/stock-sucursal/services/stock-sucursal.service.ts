@@ -76,11 +76,11 @@ export class StockSucursalService {
             as: 'almacenSucursal',
           },
         },
-        ...(request.sucursal
+        ...(request.ubicacion
           ? [
               {
                 $match: {
-                  'almacenSucursal.sucursal': request.sucursal,
+                  'almacenSucursal.sucursal': request.ubicacion,
                 },
               },
             ]

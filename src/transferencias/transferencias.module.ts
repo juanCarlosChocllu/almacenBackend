@@ -15,7 +15,7 @@ import { CodigoTransferenciaService } from './services/codigoTransferencia.servi
 import { CodigoTransferenciaController } from './controller/codigoTrasnferencia.controller';
 import { CoreModule } from 'src/core/core.module';
 import { AreasModule } from 'src/areas/areas.module';
-import { DetalleAreaModule } from 'src/detalle-area/detalle-area.module';
+
 
 @Module({
     imports:[MongooseModule.forFeature([{
@@ -33,7 +33,6 @@ import { DetalleAreaModule } from 'src/detalle-area/detalle-area.module';
     ProductosModule,
     CoreModule,
     AreasModule,
-    DetalleAreaModule
   ],
   controllers: [TransferenciasController, CodigoTransferenciaController],
   providers: [TransferenciasService, FiltardoresService, CodigoTransferenciaService],

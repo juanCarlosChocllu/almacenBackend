@@ -48,9 +48,9 @@ export class TokenGuard implements CanActivate {
       if (usuario) {        
         request.usuario = usuario._id;
         request.rol = new Types.ObjectId(usuario.rol);
-        request.tipo =usuario.tipo
-        if(usuario.tipo === TipoUsuarioE.SUCURSAL){
-          request.sucursal = new Types.ObjectId(usuario.sucursal);
+        request.tipoUbicacion =usuario.tipoUbicacion
+        if(usuario.tipoUbicacion === TipoUsuarioE.SUCURSAL){
+          request.ubicacion = new Types.ObjectId(usuario.sucursal);
           return true;
         }
         return true;

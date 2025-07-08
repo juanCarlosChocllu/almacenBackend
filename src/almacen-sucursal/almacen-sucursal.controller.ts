@@ -17,7 +17,6 @@ import { PermisoE } from 'src/core/enums/permisosEnum';
 
 
 @Modulo(modulosE.ALMACEN_SUCURSAL)
-@TipoUsuario(TipoUsuarioE.SUCURSAL, TipoUsuarioE.AREA, TipoUsuarioE.NINGUNO)
 @Controller('almacen/sucursal')
 export class AlmacenSucursalController {
   constructor(private readonly almacenSucursalService: AlmacenSucursalService) {}

@@ -50,6 +50,7 @@ export class PermisosGuard implements CanActivate {
         return request.acciones.some((accion) => accion === permisoDecorador);
       }
     } catch (error) {
+      
       throw new UnauthorizedException('Permisos Invalidos');
     }
   }

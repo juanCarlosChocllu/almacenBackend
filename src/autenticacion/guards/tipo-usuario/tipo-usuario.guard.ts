@@ -45,7 +45,7 @@ export class TipoUsuarioGuard implements CanActivate {
       );    
    
       if (Array.isArray(tipo)) {
-        return tipo.some((item) => item === request.tipo);
+        return tipo.some((item) => item === request.tipoUbicacion);
       }
      
       throw new UnauthorizedException('tipo invalido');
