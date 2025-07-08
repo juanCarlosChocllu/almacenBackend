@@ -13,6 +13,7 @@ import { BuscadorStockSucursal } from '../dto/buscador-stock-sucursal.dto';
 
 import { PaginatedResponseI } from 'src/core/interface/httpRespuesta';
 import { calcularPaginas } from 'src/core/utils/mongo/mongo';
+import { filtroUbicacionAlmacenSucursal } from 'src/core/utils/fitroUbicacion/filtrosUbicacion';
 
 @Injectable()
 export class StockSucursalService {
@@ -35,12 +36,7 @@ export class StockSucursalService {
       this.filtradorSucursalService.buscadorStockSucursal(
         buscadorStockSucursal,
       );
-
- 
-      
-
-    
-  
+    const filtroUbicacion = filtroUbicacionAlmacenSucursal(request)
     const stock = await this.stockSucursal
       .aggregate([
         {
@@ -88,16 +84,8 @@ export class StockSucursalService {
             as: 'tipoProducto',
           },
         },
-        ...(request.ubicacion
-          ? [
-              {
-                $match: {
-                  'almacenSucursal.sucursal': request.ubicacion,
-                },
-              },
-            ]
-          : []),
-
+       
+        {$match:filtroUbicacion},
           ...(sucursal
             ? [
                 {
