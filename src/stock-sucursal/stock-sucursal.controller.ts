@@ -32,7 +32,7 @@ export class StockSucursalController {
  @PublicInterno()   
   @Get('verificar/cantidad/:stock/:almacen/:tipo') 
     verificarStockTransferencia(@Param('stock',ValidateIdPipe) stock:Types.ObjectId ,
-     @Param('almacen', ValidateIdPipe) almacen:Types.ObjectId , @Param('tipo') tipo:tipoE ){
+     @Param('almacen', ValidateIdPipe) almacen:Types.ObjectId , @Param('tipo', ValidateIdPipe) tipo:Types.ObjectId ){
       return this.stockSucursalService.verificarStockTransferencia(stock, almacen, tipo)
     }
 }

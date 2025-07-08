@@ -168,15 +168,19 @@ export class StockSucursalService {
   async verificarStockTransferencia(
     stock: Types.ObjectId,
     almacen: Types.ObjectId,
-    tipo: tipoE,
+    tipo: Types.ObjectId,
   ): Promise<StockSucursalI> {
+    console.log(tipo);
+    
     const transferencia: StockSucursalI = await this.stockSucursal
       .findOne({
         stock: new Types.ObjectId(stock),
         almacenSucursal: new Types.ObjectId(almacen),
-        tipo: tipo,
+        tipoProducto: new Types.ObjectId(tipo),
       })
-      .select('cantidad tipo codigo');
+      .select('cantidad  codigo');
+      console.log(transferencia);
+      
     return transferencia;
   }
 
