@@ -283,6 +283,14 @@ export class StocksService {
           as: 'almacenArea',
         },
       },
+       {
+        $lookup: {
+          from: 'TipoProducto',
+          foreignField: '_id',
+          localField: 'tipoProducto',
+          as: 'tipoProducto',
+        },
+      },
       {
         $unwind: { path: '$almacenArea', preserveNullAndEmptyArrays: true },
       },
@@ -293,7 +301,7 @@ export class StocksService {
       },
       {
         $project: {
-          tipo: 1,
+          tipo: { $arrayElemAt: [ '$tipoProducto.nombre', 0] },
           almacen: '$almacenArea.nombre',
           idAlmacen: '$almacenArea._id',
           cantidad: 1,
